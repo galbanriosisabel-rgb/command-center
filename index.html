@@ -1,441 +1,307 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="es">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Command Center – Prototype (Isabel) v4</title>
-  <style>
-    :root{
-      --bg:#0b0d10; --panel:#11151b; --panel2:#0f1318; --card:#141a22;
-      --text:#e7e9ee; --muted:#aab0bd; --border:#263244;
-      --red:#d10f2f; --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444; --link:#7dd3fc;
-      --shadow:0 12px 30px rgba(0,0,0,.35); --r:18px; --r2:14px;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-    }
-    *{box-sizing:border-box} html,body{height:100%}
-    body{
-      margin:0; font-family:var(--sans); color:var(--text);
-      background:
-        radial-gradient(1200px 700px at 20% -10%, rgba(209,15,47,.25), transparent 55%),
-        radial-gradient(900px 600px at 95% 10%, rgba(125,211,252,.12), transparent 55%),
-        var(--bg);
-    }
-    a{color:var(--link);text-decoration:none} a:hover{text-decoration:underline}
-    .app{display:grid;grid-template-columns:260px 1fr 360px;gap:14px;padding:14px;height:100vh}
-    body.assistant-collapsed .app{grid-template-columns:260px 1fr}
-    .sidebar,.main,.assistant{
-      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0)), var(--panel);
-      border:1px solid rgba(38,50,68,.9);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden
-    }
-    body.assistant-collapsed .assistant{display:none}
-    .sidebar{display:flex;flex-direction:column}
-    .brand{padding:16px 16px 12px;border-bottom:1px solid rgba(38,50,68,.7);
-      background:linear-gradient(180deg, rgba(209,15,47,.12), transparent 70%)}
-    .title{display:flex;align-items:center;gap:10px;font-weight:900}
-    .dot{width:11px;height:11px;border-radius:999px;background:var(--red);box-shadow:0 0 0 6px rgba(209,15,47,.16)}
-    .sub{margin-top:6px;color:var(--muted);font-size:12.5px;line-height:1.25}
-    .nav{padding:10px}
-    .nav button{width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;margin:6px 0;border-radius:14px;
-      border:1px solid transparent;background:transparent;color:var(--text);cursor:pointer;font-weight:800;text-align:left}
-    .nav button:hover{background:rgba(255,255,255,.03);border-color:rgba(38,50,68,.7)}
-    .nav button.active{background:rgba(209,15,47,.12);border-color:rgba(209,15,47,.35)}
-    .pill{margin-left:auto;font-size:12px;padding:3px 8px;border-radius:999px;border:1px solid rgba(38,50,68,.8);
-      color:var(--muted);background:rgba(255,255,255,.02)}
-    .footer{margin-top:auto;padding:12px 14px;border-top:1px solid rgba(38,50,68,.7);color:var(--muted);font-size:12px;display:flex;justify-content:space-between}
-    .kbd{font-family:var(--mono);border:1px solid rgba(38,50,68,.8);background:rgba(255,255,255,.03);padding:2px 6px;border-radius:8px;color:var(--text)}
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Command Center — Isabel (InjuryRX)</title>
+<style>
+  :root{
+    --bg:#0b0d10;
+    --panel:#11151b;
+    --panel2:#0f1318;
+    --card:#141a22;
+    --text:#e7e9ee;
+    --muted:#aab0bb;
+    --border:#263244;
+    --red:#d10f2f;
+    --ok:#22c55e;
+    --warn:#f59e0b;
+    --bad:#ef4444;
+    --link:#7dd3fc;
+    --shadow:0 12px 30px rgba(0,0,0,.35);
+    --r:18px;
+    --r2:14px;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    --sans: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:var(--sans);
+    color:var(--text);
+    background:
+      radial-gradient(900px 700px at 10% 0%, rgba(209,15,47,.28), transparent 55%),
+      radial-gradient(900px 700px at 100% 100%, rgba(125,211,252,.16), transparent 60%),
+      var(--bg);
+  }
+  a{color:var(--link); text-decoration:none}
+  .app{display:grid; grid-template-columns: 290px 1fr; gap:18px; padding:18px; height:100%}
+  .sidebar{
+    background:linear-gradient(180deg, rgba(20,26,34,.92), rgba(15,19,24,.92));
+    border:1px solid var(--border);
+    border-radius:24px;
+    box-shadow:var(--shadow);
+    padding:18px 14px;
+    display:flex; flex-direction:column;
+    min-height:0;
+  }
+  .brand{
+    display:flex; align-items:center; gap:10px; padding:6px 8px 12px 8px;
+    border-bottom:1px solid rgba(38,50,68,.5);
+    margin-bottom:12px;
+  }
+  .dot{width:14px;height:14px;border-radius:999px;background:var(--red); box-shadow:0 0 0 4px rgba(209,15,47,.12)}
+  .brand h1{font-size:18px; margin:0}
+  .brand small{display:block;color:var(--muted); margin-top:2px}
+  .nav{display:flex; flex-direction:column; gap:8px; padding:10px 6px; overflow:auto}
+  .navbtn{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:10px;
+    padding:12px 12px;
+    border-radius:14px;
+    border:1px solid transparent;
+    background:transparent;
+    color:var(--text);
+    cursor:pointer;
+    font-weight:600;
+  }
+  .navbtn span.meta{
+    font-weight:600; color:var(--muted); font-size:12px; padding:6px 10px;
+    border-radius:999px; border:1px solid rgba(38,50,68,.6);
+    background:rgba(15,19,24,.6);
+  }
+  .navbtn.active{
+    background:rgba(209,15,47,.12);
+    border-color:rgba(209,15,47,.28);
+  }
+  .footer{
+    margin-top:auto; padding:10px 8px; color:var(--muted); font-size:12px;
+    border-top:1px solid rgba(38,50,68,.5);
+  }
 
-    .main{display:flex;flex-direction:column;min-width:0}
-    .topbar{padding:14px 16px;border-bottom:1px solid rgba(38,50,68,.7);display:flex;align-items:center;justify-content:space-between;
-      background:linear-gradient(90deg, rgba(209,15,47,.10), transparent 45%);gap:10px}
-    .topbar h1{font-size:16px;margin:0}
-    .meta{color:var(--muted);font-size:12.5px}
-    .actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-    .btn{border:1px solid rgba(38,50,68,.9);background:rgba(255,255,255,.03);color:var(--text);
-      padding:9px 10px;border-radius:12px;cursor:pointer;font-weight:900;font-size:12.5px;display:inline-flex;align-items:center;gap:8px}
-    .btn:hover{background:rgba(255,255,255,.05)}
-    .btn.primary{border-color:rgba(209,15,47,.45);background:rgba(209,15,47,.15)}
-    .btn.primary:hover{background:rgba(209,15,47,.22)}
-    .btn.small{padding:7px 9px;font-size:12px;border-radius:10px}
-    .btn.ghost{background:transparent}
-    .btn.danger{border-color:rgba(239,68,68,.45);background:rgba(239,68,68,.15)}
-    .btn.danger:hover{background:rgba(239,68,68,.22)}
-    .content{padding:14px;overflow:auto;min-width:0}
-    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px;min-width:0}
-    .card{background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0)), var(--card);
-      border:1px solid rgba(38,50,68,.85);border-radius:var(--r2);padding:12px;min-height:90px;min-width:0}
-    .card h3{margin:0 0 8px;font-size:13px;letter-spacing:.2px}
-    .kpi{display:flex;align-items:baseline;gap:8px;margin-top:8px}
-    .num{font-size:26px;font-weight:900}
-    .tag{display:inline-flex;align-items:center;gap:6px;padding:4px 8px;border-radius:999px;border:1px solid rgba(38,50,68,.9);
-      background:rgba(255,255,255,.02);font-size:12px;color:var(--muted);white-space:nowrap}
-    .tag.click{cursor:pointer}
-    .tag.click:hover{border-color:rgba(125,211,252,.35)}
-    .dot2{width:7px;height:7px;border-radius:999px;background:var(--muted)}
-    .dot2.ok{background:var(--ok)} .dot2.warn{background:var(--warn)} .dot2.bad{background:var(--bad)}
-    .tablewrap{overflow:auto;border-radius:14px;border:1px solid rgba(38,50,68,.85)}
-    .table{width:100%;border-collapse:separate;border-spacing:0;min-width:860px}
-    .table th,.table td{padding:11px 12px;border-bottom:1px solid rgba(38,50,68,.65);font-size:12.5px;vertical-align:top}
-    .table th{color:var(--muted);background:rgba(255,255,255,.02);font-weight:900;position:sticky;top:0;z-index:2}
-    .table tr:last-child td{border-bottom:none}
-    .badge{display:inline-flex;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:900;border:1px solid rgba(38,50,68,.9);background:rgba(255,255,255,.02)}
-    .badge.red{border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.12)}
-    .badge.orange{border-color:rgba(245,158,11,.45);background:rgba(245,158,11,.12)}
-    .badge.green{border-color:rgba(34,197,94,.45);background:rgba(34,197,94,.12)}
-    .badge.gray{border-color:rgba(148,163,184,.35);background:rgba(148,163,184,.08);color:var(--muted)}
-    .searchrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
-    .input,select,textarea{background:rgba(255,255,255,.03);border:1px solid rgba(38,50,68,.9);color:var(--text);border-radius:12px;padding:9px 10px;font-size:12.5px;outline:none}
-    textarea{min-height:70px;resize:vertical}
-    .input::placeholder{color:rgba(170,176,189,.7)} select{cursor:pointer}
-    .note{font-size:12px;color:var(--muted);line-height:1.3}
-    .page{display:none} .page.active{display:block}
-    .table td .cell{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    .cell select{padding:7px 8px;border-radius:10px;font-size:12px}
-    .cell .btn{padding:7px 9px;font-size:12px;border-radius:10px}
-    .action-buttons{display:flex;gap:6px;flex-wrap:wrap}
-    .action-buttons .btn{padding:6px 8px;font-size:11px;min-width:60px}
-
-    .assistant{display:flex;flex-direction:column;min-width:0}
-    .ahead{padding:14px 14px 12px;border-bottom:1px solid rgba(38,50,68,.7);
-      background:linear-gradient(180deg, rgba(209,15,47,.10), transparent 70%);display:flex;align-items:center;justify-content:space-between;gap:10px}
-    .ahead .h{display:flex;align-items:center;gap:10px;font-weight:900;font-size:13.5px}
-    .chat{padding:12px;overflow:auto;flex:1;display:flex;flex-direction:column;gap:10px}
-    .bubble{max-width:92%;padding:10px;border-radius:16px;border:1px solid rgba(38,50,68,.9);background:rgba(255,255,255,.02);font-size:12.8px;line-height:1.25}
-    .bubble.me{margin-left:auto;background:rgba(125,211,252,.08);border-color:rgba(125,211,252,.20)}
-    .bubble.bot{background:rgba(209,15,47,.10);border-color:rgba(209,15,47,.22)}
-    .composer{border-top:1px solid rgba(38,50,68,.7);padding:10px;display:flex;gap:8px;align-items:center;background:var(--panel2)}
-    .composer input{flex:1}
-
-    .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;padding:18px;z-index:50}
-    .backdrop.show{display:flex}
-    .modal{width:min(960px, 100%);background:var(--panel);border:1px solid rgba(38,50,68,.9);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
-    .modal .mhead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 14px 12px;border-bottom:1px solid rgba(38,50,68,.7);
-      background:linear-gradient(90deg, rgba(209,15,47,.10), transparent 45%)}
-    .modal .mhead .mtitle{font-weight:950}
-    .modal .mbody{padding:14px;max-height:70vh;overflow-y:auto}
-    .formgrid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
-    .col3{grid-column:span 3}
-    .col4{grid-column:span 4}
-    .col6{grid-column:span 6}
-    .col8{grid-column:span 8}
-    .col12{grid-column:span 12}
-    .helper{font-size:12px;color:var(--muted);margin-top:6px}
-    .email-preview{background:rgba(255,255,255,.02);border:1px solid rgba(38,50,68,.85);border-radius:14px;padding:12px;margin-top:10px;font-family:var(--mono);font-size:12px;line-height:1.4;white-space:pre-wrap}
-
-    @media (max-width:1180px){.app{grid-template-columns:250px 1fr;grid-template-rows:1fr 360px} .assistant{grid-column:1/-1}}
-    @media (max-width:820px){.app{grid-template-columns:1fr;grid-template-rows:auto 1fr 360px}}
-  </style>
+  .main{
+    background:linear-gradient(180deg, rgba(20,26,34,.78), rgba(15,19,24,.78));
+    border:1px solid var(--border);
+    border-radius:24px;
+    box-shadow:var(--shadow);
+    padding:18px;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+  }
+  .topbar{display:flex; align-items:center; justify-content:space-between; gap:12px; padding-bottom:12px; border-bottom:1px solid rgba(38,50,68,.55);}
+  .title h2{margin:0; font-size:22px}
+  .title p{margin:4px 0 0 0; color:var(--muted)}
+  .actions{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+  .btn{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:10px 14px;
+    border-radius:999px;
+    background:rgba(15,19,24,.6);
+    border:1px solid rgba(38,50,68,.7);
+    color:var(--text);
+    cursor:pointer;
+    font-weight:700;
+  }
+  .btn.primary{
+    border-color:rgba(209,15,47,.45);
+    background:linear-gradient(180deg, rgba(209,15,47,.25), rgba(209,15,47,.12));
+  }
+  .btn.ghost{background:transparent}
+  .content{padding-top:14px; display:grid; gap:14px; overflow:auto; min-height:0}
+  .grid2{display:grid; grid-template-columns: 1.15fr .85fr; gap:14px}
+  .kpis{display:grid; grid-template-columns: repeat(4, minmax(180px,1fr)); gap:12px}
+  .card{
+    background:linear-gradient(180deg, rgba(20,26,34,.92), rgba(15,19,24,.92));
+    border:1px solid rgba(38,50,68,.7);
+    border-radius:18px;
+    box-shadow:0 10px 22px rgba(0,0,0,.22);
+    padding:14px;
+  }
+  .card h3{margin:0; font-size:14px; display:flex; align-items:center; justify-content:space-between; gap:10px}
+  .pill{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:6px 10px;
+    border-radius:999px;
+    border:1px solid rgba(38,50,68,.7);
+    background:rgba(15,19,24,.6);
+    color:var(--muted);
+    font-weight:700;
+    font-size:12px;
+    cursor:pointer;
+    user-select:none;
+  }
+  .pill:hover{border-color:rgba(125,211,252,.45); color:var(--text)}
+  .pill.red{border-color:rgba(209,15,47,.45); color:var(--text); background:rgba(209,15,47,.14)}
+  .pill.warn{border-color:rgba(245,158,11,.45); color:var(--text); background:rgba(245,158,11,.10)}
+  .pill.ok{border-color:rgba(34,197,94,.45); color:var(--text); background:rgba(34,197,94,.10)}
+  .kpiNum{font-size:34px; font-weight:900; margin-top:6px}
+  .muted{color:var(--muted)}
+  .row{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+  .input, select, textarea{
+    background:rgba(15,19,24,.7);
+    border:1px solid rgba(38,50,68,.75);
+    color:var(--text);
+    border-radius:14px;
+    padding:10px 12px;
+    outline:none;
+    min-height:40px;
+  }
+  textarea{min-height:90px; resize:vertical}
+  .input::placeholder{color:#7d8797}
+  table{width:100%; border-collapse:separate; border-spacing:0; font-size:13px}
+  th, td{padding:10px 10px; border-bottom:1px solid rgba(38,50,68,.45); vertical-align:top}
+  th{position:sticky; top:0; background:rgba(15,19,24,.92); z-index:1; color:var(--muted); font-weight:800}
+  tr:hover td{background:rgba(125,211,252,.04)}
+  .mono{font-family:var(--mono)}
+  .linklike{color:var(--link); cursor:pointer; font-weight:800}
+  .tag{display:inline-flex; align-items:center; padding:6px 10px; border-radius:999px; font-weight:800; border:1px solid rgba(38,50,68,.65); background:rgba(15,19,24,.6)}
+  .tag.high{border-color:rgba(239,68,68,.45); background:rgba(239,68,68,.10)}
+  .tag.med{border-color:rgba(245,158,11,.45); background:rgba(245,158,11,.10)}
+  .tag.low{border-color:rgba(34,197,94,.45); background:rgba(34,197,94,.10)}
+  .small{font-size:12px}
+  .hr{height:1px;background:rgba(38,50,68,.5); margin:10px 0}
+  .hidden{display:none !important}
+  /* Modal */
+  .backdrop{position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; align-items:center; justify-content:center; padding:18px; z-index:50}
+  .modal{width:min(900px, 96vw); max-height:88vh; overflow:auto; background:linear-gradient(180deg, rgba(20,26,34,.98), rgba(15,19,24,.98)); border:1px solid rgba(38,50,68,.8); border-radius:18px; box-shadow:0 18px 40px rgba(0,0,0,.55); padding:16px}
+  .modal h3{margin:0 0 8px 0}
+  .modal .grid{display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:10px}
+  .modal .grid3{display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:10px}
+  .modalActions{display:flex; justify-content:flex-end; gap:10px; margin-top:12px}
+  /* Assistant */
+  .assistantWrap{
+    position:fixed; right:20px; bottom:20px; width:380px; max-width:92vw;
+    z-index:60;
+  }
+  .assistant{
+    background:linear-gradient(180deg, rgba(20,26,34,.98), rgba(15,19,24,.98));
+    border:1px solid rgba(209,15,47,.28);
+    border-radius:18px;
+    box-shadow:0 18px 40px rgba(0,0,0,.55);
+    overflow:hidden;
+  }
+  .assistantHeader{
+    padding:12px 12px;
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    border-bottom:1px solid rgba(38,50,68,.55);
+  }
+  .assistantHeader strong{display:flex; align-items:center; gap:8px}
+  .assistantBody{max-height:360px; overflow:auto; padding:12px}
+  .bubble{padding:10px 12px; border-radius:14px; border:1px solid rgba(38,50,68,.7); background:rgba(15,19,24,.6); margin:0 0 10px 0}
+  .bubble.user{border-color:rgba(125,211,252,.35); background:rgba(125,211,252,.08)}
+  .assistantFooter{display:flex; gap:8px; padding:12px; border-top:1px solid rgba(38,50,68,.55)}
+  .assistantFooter input{flex:1}
+  .mini{font-size:11px; color:var(--muted)}
+  @media (max-width: 1100px){
+    .kpis{grid-template-columns: repeat(2, minmax(180px,1fr))}
+    .grid2{grid-template-columns:1fr}
+    .app{grid-template-columns: 1fr; }
+    .sidebar{display:none}
+  }
+</style>
 </head>
 <body>
 <div class="app">
   <aside class="sidebar">
     <div class="brand">
-      <div class="title"><span class="dot"></span> Command Center</div>
-      <div class="sub">Isabel • InjuryRX<br><span class="muted">Patients • Tasks • Notes • Providers • Reports</span></div>
+      <div class="dot"></div>
+      <div>
+        <h1>Command Center</h1>
+        <small>Isabel · InjuryRX</small>
+      </div>
     </div>
-    <nav class="nav">
-      <button class="active" data-page="home">🏠 Home <span class="pill">Today</span></button>
-      <button data-page="patients">👥 Patients <span class="pill">Active</span></button>
-      <button data-page="tasks">✅ Tasks <span class="pill">Priority</span></button>
-      <button data-page="notes">📝 Notes <span class="pill">Log</span></button>
-      <button data-page="providers">🏥 Providers <span class="pill">Directory</span></button>
-      <button data-page="reports">📊 Reports <span class="pill">4pm</span></button>
-    </nav>
-    <div class="footer"><span>Shortcuts</span><span><span class="kbd">Ctrl</span> + <span class="kbd">K</span></span></div>
+    <div class="nav" id="nav">
+      <button class="navbtn active" data-route="home">🏠 Home <span class="meta">Today</span></button>
+      <button class="navbtn" data-route="patients">👥 Patients <span class="meta">Active</span></button>
+      <button class="navbtn" data-route="tasks">✅ Tasks <span class="meta">Priority</span></button>
+      <button class="navbtn" data-route="notes">📝 Notes <span class="meta">Log</span></button>
+      <button class="navbtn" data-route="providers">🏥 Providers <span class="meta">Directory</span></button>
+      <button class="navbtn" data-route="reports">📊 Reports <span class="meta">4pm</span></button>
+    </div>
+    <div class="footer">
+      Auto-save: <span id="saveBadge">ready</span><br/>
+      Shortcut: <span class="mono">Ctrl</span> + <span class="mono">K</span> (toggle assistant)
+    </div>
   </aside>
 
   <main class="main">
     <div class="topbar">
-      <div>
-        <h1 id="pageTitle">Home</h1>
-        <div class="meta" id="pageSubtitle">Quick view of what matters today</div>
+      <div class="title">
+        <h2 id="pageTitle">Home</h2>
+        <p id="pageSub">Quick view of what matters today</p>
       </div>
       <div class="actions">
-        <button class="btn" id="btnToggleAssistant">🗂️ Toggle Assistant</button>
-        <button class="btn" id="btnQuickLog">➕ Quick Log</button>
-        <button class="btn" id="btnDownloadExcel">⬇️ Download Excel</button>
-        <button class="btn primary" id="btnGenerateReport">🧾 Generate 4pm Draft</button>
+        <button class="btn" id="toggleAssistantBtn">🗂️ Toggle Assistant</button>
+        <button class="btn" id="quickLogBtn">➕ Quick Log</button>
+        <button class="btn" id="downloadBtn">⬇️ Download Excel</button>
+        <button class="btn primary" id="gen4pmBtn">🧾 Generate 4pm Draft</button>
       </div>
     </div>
 
-    <div class="content">
-      <!-- HOME -->
-      <section class="page active" id="page-home">
-        <div class="grid">
-          <div class="card" style="grid-column:span 3">
-            <h3>🔴 Overdue today</h3>
-            <div class="kpi"><div class="num" id="kpiOverdue">0</div><div class="note">cases</div></div>
-            <div class="tag click" data-homefilter="overdue"><span class="dot2 bad"></span> follow-up overdue</div>
-          </div>
-          <div class="card" style="grid-column:span 3">
-            <h3>📧 Needs reply</h3>
-            <div class="kpi"><div class="num" id="kpiNeedsReply">0</div><div class="note">actions</div></div>
-            <div class="tag click" data-homefilter="needs_reply"><span class="dot2 warn"></span> reply today</div>
-          </div>
-          <div class="card" style="grid-column:span 3">
-            <h3>🆕 New today</h3>
-            <div class="kpi"><div class="num" id="kpiNew">0</div><div class="note">patients</div></div>
-            <div class="tag click" data-homefilter="new_today"><span class="dot2 ok"></span> created today</div>
-          </div>
-          <div class="card" style="grid-column:span 3">
-            <h3>⏳ Waiting on clinic</h3>
-            <div class="kpi"><div class="num" id="kpiWaiting">0</div><div class="note">cases</div></div>
-            <div class="tag click" data-homefilter="waiting_clinic"><span class="dot2"></span> no response</div>
-          </div>
-
-          <div class="card" style="grid-column:span 7;min-width:0">
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
-              <h3 style="margin:0">📌 Priority (Today)</h3>
-              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-                <span class="tag" id="homeFilterTag" title="Current Home filter">All</span>
-                <button class="btn small" id="btnClearHomeFilter">Clear</button>
-              </div>
-            </div>
-            <div class="tablewrap" style="margin-top:10px">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th>Matter</th><th>Patient</th><th>State</th><th>Type</th>
-                    <th>Status</th><th>Waiting On</th><th>Next Step</th><th>Due</th><th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="tblPriority"></tbody>
-              </table>
-            </div>
-            <div class="note" style="margin-top:10px">Tip: click a KPI tag above (ex: <b>reply today</b>) to filter the list.</div>
-          </div>
-
-          <div class="card" style="grid-column:span 5;min-width:0">
-            <h3>📥 Action Inbox (Email → Tasks)</h3>
-            <div class="tablewrap" style="margin-top:10px">
-              <table class="table" style="min-width:720px">
-                <thead><tr><th>Type</th><th>Matter</th><th>Subject</th><th>Due</th><th>Provider Email</th><th>Action</th></tr></thead>
-                <tbody id="tblEmailActions"></tbody>
-              </table>
-            </div>
-            <div class="note" style="margin-top:10px">Click "Email" to preview and send email to provider.</div>
-          </div>
-        </div>
-      </section>
-
-      <!-- PATIENTS -->
-      <section class="page" id="page-patients">
-        <div class="searchrow">
-          <input class="input" id="patientSearch" placeholder="Search by patient, matter, state…" />
-          <select id="filterStatus"><option value="">Status (all)</option></select>
-          <select id="filterWaiting"><option value="">Waiting On (all)</option></select>
-          <button class="btn" id="btnClearPatients">Clear</button>
-        </div>
-        <div class="card">
-          <h3>👥 Patients</h3>
-          <div class="tablewrap" style="margin-top:10px">
-            <table class="table" style="min-width:1200px">
-              <thead>
-                <tr>
-                  <th>Matter</th><th>Patient</th><th>State</th><th>Type</th><th>Provider</th>
-                  <th>Requested Date</th><th>Sender</th><th>Status</th><th>Waiting On</th><th>Notes</th><th>Due</th><th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="tblPatients"></tbody>
-            </table>
-          </div>
-          <div class="note" style="margin-top:10px">Quick Log adds a new patient row (auto-saved on your device).</div>
-        </div>
-      </section>
-
-      <!-- TASKS -->
-      <section class="page" id="page-tasks">
-        <div class="searchrow">
-          <input class="input" id="taskSearch" placeholder="Search tasks (patient, subject, provider…)" />
-          <select id="filterTaskStatus"><option value="">Progress (all)</option></select>
-          <select id="filterTaskType"><option value="">Task Type (all)</option></select>
-          <button class="btn" id="btnClearTasks">Clear</button>
-        </div>
-        <div class="grid">
-          <div class="card" style="grid-column:span 8;min-width:0">
-            <h3>✅ Tasks</h3>
-            <div class="tablewrap" style="margin-top:10px">
-              <table class="table" style="min-width:940px">
-                <thead>
-                  <tr>
-                    <th>Priority</th><th>Task Type</th><th>Matter</th><th>Description</th><th>Progress</th><th>Due</th><th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody id="tblTasks"></tbody>
-              </table>
-            </div>
-            <div class="note" style="margin-top:10px">Use Progress = <b>Done</b> or <b>Updated</b> to stop follow-ups.</div>
-          </div>
-          <div class="card" style="grid-column:span 4">
-            <h3>📌 Quick Buttons</h3>
-            <div class="note">In the real version these trigger Power Automate / Power Apps.</div>
-            <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
-              <button class="btn" onclick="quickTask('Follow-up clinic','Follow-up in 48h')">➕ Follow-up 48h</button>
-              <button class="btn" onclick="quickTask('Reply email','Reply to clinic email')">➕ Reply email</button>
-              <button class="btn" onclick="quickTask('Update Clio','Update note/status in Clio')">➕ Update Clio</button>
-              <button class="btn primary" onclick="quickTask('Send referral','Send referral to provider')">➕ Send referral</button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- NOTES -->
-      <section class="page" id="page-notes">
-        <div class="grid">
-          <div class="card" style="grid-column:span 7;min-width:0">
-            <h3>📝 Notes Log</h3>
-            <div class="note">This is your audit trail for quick saves (including "Reports" saves).</div>
-            <div class="tablewrap" style="margin-top:10px">
-              <table class="table" style="min-width:900px">
-                <thead><tr><th>Date/Time</th><th>Section</th><th>Reference</th><th>Note</th></tr></thead>
-                <tbody id="tblNotesLog"></tbody>
-              </table>
-            </div>
-          </div>
-          <div class="card" style="grid-column:span 5;min-width:0">
-            <h3>✉️ Email Provider</h3>
-            <div class="note">Choose a patient + provider and it will preview the draft template.</div>
-            <div style="display:grid;gap:10px;margin-top:10px">
-              <input class="input" id="emailMatterSearch" placeholder="Search by Matter # (optional)" />
-              <select id="emailPatientPick"></select>
-              <select id="emailProviderPick"></select>
-              <button class="btn primary" id="btnOpenEmailDraft">Preview Email Draft</button>
-              <div class="note">Tip: if a provider has no email yet, add it using Quick Log on this page.</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="card" style="margin-top:12px">
-          <h3>🏥 Provider Directory (same table as Providers)</h3>
-          <div class="note">Quick Log on this page adds a provider (including email).</div>
-          <div class="tablewrap" style="margin-top:10px">
-            <table class="table" style="min-width:980px">
-              <thead><tr><th>Provider</th><th>States</th><th>Services</th><th>Email</th><th>Method</th><th>Notes</th><th>Action</th></tr></thead>
-              <tbody id="tblProvidersInNotes"></tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- PROVIDERS -->
-      <section class="page" id="page-providers">
-        <div class="searchrow">
-          <input class="input" id="providerSearch" placeholder="Search provider (name, state, service…)" />
-          <select id="filterService"><option value="">Service (all)</option></select>
-          <select id="filterProviderState"><option value="">State (all)</option></select>
-          <button class="btn" id="btnClearProviders">Clear</button>
-        </div>
-        <div class="card">
-          <h3>🏥 Providers Directory</h3>
-          <div class="tablewrap" style="margin-top:10px">
-            <table class="table" style="min-width:980px">
-              <thead><tr><th>Provider</th><th>States</th><th>Services</th><th>Email</th><th>Method</th><th>Notes</th><th>Action</th></tr></thead>
-              <tbody id="tblProviders"></tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- REPORTS -->
-      <section class="page" id="page-reports">
-        <div class="grid">
-          <div class="card" style="grid-column:span 12;min-width:0">
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
-              <div>
-                <h3 style="margin:0 0 6px">🧾 4pm Report Draft</h3>
-                <div class="note">Mark as Reported and store the completion date/time (auto-saved).</div>
-              </div>
-              <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-                <label class="tag" style="cursor:pointer">
-                  <input id="reportedChk" type="checkbox" style="accent-color: var(--red); transform: translateY(1px);" />
-                  Reported
-                </label>
-                <input class="input" id="reportedDate" type="datetime-local" />
-                <button class="btn small primary" id="btnSaveReportMeta">Save</button>
-              </div>
-            </div>
-
-            <div style="margin-top:12px; display:grid; grid-template-columns: 1fr; gap:12px;">
-              <pre id="reportDraft" style="white-space:pre-wrap;background:rgba(255,255,255,.03);border:1px solid rgba(38,50,68,.85);
-                padding:12px;border-radius:14px;font-family:var(--mono);font-size:12px;line-height:1.35;min-height:220px;overflow:auto"></pre>
-              <div style="display:flex;gap:8px;flex-wrap:wrap">
-                <button class="btn primary" onclick="copyReport()">📋 Copy</button>
-                <button class="btn" onclick="regenerateReport()">🔄 Regenerate</button>
-                <button class="btn" onclick="downloadCurrentPageExcel()">⬇️ Download Excel (Report)</button>
-              </div>
-              <div class="note" id="reportMetaNote"></div>
-            </div>
-
-            <div style="margin-top:14px">
-              <h3 style="margin:0 0 8px">🗂️ Report Save Log</h3>
-              <div class="note">Each time you hit <b>Save</b>, we store a record here so you can track later.</div>
-              <div class="tablewrap" style="margin-top:10px">
-                <table class="table" style="min-width:900px">
-                  <thead><tr><th>Date/Time</th><th>Reported?</th><th>Reported Date</th><th>Draft Preview</th><th>Actions</th></tr></thead>
-                  <tbody id="tblReportLog"></tbody>
-                </table>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-    </div>
+    <div class="content" id="content"></div>
   </main>
+</div>
 
-  <aside class="assistant">
-    <div class="ahead">
-      <div class="h"><span class="dot"></span> Isabel's Assistant</div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <div class="tag"><span class="dot2 warn"></span> <span id="pendingCount">0</span> pending</div>
-        <button class="btn small" id="btnCollapseAssistant" title="Collapse">⤵</button>
+<!-- Modal -->
+<div class="backdrop" id="backdrop" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="row" style="justify-content:space-between">
+      <h3 id="modalTitle">Quick Log</h3>
+      <button class="btn ghost" id="closeModalBtn">✕ Close</button>
+    </div>
+    <div id="modalBody"></div>
+    <div class="modalActions">
+      <button class="btn" id="modalCancelBtn">Cancel</button>
+      <button class="btn primary" id="modalSaveBtn">Save</button>
+    </div>
+    <div class="mini" id="modalHint" style="margin-top:8px"></div>
+  </div>
+</div>
+
+<!-- Assistant -->
+<div class="assistantWrap hidden" id="assistantWrap">
+  <div class="assistant">
+    <div class="assistantHeader">
+      <strong><span class="dot" style="width:10px;height:10px;box-shadow:none"></span> Isabel's Assistant</strong>
+      <div class="row" style="gap:8px">
+        <span class="mini"><span id="assistantPending">0</span> pending</span>
+        <button class="btn ghost" id="assistantCloseBtn">↘</button>
       </div>
     </div>
-    <div class="chat" id="chat">
-      <div class="bubble bot">Hi Isabel 👋. I can help you: <b>send emails to providers</b>, <b>update patient info</b>, <b>filter by needs reply</b>, or <b>open specific matters</b>.</div>
-      <div class="bubble bot">Try commands like: <br>• "send email for M-10231"<br>• "update status of M-10244 to Scheduled"<br>• "show needs reply"<br>• "open M-10255"</div>
-    </div>
-    <div class="composer">
-      <input class="input" id="msg" placeholder="Example: 'send email for M-10231' or 'update M-10244 status to Scheduled'"/>
-      <button class="btn primary" id="send">Send</button>
-    </div>
-  </aside>
-</div>
-
-<!-- Quick Log Modal -->
-<div class="backdrop" id="modalBackdrop">
-  <div class="modal" role="dialog" aria-modal="true" aria-label="Quick Log">
-    <div class="mhead">
-      <div class="mtitle" id="quickLogTitle">➕ Quick Log</div>
-      <button class="btn small" onclick="closeModal()">✕</button>
-    </div>
-    <div class="mbody">
-      <div id="quickLogBody"></div>
+    <div class="assistantBody" id="assistantBody"></div>
+    <div class="assistantFooter">
+      <input id="assistantInput" class="input" placeholder="Ej: 'update patient 107853 status=Sent to clinic' o 'give an update about Peter'"/>
+      <button class="btn primary" id="assistantSendBtn">Send</button>
     </div>
   </div>
 </div>
-
-<!-- Email Preview Modal -->
-<div class="backdrop" id="emailModalBackdrop">
-  <div class="modal" role="dialog" aria-modal="true" aria-label="Email Preview" style="max-width:800px;">
-    <div class="mhead">
-      <div class="mtitle" id="emailModalTitle">✉️ Email Preview</div>
-      <button class="btn small" onclick="closeEmailModal()">✕</button>
-    </div>
-    <div class="mbody">
-      <div id="emailModalBody"></div>
-    </div>
-  </div>
-</div>
-
 
 <script>
+(() => {
   // =============================
-  //  Local Storage (Auto-save)
+  //  State (single source of truth)
   // =============================
-  const LS_KEY = "injuryrx_command_center_v4";
+  const LS_KEY = "injuryrx_command_center_state_v1";
 
-  function nowIso(){
+  const DEFAULT_STATE = {
+    patients: [],
+    tasks: [],
+    providers: [],
+    notesLog: [],
+    reports: [],
+    assistantChat: [],
+    ui: { route: "home", homeFilter: null }
+  };
+
+  /** @type {typeof DEFAULT_STATE} */
+  let state = loadState() || structuredClone(DEFAULT_STATE);
+
+  const $ = (sel, root=document) => root.querySelector(sel);
+  const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+
+  function nowStamp(){
     const d = new Date();
     const pad = (n)=>String(n).padStart(2,"0");
     return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
@@ -445,1338 +311,1417 @@
     try{
       const raw = localStorage.getItem(LS_KEY);
       return raw ? JSON.parse(raw) : null;
-    }catch(e){ return null; }
+    }catch(e){
+      return null;
+    }
   }
+
   function saveState(){
     try{
-      localStorage.setItem(LS_KEY, JSON.stringify({
-        patients, tasks, providers, priorityRows, emailActions,
-        notesLog, reportMeta, reportLog
-      }));
-    }catch(e){}
+      localStorage.setItem(LS_KEY, JSON.stringify(state));
+      $("#saveBadge").textContent = "saved";
+      setTimeout(()=>{ $("#saveBadge").textContent = "ready"; }, 600);
+    }catch(e){
+      $("#saveBadge").textContent = "error";
+    }
   }
 
   // =============================
-  //  Dropdown lists
+  //  Utilities
   // =============================
-  const STATUS_OPTIONS = ["New","Sent to clinic","Clinic confirmed","Scheduled","Seen","Pending records","Closed","Stuck"];
-  const WAITING_OPTIONS = ["Clinic","You","Patient","Internal"];
-  const TYPE_OPTIONS = ["Chiro/PT","PT","MRI","Pain Mgmt","Ortho","Other"];
-  const TASK_TYPE_OPTIONS = ["Reply email","Follow-up clinic","Send referral","Update Clio","Other"];
-  const TASK_PROGRESS_OPTIONS = ["Open","Waiting","Done","Updated"];
-  const SERVICE_OPTIONS = ["Chiro/PT","MRI","Pain Mgmt","Ortho","Other"];
+  function norm(s){ return String(s||"").trim(); }
+  function lower(s){ return norm(s).toLowerCase(); }
+
+  function findPatient(q){
+    const query = lower(q);
+    return state.patients.find(p =>
+      lower(p.matter) === query ||
+      lower(p.patient).includes(query) ||
+      lower(p.matter).includes(query)
+    );
+  }
+
+  function ensureProviderEmailForPatient(patient){
+    // patient.providerEmail optional; else lookup providers directory by name
+    if (patient.providerEmail) return patient.providerEmail;
+    const prov = state.providers.find(x => lower(x.name) === lower(patient.provider));
+    return prov?.email || "";
+  }
+
+  function mailtoDraft(to, subject, body){
+    const s = encodeURIComponent(subject);
+    const b = encodeURIComponent(body);
+    const t = encodeURIComponent(to);
+    // Use %0D%0A for Outlook friendliness; encodeURIComponent already does it for \n
+    return `mailto:${t}?subject=${s}&body=${b}`;
+  }
+
+  function providerTemplate(patient){
+    const providerEmail = ensureProviderEmailForPatient(patient);
+    const subject = `${patient.patient} — ${patient.type || "Service"}`;
+    const body =
+`Good afternoon.
+I hope this message finds you well.
+I'm reaching out to let you know that I’m sending the client’s information for: ${patient.patient} (${patient.matter}).
+
+- Is Transportation needed?:  
+• Name: ${patient.patient || ""} 
+• Phone: ${patient.phone || ""} 
+• Email: ${patient.email || ""} 
+• Address: ${patient.address || ""} 
+• DOA: ${patient.doa || ""} 
+• DOB: ${patient.dob || ""} 
+• Law Firm: ${patient.lawFirm || ""} 
+• Liability Limits and Status: ${patient.liability || ""}
+
+If you have any specific requests or need additional details once you receive the information, feel free to let me know — I’ll be happy to assist.
+Thank you for your patience and cooperation.
+
+Best regards. 😊
+Isabel Galban
+Vital Marketing`;
+    return {providerEmail, subject, body};
+  }
+
+  function addNote(section, reference, message){
+    state.notesLog.unshift({
+      ts: nowStamp(),
+      section,
+      reference: reference || "(set)",
+      message: message || ""
+    });
+    saveState();
+  }
 
   // =============================
-  //  Default demo data
+  //  Routing & Navigation
   // =============================
-  const demo = {
-    priorityRows: [
-      {matter:"M-10231", patient:"Ana Gomez", state:"GA", type:"MRI", status:"Stuck", waiting:"Clinic", next:"Follow-up MRI (call)", due:"Today", providerEmail:"referrals@peachtreeimaging.com"},
-      {matter:"M-10244", patient:"Carlos Ruiz", state:"FL", type:"PT", status:"Sent to clinic", waiting:"Clinic", next:"Confirm PT appointment", due:"Today", providerEmail:"intake@sunriserehab.com"},
-      {matter:"M-10255", patient:"Maria Lopez", state:"TX", type:"Chiro/PT", status:"New", waiting:"You", next:"Assign provider", due:"Today", providerEmail:""},
-      {matter:"M-10202", patient:"Juan Perez", state:"GA", type:"Pain Mgmt", status:"Scheduled", waiting:"Internal", next:"Request post-visit records", due:"Tomorrow", providerEmail:""},
-    ],
-    emailActions: [
-      {type:"Needs reply", matter:"M-10255", subject:"Need DOB/DOA for referral", due:"Today", providerEmail:"intake@sunriserehab.com"},
-      {type:"Needs reply", matter:"M-10231", subject:"MRI order required", due:"Today", providerEmail:"referrals@peachtreeimaging.com"},
-      {type:"Follow-up", matter:"M-10188", subject:"Records status update", due:"Today", providerEmail:"records@bayimaging.com"},
-    ],
-    patients: [
-      {matter:"M-10255", patient:"Maria Lopez", state:"TX", type:"Chiro/PT", provider:"—", requestedDate:"2026-01-08", sender:"Slack", status:"New", waiting:"You", notes:"Assign TX provider", due:"2026-01-08"},
-      {matter:"M-10231", patient:"Ana Gomez", state:"GA", type:"MRI", provider:"Peachtree Imaging", requestedDate:"2026-01-08", sender:"Email", status:"Stuck", waiting:"Clinic", notes:"Need MRI order + confirm slot", due:"2026-01-08"},
-      {matter:"M-10244", patient:"Carlos Ruiz", state:"FL", type:"PT", provider:"Sunrise Rehab", requestedDate:"2026-01-08", sender:"Slack", status:"Sent to clinic", waiting:"Clinic", notes:"Confirm appointment date/time", due:"2026-01-08"},
-    ],
-    tasks: [
-      {id:1, priority:"High", taskType:"Reply email", matter:"M-10255", desc:"Reply: DOB/DOA needed for referral", progress:"Open", due:"Today"},
-      {id:2, priority:"High", taskType:"Reply email", matter:"M-10231", desc:"Send MRI order / required info", progress:"Open", due:"Today"},
-      {id:3, priority:"Medium", taskType:"Follow-up clinic", matter:"M-10188", desc:"Follow-up on records (email)", progress:"Open", due:"Today"},
-      {id:4, priority:"Medium", taskType:"Send referral", matter:"M-10244", desc:"Re-send referral + confirm receipt", progress:"Waiting", due:"Today"},
-    ],
-    providers: [
-      {id:1, provider:"Peachtree Imaging", states:"GA", services:"MRI", email:"referrals@peachtreeimaging.com", method:"Email", notes:"Fast response if you include DOB/DOA + LOP."},
-      {id:2, provider:"Sunrise Rehab", states:"FL", services:"Chiro/PT", email:"intake@sunriserehab.com", method:"Email", notes:"If no reply in 24h, call. Subject should include Matter #."},
-      {id:3, provider:"Metro Pain", states:"GA, FL", services:"Pain Mgmt", email:"", method:"Portal", notes:"No direct email. Save confirmation in notes."},
-    ],
-    notesLog: [
-      {dt:"2026-01-08 09:10", section:"Patients", ref:"M-10255", note:"Added patient from Slack."}
-    ],
-    reportMeta: {reported:false, reportedDate:""},
-    reportLog: []
+  const ROUTES = {
+    home: {title:"Home", sub:"Quick view of what matters today"},
+    patients: {title:"Patients", sub:"Your operational list"},
+    tasks: {title:"Tasks", sub:"Emails → actions"},
+    notes: {title:"Notes", sub:"Logs + email drafts"},
+    providers: {title:"Providers", sub:"Directory"},
+    reports: {title:"Reports", sub:"4pm report"}
   };
 
-  // =============================
-  //  State init (auto-load)
-  // =============================
-  let priorityRows, emailActions, patients, tasks, providers, notesLog, reportMeta, reportLog;
+  function setRoute(route){
+    if (!ROUTES[route]) route = "home";
+    state.ui.route = route;
+    saveState();
 
-  const saved = loadState();
-  if(saved){
-    priorityRows = saved.priorityRows || demo.priorityRows;
-    emailActions  = saved.emailActions  || demo.emailActions;
-    patients      = saved.patients      || demo.patients;
-    tasks         = saved.tasks         || demo.tasks;
-    providers     = saved.providers     || demo.providers;
-    notesLog      = saved.notesLog      || demo.notesLog;
-    reportMeta    = saved.reportMeta    || demo.reportMeta;
-    reportLog     = saved.reportLog     || demo.reportLog;
-  }else{
-    ({priorityRows, emailActions, patients, tasks, providers, notesLog, reportMeta, reportLog} = demo);
+    $$("#nav .navbtn").forEach(b => b.classList.toggle("active", b.dataset.route === route));
+    $("#pageTitle").textContent = ROUTES[route].title;
+    $("#pageSub").textContent = ROUTES[route].sub;
+
+    // Quick Log button label depends on route
+    $("#quickLogBtn").classList.toggle("hidden", !(route==="patients" || route==="tasks" || route==="providers" || route==="notes"));
+    render();
+  }
+
+  $("#nav").addEventListener("click", (e)=>{
+    const btn = e.target.closest(".navbtn");
+    if(!btn) return;
+    setRoute(btn.dataset.route);
+  });
+
+  // =============================
+  //  Render (pages)
+  // =============================
+  function render(){
+    const route = state.ui.route;
+    const el = $("#content");
+    el.innerHTML = "";
+    if(route==="home") el.appendChild(renderHome());
+    if(route==="patients") el.appendChild(renderPatients());
+    if(route==="tasks") el.appendChild(renderTasks());
+    if(route==="notes") el.appendChild(renderNotes());
+    if(route==="providers") el.appendChild(renderProviders());
+    if(route==="reports") el.appendChild(renderReports());
+  }
+
+  function renderHome(){
+    const wrap = document.createElement("div");
+    wrap.className = "content";
+
+    const kpis = document.createElement("div");
+    kpis.className = "kpis";
+
+    const needsReplyCount = state.tasks.filter(t => lower(t.type)==="needs reply" && lower(t.progress)!=="done").length;
+    const overdueCount = state.tasks.filter(t => lower(t.priority)==="high" && lower(t.progress)!=="done").length;
+    const newTodayCount = state.patients.filter(p => p.createdAt?.slice(0,10) === (new Date()).toISOString().slice(0,10)).length;
+    const waitingClinicCount = state.patients.filter(p => lower(p.waitingOn)==="clinic").length;
+
+    kpis.appendChild(kpiCard("Overdue today", overdueCount, "follow-up overdue", "overdue", "red"));
+    kpis.appendChild(kpiCard("Needs reply", needsReplyCount, "reply today", "needs-reply", "warn"));
+    kpis.appendChild(kpiCard("New today", newTodayCount, "created today", "new-today", "ok"));
+    kpis.appendChild(kpiCard("Waiting on clinic", waitingClinicCount, "no response", "waiting-clinic", ""));
+
+    wrap.appendChild(kpis);
+
+    const grid = document.createElement("div");
+    grid.className = "grid2";
+
+    // Priority table derives from patients (or tasks) with optional filter
+    grid.appendChild(priorityPanel());
+    grid.appendChild(actionInboxPanel());
+    wrap.appendChild(grid);
+
+    return wrap;
+  }
+
+  function kpiCard(title, num, tagLabel, filterKey, style){
+    const c = document.createElement("div");
+    c.className = "card";
+    c.innerHTML = `
+      <h3>${title}</h3>
+      <div class="kpiNum">${num}</div>
+      <div style="margin-top:8px">
+        <span class="pill ${style}" data-home-filter="${filterKey}">${tagLabel}</span>
+      </div>
+    `;
+    c.querySelector(".pill").addEventListener("click", ()=>{
+      state.ui.homeFilter = filterKey;
+      saveState();
+      render(); // rerender home lists with filter
+    });
+    return c;
+  }
+
+  function priorityPanel(){
+    const card = document.createElement("div");
+    card.className = "card";
+    const filter = state.ui.homeFilter;
+
+    const filteredPatients = (() => {
+      if(!filter) return state.patients;
+      if(filter==="waiting-clinic") return state.patients.filter(p => lower(p.waitingOn)==="clinic");
+      if(filter==="new-today"){
+        const today = (new Date()).toISOString().slice(0,10);
+        return state.patients.filter(p => (p.createdAt||"").slice(0,10) === today);
+      }
+      return state.patients;
+    })();
+
+    const heading = document.createElement("div");
+    heading.className = "row";
+    heading.style.justifyContent="space-between";
+    heading.innerHTML = `
+      <h3 style="margin:0">📌 Priority (Today)</h3>
+      <div class="row">
+        <span class="pill" title="Home filter">${filter ? filter.replaceAll("-"," ") : "all"}</span>
+        <button class="btn" id="homeClearBtn">Clear</button>
+      </div>
+    `;
+    heading.querySelector("#homeClearBtn").addEventListener("click", ()=>{
+      state.ui.homeFilter = null;
+      saveState(); render();
+    });
+
+    card.appendChild(heading);
+    card.appendChild(document.createElement("div")).className="hr";
+
+    const table = document.createElement("table");
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th>Matter</th><th>Patient</th><th>State</th><th>Type</th><th>Status</th><th>Waiting</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${filteredPatients.slice(0,12).map(p=>`
+          <tr>
+            <td class="mono"><span class="linklike" data-open-matter="${escapeHtml(p.matter)}">${escapeHtml(p.matter)}</span></td>
+            <td>${escapeHtml(p.patient)}</td>
+            <td>${escapeHtml(p.state)}</td>
+            <td>${escapeHtml(p.type)}</td>
+            <td>${escapeHtml(p.status || "")}</td>
+            <td>${escapeHtml(p.waitingOn || "")}</td>
+          </tr>`).join("") || `<tr><td colspan="6" class="muted">No patients yet. Use Quick Log in Patients.</td></tr>`}
+      </tbody>
+    `;
+    table.addEventListener("click", (e)=>{
+      const a = e.target.closest("[data-open-matter]");
+      if(!a) return;
+      const matter = a.dataset.openMatter;
+      state.ui.route = "patients";
+      saveState();
+      setRoute("patients");
+      // apply a lightweight filter by setting search box value in renderPatients via state.ui
+      state.ui.patientSearch = matter;
+      saveState();
+      render();
+    });
+
+    card.appendChild(table);
+    const tip = document.createElement("div");
+    tip.className="mini";
+    tip.style.marginTop="8px";
+    tip.textContent = "Tip: click a Matter to open it in Patients.";
+    card.appendChild(tip);
+    return card;
+  }
+
+  function actionInboxPanel(){
+    const card = document.createElement("div");
+    card.className = "card";
+    const openTasks = state.tasks.filter(t => lower(t.progress)!=="done");
+    card.innerHTML = `
+      <h3 style="margin:0">📥 Action Inbox (Email → Tasks)</h3>
+      <div class="hr"></div>
+    `;
+    const table = document.createElement("table");
+    table.innerHTML = `
+      <thead><tr><th>Type</th><th>Matter</th><th>Subject</th><th></th></tr></thead>
+      <tbody>
+        ${openTasks.slice(0,12).map(t=>`
+          <tr>
+            <td><span class="tag ${t.type==="Needs reply"?"med":"low"}">${escapeHtml(t.type)}</span></td>
+            <td class="mono">${escapeHtml(t.matter||"(set)")}</td>
+            <td>${escapeHtml(t.subject||t.description||"")}</td>
+            <td><button class="btn" data-email-matter="${escapeHtml(t.matter||"")}">✉️ Email</button></td>
+          </tr>`).join("") || `<tr><td colspan="4" class="muted">No tasks yet.</td></tr>`}
+      </tbody>
+    `;
+    table.addEventListener("click", (e)=>{
+      const btn = e.target.closest("[data-email-matter]");
+      if(!btn) return;
+      const matter = btn.dataset.emailMatter;
+      const patient = findPatient(matter);
+      if(!patient){
+        alert("No patient found for that matter yet. Add the patient in Patients first.");
+        return;
+      }
+      openEmailForPatient(patient);
+    });
+    card.appendChild(table);
+    const tip = document.createElement("div");
+    tip.className="mini";
+    tip.style.marginTop="8px";
+    tip.textContent = 'Click "Email" to open Outlook draft (mailto).';
+    card.appendChild(tip);
+    return card;
+  }
+
+  function renderPatients(){
+    const wrap = document.createElement("div");
+    wrap.className = "content";
+
+    const tools = document.createElement("div");
+    tools.className = "row";
+    tools.innerHTML = `
+      <input class="input" id="patientSearch" placeholder="Search by patient or matter" style="min-width:260px"/>
+      <select id="patientStatusFilter">
+        <option value="">Status (all)</option>
+        ${unique(state.patients.map(p=>p.status)).map(v=>`<option>${escapeHtml(v)}</option>`).join("")}
+      </select>
+      <select id="patientWaitingFilter">
+        <option value="">Waiting On (all)</option>
+        ${unique(state.patients.map(p=>p.waitingOn)).map(v=>`<option>${escapeHtml(v)}</option>`).join("")}
+      </select>
+      <button class="btn" id="patientClearBtn">Clear</button>
+    `;
+    wrap.appendChild(tools);
+
+    const card = document.createElement("div");
+    card.className="card";
+    card.innerHTML = `<h3 style="margin:0">👥 Patients</h3><div class="hr"></div>`;
+    const table = document.createElement("table");
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th>Matter</th><th>Patient</th><th>State</th><th>Type</th><th>Provider</th><th>Requested Date</th><th>Sender</th><th>Status</th><th>Waiting On</th><th>Notes</th><th></th>
+        </tr>
+      </thead>
+      <tbody id="patientsTbody"></tbody>
+    `;
+    card.appendChild(table);
+
+    const hint = document.createElement("div");
+    hint.className="mini";
+    hint.style.marginTop="8px";
+    hint.textContent = "Quick Log adds a new patient row (auto-saved on your device).";
+    card.appendChild(hint);
+
+    wrap.appendChild(card);
+
+    // bind filters
+    const searchEl = tools.querySelector("#patientSearch");
+    const statusEl = tools.querySelector("#patientStatusFilter");
+    const waitingEl = tools.querySelector("#patientWaitingFilter");
+    const clearBtn = tools.querySelector("#patientClearBtn");
+
+    // pre-fill search if set by home open
+    if(state.ui.patientSearch){
+      searchEl.value = state.ui.patientSearch;
+      state.ui.patientSearch = "";
+      saveState();
+    }
+
+    const refresh = () => {
+      const q = lower(searchEl.value);
+      const sf = norm(statusEl.value);
+      const wf = norm(waitingEl.value);
+      const rows = state.patients
+        .filter(p => !q || lower(p.patient).includes(q) || lower(p.matter).includes(q))
+        .filter(p => !sf || p.status===sf)
+        .filter(p => !wf || p.waitingOn===wf);
+      renderPatientsRows(rows, table.querySelector("#patientsTbody"));
+    };
+
+    searchEl.addEventListener("input", refresh);
+    statusEl.addEventListener("change", refresh);
+    waitingEl.addEventListener("change", refresh);
+    clearBtn.addEventListener("click", ()=>{
+      searchEl.value=""; statusEl.value=""; waitingEl.value="";
+      refresh();
+    });
+
+    table.addEventListener("click", (e)=>{
+      const action = e.target.closest("[data-action]");
+      if(!action) return;
+      const matter = action.dataset.matter;
+      const idx = state.patients.findIndex(p => p.matter===matter);
+      if(idx<0) return;
+
+      if(action.dataset.action==="delete"){
+        if(!confirm("Delete this patient?")) return;
+        const removed = state.patients.splice(idx,1)[0];
+        addNote("Patients", removed.matter, "Deleted patient");
+        saveState();
+        refresh();
+        render(); // update home KPIs too
+      }
+      if(action.dataset.action==="email"){
+        openEmailForPatient(state.patients[idx]);
+      }
+      if(action.dataset.action==="edit"){
+        toggleRowEdit(action.closest("tr"), true);
+      }
+      if(action.dataset.action==="cancel"){
+        toggleRowEdit(action.closest("tr"), false, true);
+      }
+      if(action.dataset.action==="save"){
+        const tr = action.closest("tr");
+        const updated = readRowInputs(tr);
+        state.patients[idx] = {...state.patients[idx], ...updated};
+        addNote("Patients", state.patients[idx].matter, "Updated patient");
+        saveState();
+        refresh();
+        render();
+      }
+    });
+
+    refresh();
+    return wrap;
+  }
+
+  function renderPatientsRows(rows, tbody){
+    tbody.innerHTML = rows.map(p => rowPatient(p)).join("") || `<tr><td colspan="11" class="muted">No patients yet. Click Quick Log.</td></tr>`;
+  }
+
+  function rowPatient(p){
+    const safe = (v)=>escapeHtml(v||"");
+    const matter = safe(p.matter);
+    return `
+      <tr data-matter="${matter}">
+        <td class="mono"><b>${matter}</b></td>
+        <td>${safe(p.patient)}</td>
+        <td>${safe(p.state)}</td>
+        <td>${safe(p.type)}</td>
+        <td>${safe(p.provider)}</td>
+        <td>${safe(p.requestedDate)}</td>
+        <td>${safe(p.sender)}</td>
+        <td>${safe(p.status)}</td>
+        <td>${safe(p.waitingOn)}</td>
+        <td class="small">${safe(p.notes || "")}</td>
+        <td>
+          <div class="row" style="gap:6px">
+            <button class="btn" data-action="email" data-matter="${matter}">✉️</button>
+            <button class="btn" data-action="edit" data-matter="${matter}">Edit</button>
+            <button class="btn hidden" data-action="save" data-matter="${matter}">Save</button>
+            <button class="btn hidden" data-action="cancel" data-matter="${matter}">Cancel</button>
+            <button class="btn" data-action="delete" data-matter="${matter}">Delete</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }
+
+  function toggleRowEdit(tr, on, revert=false){
+    // Convert certain cells to inputs; keep original in dataset for revert
+    const cells = tr.querySelectorAll("td");
+    const fields = ["matter","patient","state","type","provider","requestedDate","sender","status","waitingOn","notes"];
+    if(on){
+      if(tr.dataset.editing==="1") return;
+      tr.dataset.editing="1";
+      fields.forEach((f, i)=>{
+        const td = cells[i];
+        td.dataset.orig = td.innerText;
+        const val = td.innerText.trim();
+        if(f==="notes"){
+          td.innerHTML = `<textarea class="input" data-field="${f}" style="min-height:44px">${escapeAttr(val)}</textarea>`;
+        }else{
+          td.innerHTML = `<input class="input" data-field="${f}" value="${escapeAttr(val)}" />`;
+        }
+      });
+      // toggle buttons
+      tr.querySelector('[data-action="edit"]').classList.add("hidden");
+      tr.querySelector('[data-action="save"]').classList.remove("hidden");
+      tr.querySelector('[data-action="cancel"]').classList.remove("hidden");
+    }else{
+      // off
+      tr.dataset.editing="0";
+      if(revert){
+        fields.forEach((f,i)=>{
+          const td=cells[i];
+          td.textContent = td.dataset.orig || "";
+        });
+      }else{
+        // keep current values already saved by caller re-render
+      }
+      tr.querySelector('[data-action="edit"]').classList.remove("hidden");
+      tr.querySelector('[data-action="save"]').classList.add("hidden");
+      tr.querySelector('[data-action="cancel"]').classList.add("hidden");
+    }
+  }
+
+  function readRowInputs(tr){
+    const data = {};
+    tr.querySelectorAll("[data-field]").forEach(inp=>{
+      data[inp.dataset.field] = inp.value;
+    });
+    // normalize keys
+    data.matter = norm(data.matter);
+    return data;
+  }
+
+  function renderTasks(){
+    const wrap = document.createElement("div");
+    wrap.className="content";
+
+    const tools = document.createElement("div");
+    tools.className="row";
+    tools.innerHTML = `
+      <input class="input" id="taskSearch" placeholder="Search tasks (patient, subject, matter)" style="min-width:260px"/>
+      <select id="taskProgress">
+        <option value="">Progress (all)</option>
+        ${unique(state.tasks.map(t=>t.progress)).map(v=>`<option>${escapeHtml(v)}</option>`).join("")}
+      </select>
+      <select id="taskType">
+        <option value="">Task Type (all)</option>
+        ${unique(state.tasks.map(t=>t.type)).map(v=>`<option>${escapeHtml(v)}</option>`).join("")}
+      </select>
+      <button class="btn" id="taskClearBtn">Clear</button>
+    `;
+    wrap.appendChild(tools);
+
+    const grid = document.createElement("div");
+    grid.className="grid2";
+
+    const card = document.createElement("div");
+    card.className="card";
+    card.innerHTML = `<h3 style="margin:0">✅ Tasks</h3><div class="hr"></div>`;
+    const table = document.createElement("table");
+    table.innerHTML = `
+      <thead><tr><th>Priority</th><th>Task Type</th><th>Matter</th><th>Description</th><th>Progress</th><th></th></tr></thead>
+      <tbody id="tasksTbody"></tbody>
+    `;
+    card.appendChild(table);
+    const hint = document.createElement("div");
+    hint.className="mini";
+    hint.style.marginTop="8px";
+    hint.textContent = "Use Quick Buttons to add tasks fast, then edit/save as needed.";
+    card.appendChild(hint);
+
+    const quick = document.createElement("div");
+    quick.className="card";
+    quick.innerHTML = `
+      <h3 style="margin:0">📌 Quick Buttons</h3>
+      <p class="muted" style="margin:8px 0 0 0">These add tasks instantly. You can edit afterwards.</p>
+      <div class="hr"></div>
+      <div class="row" style="flex-direction:column; align-items:stretch">
+        <button class="btn" data-qtask="followup48">➕ Follow-up 48h</button>
+        <button class="btn" data-qtask="replyemail">➕ Reply email</button>
+        <button class="btn" data-qtask="updateclio">➕ Update Clio</button>
+        <button class="btn primary" data-qtask="sendref">➕ Send referral</button>
+      </div>
+    `;
+    quick.addEventListener("click", (e)=>{
+      const b = e.target.closest("[data-qtask]");
+      if(!b) return;
+      const type = b.dataset.qtask;
+      const map = {
+        followup48: {priority:"Medium", type:"Follow-up", description:"Follow-up in 48h"},
+        replyemail: {priority:"High", type:"Needs reply", description:"Reply email"},
+        updateclio: {priority:"Medium", type:"Update Clio", description:"Update Clio"},
+        sendref: {priority:"Medium", type:"Send referral", description:"Send referral"}
+      };
+      const t = map[type];
+      state.tasks.unshift({
+        id: crypto.randomUUID(),
+        priority: t.priority,
+        type: t.type,
+        matter: "",
+        description: t.description,
+        subject: "",
+        progress: "Open",
+        createdAt: nowStamp()
+      });
+      addNote("Tasks", "(set)", `Quick Button: ${t.description}`);
+      saveState();
+      refresh();
+      render(); // update Home too
+    });
+
+    grid.appendChild(card);
+    grid.appendChild(quick);
+    wrap.appendChild(grid);
+
+    const searchEl = tools.querySelector("#taskSearch");
+    const progEl = tools.querySelector("#taskProgress");
+    const typeEl = tools.querySelector("#taskType");
+    const clearBtn = tools.querySelector("#taskClearBtn");
+
+    const refresh = () => {
+      const q = lower(searchEl.value);
+      const pf = norm(progEl.value);
+      const tf = norm(typeEl.value);
+      const rows = state.tasks
+        .filter(t => !q || lower(t.description).includes(q) || lower(t.subject).includes(q) || lower(t.matter).includes(q))
+        .filter(t => !pf || t.progress===pf)
+        .filter(t => !tf || t.type===tf);
+      table.querySelector("#tasksTbody").innerHTML = rows.map(rowTask).join("") || `<tr><td colspan="6" class="muted">No tasks yet.</td></tr>`;
+    };
+
+    searchEl.addEventListener("input", refresh);
+    progEl.addEventListener("change", refresh);
+    typeEl.addEventListener("change", refresh);
+    clearBtn.addEventListener("click", ()=>{ searchEl.value=""; progEl.value=""; typeEl.value=""; refresh(); });
+
+    table.addEventListener("click", (e)=>{
+      const a = e.target.closest("[data-action]");
+      if(!a) return;
+      const id = a.dataset.id;
+      const idx = state.tasks.findIndex(t => t.id===id);
+      if(idx<0) return;
+      if(a.dataset.action==="delete"){
+        if(!confirm("Delete this task?")) return;
+        const removed = state.tasks.splice(idx,1)[0];
+        addNote("Tasks", removed.matter||"(set)", "Deleted task");
+        saveState(); refresh(); render();
+      }
+      if(a.dataset.action==="edit"){
+        toggleTaskEdit(a.closest("tr"), true);
+      }
+      if(a.dataset.action==="cancel"){
+        toggleTaskEdit(a.closest("tr"), false, true);
+      }
+      if(a.dataset.action==="save"){
+        const tr=a.closest("tr");
+        const updated=readTaskInputs(tr);
+        state.tasks[idx]={...state.tasks[idx], ...updated};
+        addNote("Tasks", state.tasks[idx].matter||"(set)", "Updated task");
+        saveState(); refresh(); render();
+      }
+      if(a.dataset.action==="email"){
+        const matter = state.tasks[idx].matter;
+        const patient = findPatient(matter);
+        if(!patient){ alert("Add patient first (Patients) then email provider."); return; }
+        openEmailForPatient(patient);
+      }
+    });
+
+    refresh();
+    return wrap;
+  }
+
+  function rowTask(t){
+    const cls = lower(t.priority)==="high" ? "high" : (lower(t.priority)==="medium" ? "med" : "low");
+    const safe=(v)=>escapeHtml(v||"");
+    return `
+      <tr data-id="${escapeHtml(t.id)}">
+        <td><span class="tag ${cls}">${safe(t.priority)}</span></td>
+        <td>${safe(t.type)}</td>
+        <td class="mono">${safe(t.matter||"(set)")}</td>
+        <td>${safe(t.description || t.subject || "")}</td>
+        <td>${safe(t.progress||"Open")}</td>
+        <td>
+          <div class="row" style="gap:6px">
+            <button class="btn" data-action="email" data-id="${escapeHtml(t.id)}">✉️</button>
+            <button class="btn" data-action="edit" data-id="${escapeHtml(t.id)}">Edit</button>
+            <button class="btn hidden" data-action="save" data-id="${escapeHtml(t.id)}">Save</button>
+            <button class="btn hidden" data-action="cancel" data-id="${escapeHtml(t.id)}">Cancel</button>
+            <button class="btn" data-action="delete" data-id="${escapeHtml(t.id)}">Delete</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }
+
+  function toggleTaskEdit(tr, on, revert=false){
+    const tds = tr.querySelectorAll("td");
+    const fields = ["priority","type","matter","description","progress"];
+    if(on){
+      if(tr.dataset.editing==="1") return;
+      tr.dataset.editing="1";
+      // store originals in data-orig
+      fields.forEach((f,i)=>{
+        const td=tds[i];
+        td.dataset.orig=td.innerText;
+        const val=td.innerText.trim();
+        td.innerHTML = `<input class="input" data-field="${f}" value="${escapeAttr(val)}" />`;
+      });
+      tr.querySelector('[data-action="edit"]').classList.add("hidden");
+      tr.querySelector('[data-action="save"]').classList.remove("hidden");
+      tr.querySelector('[data-action="cancel"]').classList.remove("hidden");
+    }else{
+      tr.dataset.editing="0";
+      if(revert){
+        fields.forEach((f,i)=>{ tds[i].textContent = tds[i].dataset.orig || ""; });
+      }
+      tr.querySelector('[data-action="edit"]').classList.remove("hidden");
+      tr.querySelector('[data-action="save"]').classList.add("hidden");
+      tr.querySelector('[data-action="cancel"]').classList.add("hidden");
+    }
+  }
+
+  function readTaskInputs(tr){
+    const data = {};
+    tr.querySelectorAll("[data-field]").forEach(inp=> data[inp.dataset.field]=inp.value);
+    return data;
+  }
+
+  function renderNotes(){
+    const wrap=document.createElement("div");
+    wrap.className="content";
+
+    const grid=document.createElement("div");
+    grid.className="grid2";
+
+    const logCard=document.createElement("div");
+    logCard.className="card";
+    logCard.innerHTML = `
+      <h3 style="margin:0">🧾 Notes Log</h3>
+      <p class="muted" style="margin:8px 0 0 0">Audit trail for quick saves (including Reports saves).</p>
+      <div class="hr"></div>
+    `;
+    const table=document.createElement("table");
+    table.innerHTML = `
+      <thead><tr><th>Date/Time</th><th>Section</th><th>Reference</th><th>Message</th></tr></thead>
+      <tbody>
+        ${state.notesLog.map(n=>`
+          <tr><td class="mono">${escapeHtml(n.ts)}</td><td>${escapeHtml(n.section)}</td><td class="mono">${escapeHtml(n.reference)}</td><td>${escapeHtml(n.message)}</td></tr>
+        `).join("") || `<tr><td colspan="4" class="muted">No notes yet.</td></tr>`}
+      </tbody>
+    `;
+    logCard.appendChild(table);
+
+    const emailCard=document.createElement("div");
+    emailCard.className="card";
+    emailCard.innerHTML = `
+      <h3 style="margin:0">✉️ Email Provider</h3>
+      <p class="muted" style="margin:8px 0 0 0">Choose a patient + provider and it will open Outlook with the draft template.</p>
+      <div class="hr"></div>
+      <div class="row" style="flex-direction:column; align-items:stretch; gap:10px">
+        <input class="input" id="notesMatterSearch" placeholder="Type matter manually (ex: 107853)"/>
+        <select id="notesPatientSelect"></select>
+        <select id="notesProviderSelect"></select>
+        <button class="btn primary" id="notesOpenEmailBtn">Open Outlook Draft</button>
+        <div class="mini">Tip: if a provider has no email yet, add it in Providers.</div>
+      </div>
+    `;
+
+    grid.appendChild(logCard);
+    grid.appendChild(emailCard);
+    wrap.appendChild(grid);
+
+    // Provider Directory preview
+    const dir=document.createElement("div");
+    dir.className="card";
+    dir.innerHTML = `
+      <h3 style="margin:0">🏥 Provider Directory</h3>
+      <p class="muted" style="margin:8px 0 0 0">Quick Log on this page adds a provider (including email).</p>
+      <div class="hr"></div>
+      <table>
+        <thead><tr><th>Name</th><th>States</th><th>Services</th><th>Email</th><th>Method</th><th>Notes</th></tr></thead>
+        <tbody>
+          ${state.providers.map(p=>`
+            <tr><td>${escapeHtml(p.name)}</td><td>${escapeHtml(p.states)}</td><td>${escapeHtml(p.services)}</td><td class="mono">${escapeHtml(p.email)}</td><td>${escapeHtml(p.method||"")}</td><td>${escapeHtml(p.notes||"")}</td></tr>
+          `).join("") || `<tr><td colspan="6" class="muted">No providers yet.</td></tr>`}
+        </tbody>
+      </table>
+    `;
+    wrap.appendChild(dir);
+
+    // Populate selects
+    const patientSel = emailCard.querySelector("#notesPatientSelect");
+    const providerSel = emailCard.querySelector("#notesProviderSelect");
+    const matterInput = emailCard.querySelector("#notesMatterSearch");
+
+    patientSel.innerHTML = `<option value="">Select patient...</option>` + state.patients.map(p=>`<option value="${escapeAttr(p.matter)}">${escapeHtml(p.matter)} — ${escapeHtml(p.patient)} (${escapeHtml(p.type||"")})</option>`).join("");
+    providerSel.innerHTML = `<option value="">Select provider...</option>` + state.providers.map(p=>`<option value="${escapeAttr(p.email)}">${escapeHtml(p.name)} (${escapeHtml(p.email||"no email")})</option>`).join("");
+
+    function syncFromMatter(){
+      const q = lower(matterInput.value);
+      if(!q) return;
+      const patient = state.patients.find(p => lower(p.matter)===q);
+      if(patient){
+        patientSel.value = patient.matter;
+        // auto provider if matches name
+        const prov = state.providers.find(x=> lower(x.name)===lower(patient.provider));
+        if(prov) providerSel.value = prov.email;
+      }
+    }
+    matterInput.addEventListener("input", syncFromMatter);
+
+    emailCard.querySelector("#notesOpenEmailBtn").addEventListener("click", ()=>{
+      const matter = patientSel.value || matterInput.value.trim();
+      const patient = findPatient(matter);
+      if(!patient){ alert("Patient not found. Add it in Patients."); return; }
+      openEmailForPatient(patient, providerSel.value || "");
+    });
+
+    return wrap;
+  }
+
+  function renderProviders(){
+    const wrap=document.createElement("div");
+    wrap.className="content";
+
+    const tools=document.createElement("div");
+    tools.className="row";
+    tools.innerHTML = `
+      <input class="input" id="provSearch" placeholder="Search providers" style="min-width:260px"/>
+      <button class="btn" id="provClearBtn">Clear</button>
+    `;
+    wrap.appendChild(tools);
+
+    const card=document.createElement("div");
+    card.className="card";
+    card.innerHTML = `<h3 style="margin:0">🏥 Providers</h3><div class="hr"></div>`;
+    const table=document.createElement("table");
+    table.innerHTML = `
+      <thead><tr><th>Name</th><th>States</th><th>Services</th><th>Email</th><th>Method</th><th>Notes</th><th></th></tr></thead>
+      <tbody id="provTbody"></tbody>
+    `;
+    card.appendChild(table);
+    wrap.appendChild(card);
+
+    const searchEl = tools.querySelector("#provSearch");
+    const clearBtn = tools.querySelector("#provClearBtn");
+
+    const refresh = () => {
+      const q=lower(searchEl.value);
+      const rows = state.providers.filter(p => !q || lower(p.name).includes(q) || lower(p.email).includes(q) || lower(p.services).includes(q));
+      table.querySelector("#provTbody").innerHTML = rows.map(rowProvider).join("") || `<tr><td colspan="7" class="muted">No providers yet. Quick Log adds providers.</td></tr>`;
+    };
+
+    searchEl.addEventListener("input", refresh);
+    clearBtn.addEventListener("click", ()=>{ searchEl.value=""; refresh(); });
+
+    table.addEventListener("click",(e)=>{
+      const a=e.target.closest("[data-action]");
+      if(!a) return;
+      const id=a.dataset.id;
+      const idx=state.providers.findIndex(p=>p.id===id);
+      if(idx<0) return;
+      if(a.dataset.action==="delete"){
+        if(!confirm("Delete provider?")) return;
+        const removed=state.providers.splice(idx,1)[0];
+        addNote("Providers", removed.name, "Deleted provider");
+        saveState(); refresh();
+      }
+      if(a.dataset.action==="edit"){ toggleProviderEdit(a.closest("tr"), true); }
+      if(a.dataset.action==="cancel"){ toggleProviderEdit(a.closest("tr"), false, true); }
+      if(a.dataset.action==="save"){
+        const tr=a.closest("tr");
+        const updated=readProviderInputs(tr);
+        state.providers[idx]={...state.providers[idx], ...updated};
+        addNote("Providers", state.providers[idx].name, "Updated provider");
+        saveState(); refresh();
+      }
+      if(a.dataset.action==="email"){
+        const email = state.providers[idx].email;
+        if(!email){ alert("Provider has no email."); return; }
+        // open a blank email with template (no patient) – still required template
+        const subject = "Client information";
+        const body =
+`Good afternoon.
+I hope this message finds you well.
+I'm reaching out to let you know that I’m sending the client’s information for: ----. 
+
+- Is Transportation needed?:  
+• Name: 
+• Phone:
+• Email: 
+• Address: 
+• DOA: 
+• DOB: 
+• Law Firm:
+• Liability Limits and Status:
+
+If you have any specific requests or need additional details once you receive the information, feel free to let me know — I’ll be happy to assist.
+Thank you for your patience and cooperation.
+
+Best regards. 😊
+Isabel Galban
+Vital Marketing`;
+        window.location.href = mailtoDraft(email, subject, body);
+        addNote("Providers", state.providers[idx].name, "Opened email draft");
+      }
+    });
+
+    refresh();
+    return wrap;
+  }
+
+  function rowProvider(p){
+    const safe=(v)=>escapeHtml(v||"");
+    return `
+      <tr data-id="${escapeHtml(p.id)}">
+        <td>${safe(p.name)}</td>
+        <td>${safe(p.states)}</td>
+        <td>${safe(p.services)}</td>
+        <td class="mono">${safe(p.email)}</td>
+        <td>${safe(p.method)}</td>
+        <td class="small">${safe(p.notes)}</td>
+        <td>
+          <div class="row" style="gap:6px">
+            <button class="btn" data-action="email" data-id="${escapeHtml(p.id)}">✉️</button>
+            <button class="btn" data-action="edit" data-id="${escapeHtml(p.id)}">Edit</button>
+            <button class="btn hidden" data-action="save" data-id="${escapeHtml(p.id)}">Save</button>
+            <button class="btn hidden" data-action="cancel" data-id="${escapeHtml(p.id)}">Cancel</button>
+            <button class="btn" data-action="delete" data-id="${escapeHtml(p.id)}">Delete</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }
+
+  function toggleProviderEdit(tr,on,revert=false){
+    const tds=tr.querySelectorAll("td");
+    const fields=["name","states","services","email","method","notes"];
+    if(on){
+      if(tr.dataset.editing==="1") return;
+      tr.dataset.editing="1";
+      fields.forEach((f,i)=>{
+        const td=tds[i];
+        td.dataset.orig=td.innerText;
+        const val=td.innerText.trim();
+        td.innerHTML = `<input class="input" data-field="${f}" value="${escapeAttr(val)}" />`;
+      });
+      tr.querySelector('[data-action="edit"]').classList.add("hidden");
+      tr.querySelector('[data-action="save"]').classList.remove("hidden");
+      tr.querySelector('[data-action="cancel"]').classList.remove("hidden");
+    }else{
+      tr.dataset.editing="0";
+      if(revert){ fields.forEach((f,i)=>{ tds[i].textContent = tds[i].dataset.orig||""; }); }
+      tr.querySelector('[data-action="edit"]').classList.remove("hidden");
+      tr.querySelector('[data-action="save"]').classList.add("hidden");
+      tr.querySelector('[data-action="cancel"]').classList.add("hidden");
+    }
+  }
+  function readProviderInputs(tr){
+    const data={};
+    tr.querySelectorAll("[data-field]").forEach(inp=>data[inp.dataset.field]=inp.value);
+    return data;
+  }
+
+  function renderReports(){
+    const wrap=document.createElement("div");
+    wrap.className="content";
+
+    const card=document.createElement("div");
+    card.className="card";
+    card.innerHTML = `
+      <h3 style="margin:0">📊 4pm report</h3>
+      <p class="muted" style="margin:8px 0 0 0">Generate, copy, and save your daily report. Saves are tracked.</p>
+      <div class="hr"></div>
+      <textarea id="reportDraft" class="input" placeholder="Click Generate 4pm Draft..."></textarea>
+      <div class="row" style="margin-top:10px">
+        <button class="btn" id="copyReportBtn">📋 Copy</button>
+        <button class="btn" id="saveReportBtn">💾 Save</button>
+      </div>
+      <div class="hr"></div>
+      <h3 style="margin:0">Report Save Log</h3>
+      <div class="mini" style="margin-top:6px">You can edit/save/delete saved reports below.</div>
+      <div class="hr"></div>
+    `;
+    const table=document.createElement("table");
+    table.innerHTML = `
+      <thead><tr><th>Date/Time</th><th>Preview</th><th></th></tr></thead>
+      <tbody id="reportsTbody"></tbody>
+    `;
+    card.appendChild(table);
+    wrap.appendChild(card);
+
+    const refresh=()=>{
+      const tbody = card.querySelector("#reportsTbody");
+      tbody.innerHTML = state.reports.map(r=>`
+        <tr data-id="${escapeHtml(r.id)}">
+          <td class="mono">${escapeHtml(r.ts)}</td>
+          <td>${escapeHtml(r.text).slice(0,120)}${escapeHtml(r.text).length>120?"…":""}</td>
+          <td>
+            <div class="row" style="gap:6px">
+              <button class="btn" data-action="load" data-id="${escapeHtml(r.id)}">Load</button>
+              <button class="btn" data-action="delete" data-id="${escapeHtml(r.id)}">Delete</button>
+            </div>
+          </td>
+        </tr>
+      `).join("") || `<tr><td colspan="3" class="muted">No saved reports yet.</td></tr>`;
+    };
+
+    card.querySelector("#copyReportBtn").addEventListener("click", async ()=>{
+      const text = card.querySelector("#reportDraft").value;
+      await navigator.clipboard.writeText(text);
+      addNote("Reports","4pm","Copied report");
+      alert("Copied!");
+    });
+
+    card.querySelector("#saveReportBtn").addEventListener("click", ()=>{
+      const text = card.querySelector("#reportDraft").value.trim();
+      if(!text){ alert("Nothing to save."); return; }
+      const item={id: crypto.randomUUID(), ts: nowStamp(), text};
+      state.reports.unshift(item);
+      addNote("Reports","4pm","Saved report");
+      saveState();
+      refresh();
+    });
+
+    table.addEventListener("click",(e)=>{
+      const a=e.target.closest("[data-action]");
+      if(!a) return;
+      const id=a.dataset.id;
+      const idx=state.reports.findIndex(r=>r.id===id);
+      if(idx<0) return;
+      if(a.dataset.action==="load"){
+        card.querySelector("#reportDraft").value = state.reports[idx].text;
+      }
+      if(a.dataset.action==="delete"){
+        if(!confirm("Delete saved report?")) return;
+        state.reports.splice(idx,1);
+        addNote("Reports","4pm","Deleted saved report");
+        saveState(); refresh();
+      }
+    });
+
+    refresh();
+    return wrap;
+  }
+
+  // =============================
+  //  Global Buttons
+  // =============================
+  $("#toggleAssistantBtn").addEventListener("click", ()=>toggleAssistant());
+  $("#assistantCloseBtn").addEventListener("click", ()=>toggleAssistant(false));
+  $("#assistantSendBtn").addEventListener("click", ()=>assistantSend());
+  $("#assistantInput").addEventListener("keydown",(e)=>{ if(e.key==="Enter"){ e.preventDefault(); assistantSend(); } });
+
+  $("#downloadBtn").addEventListener("click", ()=>{
+    // lightweight CSV export
+    const csv = [
+      ["Matter","Patient","State","Type","Provider","Requested Date","Sender","Status","Waiting On","Notes"].join(","),
+      ...state.patients.map(p=>[
+        p.matter,p.patient,p.state,p.type,p.provider,p.requestedDate,p.sender,p.status,p.waitingOn,(p.notes||"").replaceAll("\n"," ")
+      ].map(csvCell).join(","))
+    ].join("\n");
+    const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `patients_${(new Date()).toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  });
+
+  $("#gen4pmBtn").addEventListener("click", ()=>{
+    const openTasks = state.tasks.filter(t => lower(t.progress)!=="done");
+    const draft =
+`Key pending / issues:
+${openTasks.map(t=>`- ${t.matter||"(set)"}: ${t.type} — ${t.description||t.subject||""}`).join("\n") || "- (none)"}
+\nPatients in system: ${state.patients.length}
+Open tasks: ${openTasks.length}
+Generated: ${nowStamp()}`;
+    // If on reports page, fill textarea; else go to reports and fill
+    if(state.ui.route!=="reports"){
+      state.ui.route="reports";
+      saveState();
+      setRoute("reports");
+    }
+    setTimeout(()=>{
+      const ta = $("#reportDraft");
+      if(ta) ta.value = draft;
+      addNote("Reports","4pm","Generated report draft");
+    }, 0);
+  });
+
+  $("#quickLogBtn").addEventListener("click", ()=>{
+    const r = state.ui.route;
+    if(r==="patients") openQuickLogPatients();
+    else if(r==="tasks") openQuickLogTasks();
+    else if(r==="providers") openQuickLogProviders();
+    else if(r==="notes") openQuickLogProviders(); // notes quick log adds providers (as you requested)
+  });
+
+  // Ctrl+K toggle assistant
+  window.addEventListener("keydown",(e)=>{
+    if((e.ctrlKey || e.metaKey) && e.key.toLowerCase()==="k"){
+      e.preventDefault();
+      toggleAssistant();
+    }
+  });
+
+  // =============================
+  //  Quick Log Modals
+  // =============================
+  const backdrop = $("#backdrop");
+  const modalTitle = $("#modalTitle");
+  const modalBody = $("#modalBody");
+  const modalHint = $("#modalHint");
+  let modalSaveHandler = null;
+
+  function openModal(title, bodyHtml, hint, onSave){
+    modalTitle.textContent = title;
+    modalBody.innerHTML = bodyHtml;
+    modalHint.textContent = hint || "";
+    modalSaveHandler = onSave;
+    backdrop.style.display="flex";
+    backdrop.setAttribute("aria-hidden","false");
+  }
+  function closeModal(){
+    backdrop.style.display="none";
+    backdrop.setAttribute("aria-hidden","true");
+    modalBody.innerHTML="";
+    modalSaveHandler=null;
+  }
+  $("#closeModalBtn").addEventListener("click", closeModal);
+  $("#modalCancelBtn").addEventListener("click", closeModal);
+  $("#modalSaveBtn").addEventListener("click", ()=>{
+    if(modalSaveHandler) modalSaveHandler();
+  });
+
+  function openQuickLogPatients(){
+    openModal(
+      "Quick Log — Patient",
+      `
+      <div class="grid">
+        <input class="input" id="ql_matter" placeholder="Matter (ex: 107853)"/>
+        <input class="input" id="ql_patient" placeholder="Patient name"/>
+        <input class="input" id="ql_state" placeholder="State (ex: OH)"/>
+        <input class="input" id="ql_type" placeholder="Type (MRI, PT, Chiro/PT...)"/>
+        <input class="input" id="ql_provider" placeholder="Provider name"/>
+        <input class="input" id="ql_providerEmail" placeholder="Provider email (optional)"/>
+        <input class="input" id="ql_req" placeholder="Requested date (YYYY-MM-DD)"/>
+        <input class="input" id="ql_sender" placeholder="Sender (Email/Web page/etc)"/>
+        <input class="input" id="ql_status" placeholder="Status (New / Sent to clinic / Stuck...)"/>
+        <input class="input" id="ql_waiting" placeholder="Waiting On (Clinic / You / Attorney...)"/>
+      </div>
+      <div style="margin-top:10px">
+        <textarea class="input" id="ql_notes" placeholder="Notes"></textarea>
+      </div>
+      `,
+      "Adds a patient and updates Home + Assistant immediately.",
+      ()=>{
+        const p = {
+          matter: norm($("#ql_matter").value),
+          patient: norm($("#ql_patient").value),
+          state: norm($("#ql_state").value),
+          type: norm($("#ql_type").value),
+          provider: norm($("#ql_provider").value),
+          providerEmail: norm($("#ql_providerEmail").value),
+          requestedDate: norm($("#ql_req").value),
+          sender: norm($("#ql_sender").value),
+          status: norm($("#ql_status").value),
+          waitingOn: norm($("#ql_waiting").value),
+          notes: norm($("#ql_notes").value),
+          createdAt: new Date().toISOString()
+        };
+        if(!p.matter || !p.patient){
+          alert("Matter and Patient are required.");
+          return;
+        }
+        // avoid duplicates by matter
+        const existingIdx = state.patients.findIndex(x=>x.matter===p.matter);
+        if(existingIdx>=0){
+          state.patients[existingIdx] = {...state.patients[existingIdx], ...p};
+          addNote("Patients", p.matter, "Quick Log updated patient");
+        }else{
+          state.patients.unshift(p);
+          addNote("Patients", p.matter, "Quick Log added patient");
+        }
+        saveState();
+        closeModal();
+        render(); // refresh all
+      }
+    );
+  }
+
+  function openQuickLogTasks(){
+    openModal(
+      "Quick Log — Task",
+      `
+      <div class="grid">
+        <input class="input" id="t_matter" placeholder="Matter (optional, but recommended)"/>
+        <input class="input" id="t_type" placeholder="Task Type (Needs reply / Follow-up / Send referral...)"/>
+        <input class="input" id="t_priority" placeholder="Priority (High/Medium/Low)"/>
+        <input class="input" id="t_progress" placeholder="Progress (Open/Done)"/>
+      </div>
+      <div style="margin-top:10px">
+        <textarea class="input" id="t_desc" placeholder="Description / subject"></textarea>
+      </div>
+      `,
+      "Adds a task. You can edit later.",
+      ()=>{
+        const t = {
+          id: crypto.randomUUID(),
+          matter: norm($("#t_matter").value),
+          type: norm($("#t_type").value) || "Needs reply",
+          priority: norm($("#t_priority").value) || "Medium",
+          progress: norm($("#t_progress").value) || "Open",
+          description: norm($("#t_desc").value),
+          subject: "",
+          createdAt: nowStamp()
+        };
+        state.tasks.unshift(t);
+        addNote("Tasks", t.matter||"(set)", "Quick Log added task");
+        saveState(); closeModal(); render();
+      }
+    );
+  }
+
+  function openQuickLogProviders(){
+    openModal(
+      "Quick Log — Provider",
+      `
+      <div class="grid">
+        <input class="input" id="p_name" placeholder="Provider / Company name"/>
+        <input class="input" id="p_states" placeholder="States (ex: GA, FL)"/>
+        <input class="input" id="p_services" placeholder="Services (MRI, PT, Chiro/PT...)"/>
+        <input class="input" id="p_email" placeholder="Email"/>
+        <input class="input" id="p_method" placeholder="Method (Email/Portal/Fax)"/>
+        <input class="input" id="p_notes" placeholder="Notes"/>
+      </div>
+      `,
+      "Adds a provider to the directory (also used by Email drafts).",
+      ()=>{
+        const prov = {
+          id: crypto.randomUUID(),
+          name: norm($("#p_name").value),
+          states: norm($("#p_states").value),
+          services: norm($("#p_services").value),
+          email: norm($("#p_email").value),
+          method: norm($("#p_method").value),
+          notes: norm($("#p_notes").value)
+        };
+        if(!prov.name){ alert("Provider name required."); return; }
+        state.providers.unshift(prov);
+        addNote("Providers", prov.name, "Quick Log added provider");
+        saveState(); closeModal(); render();
+      }
+    );
+  }
+
+  // =============================
+  //  Email
+  // =============================
+  function openEmailForPatient(patient, overrideEmail=""){
+    const {providerEmail, subject, body} = providerTemplate(patient);
+    const email = overrideEmail || providerEmail;
+    if(!email){
+      alert("This patient/provider has no email. Add email in Providers or patient quick log.");
+      return;
+    }
+    window.location.href = mailtoDraft(email, subject, body);
+    addNote("Notes", patient.matter, "Opened Outlook draft");
+  }
+
+  // =============================
+  //  Assistant (rule-based)
+  // =============================
+  function toggleAssistant(force){
+    const wrap = $("#assistantWrap");
+    const willShow = (force===undefined) ? wrap.classList.contains("hidden") : force;
+    wrap.classList.toggle("hidden", !willShow);
+    if(willShow){
+      renderAssistant();
+      setTimeout(()=>$("#assistantInput").focus(), 50);
+    }
+    saveState();
+  }
+
+  function renderAssistant(){
+    const body = $("#assistantBody");
+    body.innerHTML = "";
+    const msgs = state.assistantChat;
+    if(!msgs.length){
+      assistantPush("assistant", `Hola Isabel 👋
+
+Puedes escribir:
+• show needs reply
+• open 107853
+• give an update about Peter
+• update patient 107853 status=Sent to clinic waitingOn=Clinic
+• email provider 107853`);
+    }
+    state.assistantChat.forEach(m=>{
+      const div=document.createElement("div");
+      div.className = "bubble " + (m.role==="user" ? "user" : "");
+      div.textContent = m.text;
+      body.appendChild(div);
+    });
+    $("#assistantPending").textContent = "0";
+    body.scrollTop = body.scrollHeight;
+  }
+
+  function assistantPush(role, text){
+    state.assistantChat.push({ts:Date.now(), role, text});
+    // keep last 80 messages
+    if(state.assistantChat.length>80) state.assistantChat.splice(0, state.assistantChat.length-80);
+    saveState();
+    renderAssistant();
+  }
+
+  function assistantSend(){
+    const input = $("#assistantInput");
+    const text = norm(input.value);
+    if(!text) return;
+    input.value="";
+    assistantPush("user", text);
+    const reply = handleAssistant(text);
+    assistantPush("assistant", reply);
+  }
+
+  function handleAssistant(text){
+    const t = lower(text);
+
+    // show needs reply
+    if(t.includes("show needs reply") || t.includes("needs reply")){
+      const list = state.tasks.filter(x=>lower(x.type)==="needs reply" && lower(x.progress)!=="done");
+      if(!list.length) return "No open 'Needs reply' tasks right now.";
+      // route to tasks and prefilter type
+      state.ui.route="tasks"; saveState(); setRoute("tasks");
+      return `Opened Tasks. You can filter by Task Type = Needs reply. Pending:\n${list.slice(0,8).map(x=>`- ${x.matter||"(set)"}: ${x.description||""}`).join("\n")}`;
+    }
+
+    // open <matter>
+    const openMatch = t.match(/\bopen\s+([a-z0-9-]+)/i);
+    if(openMatch){
+      const q = openMatch[1];
+      const p = findPatient(q);
+      if(!p) return `I couldn't find a patient for '${q}'.`;
+      state.ui.route="patients"; state.ui.patientSearch=p.matter; saveState(); setRoute("patients");
+      render();
+      return `Opened Patients and filtered by matter ${p.matter} (${p.patient}).`;
+    }
+
+    // give an update about <name>
+    const updMatch = t.match(/update\s+about\s+(.+)/i) || t.match(/give\s+an\s+update\s+about\s+(.+)/i) || t.match(/give\s+me\s+an\s+update\s+about\s+(.+)/i);
+    if(updMatch){
+      const q = updMatch[1].trim();
+      const p = findPatient(q);
+      if(!p) return `I couldn't find '${q}' in your patients list.`;
+      return formatPatientUpdate(p);
+    }
+
+    // update patient <matter> status=... waitingOn=...
+    const up = t.match(/update\s+patient\s+([a-z0-9-]+)\s*(.*)/i);
+    if(up){
+      const matter = up[1];
+      const rest = up[2] || "";
+      const p = findPatient(matter);
+      if(!p) return `I couldn't find patient with matter '${matter}'.`;
+      const updates = parseKeyVals(rest);
+      const idx = state.patients.findIndex(x=>x.matter===p.matter);
+      state.patients[idx] = {...state.patients[idx], ...updates};
+      addNote("Patients", p.matter, "Updated via Assistant");
+      saveState();
+      render();
+      return `Updated ${p.patient} (${p.matter}).\nStatus: ${state.patients[idx].status||""}\nWaiting On: ${state.patients[idx].waitingOn||""}`;
+    }
+
+    // email provider <matter>
+    const em = t.match(/email\s+provider\s+([a-z0-9-]+)/i) || t.match(/send\s+email\s+for\s+([a-z0-9-]+)/i);
+    if(em){
+      const q = em[1];
+      const p = findPatient(q);
+      if(!p) return `I couldn't find patient for matter '${q}'.`;
+      openEmailForPatient(p);
+      return `Opening Outlook draft for ${p.patient} (${p.matter}).`;
+    }
+
+    // fallback: try patient name lookup
+    const maybe = findPatient(text);
+    if(maybe){
+      return formatPatientUpdate(maybe);
+    }
+
+    return `I can help with:
+• show needs reply
+• open <matter>
+• give an update about <name>
+• update patient <matter> status=... waitingOn=...
+• email provider <matter>`;
+  }
+
+  function parseKeyVals(rest){
+    // accepts: status=Sent to clinic waitingOn=Clinic provider=...
+    const out = {};
+    const parts = rest.match(/(\w+)\s*=\s*([^=]+?)(?=\s+\w+\s*=|$)/g) || [];
+    for(const p of parts){
+      const m = p.match(/(\w+)\s*=\s*([\s\S]+)/);
+      if(!m) continue;
+      const key = m[1];
+      const val = m[2].trim();
+      // map common keys
+      if(key.toLowerCase()==="waitingon") out.waitingOn = val;
+      else if(key.toLowerCase()==="lawfirm") out.lawFirm = val;
+      else out[key] = val;
+    }
+    return out;
+  }
+
+  function formatPatientUpdate(p){
+    return `Patient: ${p.patient}
+Matter: ${p.matter}
+Type: ${p.type||""}
+Provider: ${p.provider||""}
+Status: ${p.status||""}
+Waiting On: ${p.waitingOn||""}
+Requested: ${p.requestedDate||""}
+Notes: ${p.notes||""}`;
   }
 
   // =============================
   //  Helpers
   // =============================
-  function fillSelect(selectEl, options, includeBlank=false, blankLabel="(all)") {
-    selectEl.innerHTML = "";
-    if(includeBlank) {
-      const o=document.createElement("option");
-      o.value=""; o.textContent=blankLabel;
-      selectEl.appendChild(o);
-    }
-    options.forEach(v=>{
-      const o=document.createElement("option");
-      o.value=v; o.textContent=v;
-      selectEl.appendChild(o);
-    });
+  function unique(arr){
+    return Array.from(new Set(arr.map(x=>norm(x)).filter(Boolean))).sort((a,b)=>a.localeCompare(b));
   }
-
-  function escapeHtml(s) {
-    return String(s ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#39;");
+  function csvCell(v){
+    const s = String(v ?? "");
+    if(/[",\n]/.test(s)) return `"${s.replaceAll('"','""')}"`;
+    return s;
   }
-
-  function mkSelectCell(value, options, onChangeJs) {
-    const opts = options.map(o => `<option ${o===value?"selected":""}>${escapeHtml(o)}</option>`).join("");
-    return `<select onchange="${onChangeJs}">${opts}</select>`;
+  function escapeHtml(s){
+    return String(s ?? "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
-
-  function mailtoHref(email, subject="", body=""){
-    const params = new URLSearchParams();
-    if(subject) params.set("subject", subject);
-    if(body) params.set("body", body);
-    return `mailto:${encodeURIComponent(email)}?${params.toString()}`;
-  }
-
-  function addNote(section, ref, note){
-    notesLog.unshift({dt: nowIso(), section, ref, note});
-    saveState();
-    renderNotesLog();
-  }
-
-  function findPatient(matter){
-    if(!matter) return null;
-    return patients.find(p=>String(p.matter).toLowerCase()===String(matter).toLowerCase()) || null;
-  }
-
-  function findProviderByName(name){
-    if(!name) return null;
-    return providers.find(p=>String(p.provider).toLowerCase()===String(name).toLowerCase()) || null;
+  function escapeAttr(s){
+    return String(s ?? "").replace(/"/g,'&quot;');
   }
 
   // =============================
-  //  HOME filtering (KPI click)
+  //  Boot
   // =============================
-  let homeFilter = ""; // overdue | needs_reply | new_today | waiting_clinic
-
-  function applyHomeFilter(kind){
-    homeFilter = kind || "";
-    const mapLabel = {
-      "overdue":"Overdue today",
-      "needs_reply":"Needs reply (reply today)",
-      "new_today":"New today",
-      "waiting_clinic":"Waiting on clinic",
-      "":"All"
-    };
-    document.getElementById("homeFilterTag").textContent = mapLabel[homeFilter] || "All";
-    renderHome();
+  // If user previously opened assistant, keep it open
+  if(state.assistantChat.length){
+    // keep assistant closed by default; user can open
   }
+  setRoute(state.ui.route || "home");
 
-  function homeFilterRows(rows){
-    if(!homeFilter) return rows;
-    if(homeFilter==="needs_reply"){
-      const matters = new Set(emailActions.filter(e=>String(e.type).toLowerCase()==="needs reply").map(e=>e.matter));
-      return rows.filter(r=>matters.has(r.matter));
-    }
-    if(homeFilter==="waiting_clinic"){
-      return rows.filter(r=>String(r.waiting).toLowerCase()==="clinic");
-    }
-    if(homeFilter==="new_today"){
-      const d=new Date(); const pad=(n)=>String(n).padStart(2,"0");
-      const today = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-      const matters = new Set(patients.filter(p=>p.requestedDate===today).map(p=>p.matter));
-      return rows.filter(r=>matters.has(r.matter));
-    }
-    if(homeFilter==="overdue"){
-      return rows.filter(r=>String(r.due).toLowerCase()==="today" && ["stuck","pending records"].includes(String(r.status).toLowerCase()));
-    }
-    return rows;
-  }
-
-  // =============================
-  //  Email Preview Modal
-  // =============================
-  const emailModal = document.getElementById("emailModalBackdrop");
-  function openEmailModal(){ emailModal.classList.add("show"); }
-  function closeEmailModal(){ emailModal.classList.remove("show"); }
-  emailModal.addEventListener("click", (e)=>{ if(e.target===emailModal) closeEmailModal(); });
-
-  function previewEmail(patient, provider, subject, body){
-    const title = document.getElementById("emailModalTitle");
-    const bodyEl = document.getElementById("emailModalBody");
-    
-    title.textContent = `✉️ Email to ${provider.provider}`;
-    
-    let html = `
-      <div class="note"><b>To:</b> ${provider.email}</div>
-      <div class="note"><b>Subject:</b> ${escapeHtml(subject)}</div>
-      <div class="email-preview">${escapeHtml(body).replace(/\n/g, '<br>')}</div>
-      <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
-        <button class="btn" onclick="closeEmailModal()">✕ Close</button>
-        <a class="btn primary" href="${mailtoHref(provider.email, subject, body)}" target="_blank">📧 Open in Email Client</a>
-        <button class="btn" onclick="copyToClipboard('${escapeHtml(body).replace(/'/g, "\\'")}')">📋 Copy Body</button>
-      </div>
-    `;
-    
-    bodyEl.innerHTML = html;
-    openEmailModal();
-  }
-
-  function copyToClipboard(text){
-    navigator.clipboard.writeText(text)
-      .then(()=>alert("Copied to clipboard ✅"))
-      .catch(()=>alert("Could not copy (browser permissions)."));
-  }
-
-  // =============================
-  //  Build Email Template
-  // =============================
-  function buildProviderEmailTemplate(patient, provider){
-    const clientName = patient ? patient.patient : "----";
-    const matter = patient ? patient.matter : "----";
-    const serviceType = patient ? patient.type : "----";
-    
-    const subject = `Client info – ${clientName} (${matter}) – ${serviceType}`;
-    
-    const body = [
-      "Good afternoon.",
-      "I hope this message finds you well.",
-      `I'm reaching out to let you know that I'm sending the client's information for: ${clientName} (${matter}) - ${serviceType}.`,
-      "",
-      "- Is Transportation needed?:",
-      "• Name:",
-      "• Phone:",
-      "• Email:",
-      "• Address:",
-      "• DOA:",
-      "• DOB:",
-      "• Law Firm:",
-      "• Liability Limits and Status:",
-      "",
-      "If you have any specific requests or need additional details once you receive the information, feel free to let me know — I'll be happy to assist.",
-      "Thank you for your patience and cooperation.",
-      "",
-      "Best regards. 😊",
-      "Isabel Galban",
-      "Vital Marketing"
-    ].join("\n");
-    
-    return {subject, body};
-  }
-
-  // =============================
-  //  Render Functions
-  // =============================
-  function renderHome() {
-    // KPIs
-    const needsReplyCount = emailActions.filter(e=>String(e.type).toLowerCase()==="needs reply").length;
-    document.getElementById("kpiNeedsReply").textContent = String(needsReplyCount);
-
-    const waitingClinicCount = priorityRows.filter(r=>String(r.waiting).toLowerCase()==="clinic").length;
-    document.getElementById("kpiWaiting").textContent = String(waitingClinicCount);
-
-    const d=new Date(); const pad=(n)=>String(n).padStart(2,"0");
-    const today = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-    const newTodayCount = patients.filter(p=>p.requestedDate===today).length;
-    document.getElementById("kpiNew").textContent = String(newTodayCount);
-
-    const overdueCount = priorityRows.filter(r=>String(r.due).toLowerCase()==="today" && ["stuck","pending records"].includes(String(r.status).toLowerCase())).length;
-    document.getElementById("kpiOverdue").textContent = String(overdueCount);
-
-    const shown = homeFilterRows(priorityRows);
-
-    document.getElementById("tblPriority").innerHTML = shown.map((r, idx)=>`
-      <tr>
-        <td><a href="#" onclick="openPatient('${r.matter}')">${escapeHtml(r.matter)}</a></td>
-        <td>${escapeHtml(r.patient)}</td>
-        <td>${escapeHtml(r.state)}</td>
-        <td><div class="cell">${mkSelectCell(r.type, TYPE_OPTIONS, `updatePriorityByMatter('${r.matter}','type',this.value)`)}</div></td>
-        <td><div class="cell">${mkSelectCell(r.status, STATUS_OPTIONS, `updatePriorityByMatter('${r.matter}','status',this.value)`)}</div></td>
-        <td><div class="cell">${mkSelectCell(r.waiting, WAITING_OPTIONS, `updatePriorityByMatter('${r.matter}','waiting',this.value)`)}</div></td>
-        <td>${escapeHtml(r.next)}</td>
-        <td>${escapeHtml(r.due)}</td>
-        <td class="action-buttons">
-          ${r.providerEmail ? `<button class="btn small" onclick="sendEmailFromPriority('${r.matter}')">📧 Email</button>` : ''}
-          <button class="btn small" onclick="openPatient('${r.matter}')">👁️ View</button>
-        </td>
-      </tr>
-    `).join("");
-
-    document.getElementById("tblEmailActions").innerHTML = emailActions.map((e, idx)=>{
-      const t = String(e.type).toLowerCase();
-      const cls = (t==="needs reply") ? "orange" : (t==="follow-up" ? "gray" : "gray");
-      const patient = findPatient(e.matter);
-      const provider = providers.find(p=>p.email===e.providerEmail);
-      const emailTemplate = buildProviderEmailTemplate(patient, provider || {provider: "Provider", email: e.providerEmail});
-      
-      return `
-        <tr>
-          <td><span class="badge ${cls}">${escapeHtml(e.type)}</span></td>
-          <td>${escapeHtml(e.matter)}</td>
-          <td>${escapeHtml(e.subject)}</td>
-          <td>${escapeHtml(e.due)}</td>
-          <td>${e.providerEmail ? `<a href="mailto:${e.providerEmail}">${escapeHtml(e.providerEmail)}</a>` : '<span class="badge gray">No email</span>'}</td>
-          <td class="action-buttons">
-            ${e.providerEmail ? `<button class="btn small" onclick="previewEmailFromAction(${idx})">📧 Preview</button>` : ''}
-          </td>
-        </tr>`;
-    }).join("");
-  }
-
-  function renderPatients() {
-    const q = (document.getElementById("patientSearch").value || "").toLowerCase();
-    const fs = document.getElementById("filterStatus").value;
-    const fw = document.getElementById("filterWaiting").value;
-
-    const rows = patients.filter(p=>{
-      const hay = `${p.matter} ${p.patient} ${p.state} ${p.type} ${p.provider} ${p.sender} ${p.status} ${p.waiting} ${p.notes}`.toLowerCase();
-      if(q && !hay.includes(q)) return false;
-      if(fs && p.status !== fs) return false;
-      if(fw && p.waiting !== fw) return false;
-      return true;
-    });
-
-    document.getElementById("tblPatients").innerHTML = rows.map((p, idx)=>`
-      <tr>
-        <td><a href="#" onclick="openPatientDetail(${idx})">${escapeHtml(p.matter)}</a></td>
-        <td>${escapeHtml(p.patient)}</td>
-        <td>${escapeHtml(p.state)}</td>
-        <td><div class="cell">${mkSelectCell(p.type, TYPE_OPTIONS, `updatePatientByMatter('${p.matter}','type',this.value)`)}</div></td>
-        <td>${escapeHtml(p.provider)}</td>
-        <td>${escapeHtml(p.requestedDate)}</td>
-        <td>${escapeHtml(p.sender)}</td>
-        <td><div class="cell">${mkSelectCell(p.status, STATUS_OPTIONS, `updatePatientByMatter('${p.matter}','status',this.value)`)}</div></td>
-        <td><div class="cell">${mkSelectCell(p.waiting, WAITING_OPTIONS, `updatePatientByMatter('${p.matter}','waiting',this.value)`)}</div></td>
-        <td>${escapeHtml(p.notes)}</td>
-        <td>${escapeHtml(p.due)}</td>
-        <td class="action-buttons">
-          <button class="btn small" onclick="editPatient(${idx})">✏️ Edit</button>
-          <button class="btn small danger" onclick="deletePatient(${idx})">🗑️ Delete</button>
-        </td>
-      </tr>
-    `).join("");
-  }
-
-  function renderTasks() {
-    const q = (document.getElementById("taskSearch").value || "").toLowerCase();
-    const fs = document.getElementById("filterTaskStatus").value;
-    const ft = document.getElementById("filterTaskType").value;
-
-    const rows = tasks.filter(t=>{
-      const hay = `${t.priority} ${t.taskType} ${t.matter} ${t.desc} ${t.progress} ${t.due}`.toLowerCase();
-      if(q && !hay.includes(q)) return false;
-      if(fs && t.progress !== fs) return false;
-      if(ft && t.taskType !== ft) return false;
-      return true;
-    });
-
-    document.getElementById("tblTasks").innerHTML = rows.map((t, idx)=>`
-      <tr>
-        <td><span class="badge ${t.priority==='High'?'red':t.priority==='Medium'?'orange':'gray'}">${escapeHtml(t.priority)}</span></td>
-        <td><div class="cell">${mkSelectCell(t.taskType, TASK_TYPE_OPTIONS, `updateTaskById(${t.id},'taskType',this.value)`)}</div></td>
-        <td>${escapeHtml(t.matter)}</td>
-        <td>${escapeHtml(t.desc)}</td>
-        <td><div class="cell">${mkSelectCell(t.progress, TASK_PROGRESS_OPTIONS, `updateTaskById(${t.id},'progress',this.value); refreshPendingCount();`)}</div></td>
-        <td>${escapeHtml(t.due)}</td>
-        <td class="action-buttons">
-          <button class="btn small" onclick="editTask(${idx})">✏️ Edit</button>
-          <button class="btn small danger" onclick="deleteTask(${idx})">🗑️ Delete</button>
-        </td>
-      </tr>
-    `).join("");
-  }
-
-  function renderProvidersTable(tbodyId){
-    const tbody = document.getElementById(tbodyId);
-    tbody.innerHTML = providers.map((p, idx)=>`
-      <tr>
-        <td><b>${escapeHtml(p.provider)}</b></td>
-        <td>${escapeHtml(p.states)}</td>
-        <td><span class="badge gray">${escapeHtml(p.services)}</span></td>
-        <td>${p.email ? `<a href="mailto:${p.email}">${escapeHtml(p.email)}</a>` : `<span class="badge gray">No email</span>`}</td>
-        <td><span class="badge gray">${escapeHtml(p.method)}</span></td>
-        <td>${escapeHtml(p.notes)}</td>
-        <td class="action-buttons">
-          ${p.email ? `<button class="btn small" onclick="sendEmailToProvider(${idx})">📧 Email</button>` : `<span class="badge gray">—</span>`}
-          <button class="btn small" onclick="editProvider(${idx})">✏️ Edit</button>
-          <button class="btn small danger" onclick="deleteProvider(${idx})">🗑️ Delete</button>
-        </td>
-      </tr>
-    `).join("");
-  }
-
-  function renderProviders(){
-    const q = (document.getElementById("providerSearch").value || "").toLowerCase();
-    const fs = document.getElementById("filterService").value;
-    const st = document.getElementById("filterProviderState").value;
-
-    const filtered = providers.filter(p=>{
-      const hay = `${p.provider} ${p.states} ${p.services} ${p.email} ${p.method} ${p.notes}`.toLowerCase();
-      if(q && !hay.includes(q)) return false;
-      if(fs && p.services !== fs) return false;
-      if(st && !String(p.states).split(",").map(x=>x.trim()).includes(st)) return false;
-      return true;
-    });
-
-    document.getElementById("tblProviders").innerHTML = filtered.map((p, idx)=>`
-      <tr>
-        <td><b>${escapeHtml(p.provider)}</b></td>
-        <td>${escapeHtml(p.states)}</td>
-        <td><span class="badge gray">${escapeHtml(p.services)}</span></td>
-        <td>${p.email ? `<a href="mailto:${p.email}">${escapeHtml(p.email)}</a>` : `<span class="badge gray">No email</span>`}</td>
-        <td><span class="badge gray">${escapeHtml(p.method)}</span></td>
-        <td>${escapeHtml(p.notes)}</td>
-        <td class="action-buttons">
-          ${p.email ? `<button class="btn small" onclick="sendEmailToProvider(${idx})">📧 Email</button>` : `<span class="badge gray">—</span>`}
-          <button class="btn small" onclick="editProvider(${idx})">✏️ Edit</button>
-          <button class="btn small danger" onclick="deleteProvider(${idx})">🗑️ Delete</button>
-        </td>
-      </tr>
-    `).join("");
-  }
-
-  function renderNotesLog(){
-    document.getElementById("tblNotesLog").innerHTML = notesLog.map(n=>`
-      <tr>
-        <td>${escapeHtml(n.dt)}</td>
-        <td>${escapeHtml(n.section)}</td>
-        <td>${escapeHtml(n.ref)}</td>
-        <td>${escapeHtml(n.note)}</td>
-      </tr>
-    `).join("");
-  }
-
-  function renderReportLog(){
-    document.getElementById("tblReportLog").innerHTML = reportLog.map((r, idx)=>`
-      <tr>
-        <td>${escapeHtml(r.savedAt)}</td>
-        <td>${r.reported ? `<span class="badge green">Yes</span>` : `<span class="badge gray">No</span>`}</td>
-        <td>${escapeHtml(r.reportedDate || "")}</td>
-        <td>${escapeHtml(String(r.draft || "").slice(0,140))}${String(r.draft||"").length>140?"…":""}</td>
-        <td class="action-buttons">
-          <button class="btn small" onclick="editReportLog(${idx})">✏️ Edit</button>
-          <button class="btn small danger" onclick="deleteReportLog(${idx})">🗑️ Delete</button>
-        </td>
-      </tr>
-    `).join("");
-  }
-
-  function renderEmailPickers(){
-    const pSel = document.getElementById("emailPatientPick");
-    const prSel = document.getElementById("emailProviderPick");
-    pSel.innerHTML = "";
-    prSel.innerHTML = "";
-
-    const p0 = document.createElement("option");
-    p0.value=""; p0.textContent="Select patient…";
-    pSel.appendChild(p0);
-
-    patients.forEach(p=>{
-      const o=document.createElement("option");
-      o.value=p.matter;
-      o.textContent = `${p.matter} — ${p.patient}`;
-      pSel.appendChild(o);
-    });
-
-    const pr0 = document.createElement("option");
-    pr0.value=""; pr0.textContent="Select provider…";
-    prSel.appendChild(pr0);
-
-    providers.forEach(pr=>{
-      const o=document.createElement("option");
-      o.value=pr.provider;
-      o.textContent = pr.provider + (pr.email ? ` (${pr.email})` : " (no email)");
-      prSel.appendChild(o);
-    });
-  }
-
-  // =============================
-  //  CRUD Operations
-  // =============================
-  // Patients
-  function editPatient(idx){
-    const patient = patients[idx];
-    openQuickLog();
-    document.getElementById("quickLogTitle").textContent = "✏️ Edit Patient";
-    document.getElementById("quickLogBody").innerHTML = renderPatientForm(patient, idx);
-    initPatientForm();
-  }
-
-  function deletePatient(idx){
-    if(confirm(`Delete patient ${patients[idx].patient} (${patients[idx].matter})?`)){
-      const matter = patients[idx].matter;
-      patients.splice(idx, 1);
-      addNote("Patients", matter, "Deleted patient.");
-      saveState();
-      renderPatients();
-      renderHome();
-      renderEmailPickers();
-    }
-  }
-
-  function openPatientDetail(idx){
-    editPatient(idx);
-  }
-
-  // Tasks
-  function editTask(idx){
-    const task = tasks[idx];
-    openQuickLog();
-    document.getElementById("quickLogTitle").textContent = "✏️ Edit Task";
-    document.getElementById("quickLogBody").innerHTML = renderTaskForm(task, idx);
-    initTaskForm();
-  }
-
-  function deleteTask(idx){
-    if(confirm(`Delete task "${tasks[idx].desc}"?`)){
-      const matter = tasks[idx].matter;
-      tasks.splice(idx, 1);
-      addNote("Tasks", matter, "Deleted task.");
-      saveState();
-      renderTasks();
-      refreshPendingCount();
-    }
-  }
-
-  // Providers
-  function editProvider(idx){
-    const provider = providers[idx];
-    openQuickLog();
-    document.getElementById("quickLogTitle").textContent = "✏️ Edit Provider";
-    document.getElementById("quickLogBody").innerHTML = renderProviderForm(provider, idx);
-    initProviderForm();
-  }
-
-  function deleteProvider(idx){
-    if(confirm(`Delete provider ${providers[idx].provider}?`)){
-      const providerName = providers[idx].provider;
-      providers.splice(idx, 1);
-      addNote("Providers", providerName, "Deleted provider.");
-      saveState();
-      renderProviders();
-      renderProvidersTable("tblProvidersInNotes");
-      renderEmailPickers();
-    }
-  }
-
-  // Report Log
-  function editReportLog(idx){
-    const report = reportLog[idx];
-    if(prompt("Edit report preview (first 200 chars):", String(report.draft || "").substring(0,200))){
-      report.draft = prompt("Enter new draft content:", report.draft || "");
-      saveState();
-      renderReportLog();
-    }
-  }
-
-  function deleteReportLog(idx){
-    if(confirm("Delete this report log entry?")){
-      reportLog.splice(idx, 1);
-      saveState();
-      renderReportLog();
-    }
-  }
-
-  // =============================
-  //  Updates (by Matter / id)
-  // =============================
-  function updatePriorityByMatter(matter, field, value){
-    const i = priorityRows.findIndex(r=>r.matter===matter);
-    if(i>=0){ priorityRows[i][field]=value; saveState(); renderHome(); }
-  }
-  
-  function updatePatientByMatter(matter, field, value){
-    const i = patients.findIndex(p=>p.matter===matter);
-    if(i>=0){ 
-      patients[i][field]=value; 
-      addNote("Patients", matter, `Updated ${field} → ${value}`); 
-      saveState(); 
-      renderPatients(); 
-      renderHome(); 
-      renderEmailPickers(); 
-    }
-  }
-  
-  function updateTaskById(id, field, value){
-    const i = tasks.findIndex(t=>t.id===id);
-    if(i>=0){ 
-      tasks[i][field]=value; 
-      addNote("Tasks", tasks[i].matter, `Updated ${field} → ${value}`); 
-      saveState(); 
-      renderTasks(); 
-    }
-  }
-
-  // =============================
-  //  Email Functions
-  // =============================
-  function sendEmailFromPriority(matter){
-    const patient = findPatient(matter);
-    const priorityRow = priorityRows.find(r=>r.matter===matter);
-    if(!priorityRow || !priorityRow.providerEmail){
-      alert("No provider email found for this matter.");
-      return;
-    }
-    
-    const provider = providers.find(p=>p.email===priorityRow.providerEmail) || {provider: "Provider", email: priorityRow.providerEmail};
-    const emailTemplate = buildProviderEmailTemplate(patient, provider);
-    previewEmail(patient, provider, emailTemplate.subject, emailTemplate.body);
-  }
-
-  function previewEmailFromAction(idx){
-    const e = emailActions[idx];
-    const patient = findPatient(e.matter);
-    const provider = providers.find(p=>p.email===e.providerEmail) || {provider: "Provider", email: e.providerEmail};
-    const emailTemplate = buildProviderEmailTemplate(patient, provider);
-    previewEmail(patient, provider, emailTemplate.subject, emailTemplate.body);
-  }
-
-  function sendEmailToProvider(idx){
-    const provider = providers[idx];
-    if(!provider.email){
-      alert("This provider has no email saved.");
-      return;
-    }
-    
-    const emailTemplate = buildProviderEmailTemplate(null, provider);
-    previewEmail(null, provider, emailTemplate.subject, emailTemplate.body);
-  }
-
-  // =============================
-  //  Navigation
-  // =============================
-  const pages=["home","patients","tasks","notes","providers","reports"];
-  const titles={
-    home:["Home","Quick view of what matters today"],
-    patients:["Patients","Your operational list"],
-    tasks:["Tasks","Emails → actions"],
-    notes:["Notes","Logs + email drafts"],
-    providers:["Providers","Operational directory"],
-    reports:["Reports","4pm report"]
-  };
-
-  function setQuickLogVisibility(){
-    const page = getActivePage();
-    const show = ["patients","tasks","notes","providers"].includes(page);
-    document.getElementById("btnQuickLog").style.display = show ? "inline-flex" : "none";
-  }
-
-  document.querySelectorAll(".nav button").forEach(btn=>{
-    btn.addEventListener("click", ()=>{
-      document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
-      btn.classList.add("active");
-      const target=btn.dataset.page;
-      pages.forEach(p=>document.getElementById("page-"+p).classList.toggle("active", p===target));
-      document.getElementById("pageTitle").textContent=titles[target][0];
-      document.getElementById("pageSubtitle").textContent=titles[target][1];
-      setQuickLogVisibility();
-    });
-  });
-
-  // =============================
-  //  Filters
-  // =============================
-  ["patientSearch","filterStatus","filterWaiting"].forEach(id=>{
-    document.getElementById(id).addEventListener("input", renderPatients);
-    document.getElementById(id).addEventListener("change", renderPatients);
-  });
-  document.getElementById("btnClearPatients").addEventListener("click", ()=>{
-    patientSearch.value=""; filterStatus.value=""; filterWaiting.value=""; renderPatients();
-  });
-
-  ["taskSearch","filterTaskStatus","filterTaskType"].forEach(id=>{
-    document.getElementById(id).addEventListener("input", renderTasks);
-    document.getElementById(id).addEventListener("change", renderTasks);
-  });
-  document.getElementById("btnClearTasks").addEventListener("click", ()=>{
-    taskSearch.value=""; filterTaskStatus.value=""; filterTaskType.value=""; renderTasks();
-  });
-
-  ["providerSearch","filterService","filterProviderState"].forEach(id=>{
-    document.getElementById(id).addEventListener("input", renderProviders);
-    document.getElementById(id).addEventListener("change", renderProviders);
-  });
-  document.getElementById("btnClearProviders").addEventListener("click", ()=>{
-    providerSearch.value=""; filterService.value=""; filterProviderState.value=""; renderProviders();
-  });
-
-  // Email matter search
-  document.getElementById("emailMatterSearch").addEventListener("input", function(){
-    const search = this.value.toLowerCase();
-    const select = document.getElementById("emailPatientPick");
-    
-    for(let i=0; i<select.options.length; i++){
-      const option = select.options[i];
-      option.style.display = option.value.toLowerCase().includes(search) || option.text.toLowerCase().includes(search) ? "" : "none";
-    }
-  });
-
-  // =============================
-  //  Assistant chat (improved)
-  // =============================
-  function appendBubble(text, who){
-    const chat=document.getElementById("chat");
-    const d=document.createElement("div");
-    d.className="bubble "+(who==="me"?"me":"bot");
-    d.innerHTML=text; chat.appendChild(d); chat.scrollTop=chat.scrollHeight;
-  }
-  
-  function botReply(msg){
-    const m=msg.toLowerCase().trim();
-
-    // Send email command
-    if(m.includes("send email") || m.includes("email for")){
-      const match = m.match(/(m-?\d+)/i);
-      if(match){
-        const matter = match[1].toUpperCase();
-        const patient = findPatient(matter);
-        if(patient){
-          const priorityRow = priorityRows.find(r=>r.matter===matter);
-          if(priorityRow && priorityRow.providerEmail){
-            const provider = providers.find(p=>p.email===priorityRow.providerEmail) || {provider: "Provider", email: priorityRow.providerEmail};
-            const emailTemplate = buildProviderEmailTemplate(patient, provider);
-            previewEmail(patient, provider, emailTemplate.subject, emailTemplate.body);
-            return `Opening email preview for <b>${escapeHtml(matter)}</b> to ${escapeHtml(provider.provider)}.`;
-          }else{
-            return `No provider email found for <b>${escapeHtml(matter)}</b>. Add it in Providers section.`;
-          }
-        }else{
-          return `Patient <b>${escapeHtml(matter)}</b> not found.`;
-        }
-      }
-      return "Please specify a Matter #, like: 'send email for M-10231'";
-    }
-
-    // Update status command
-    if(m.includes("update") && m.includes("status") && m.includes("to")){
-      const matterMatch = m.match(/(m-?\d+)/i);
-      const statusMatch = m.match(/to\s+(\w+)/i);
-      
-      if(matterMatch && statusMatch){
-        const matter = matterMatch[1].toUpperCase();
-        const newStatus = statusMatch[1].charAt(0).toUpperCase() + statusMatch[1].slice(1).toLowerCase();
-        
-        if(STATUS_OPTIONS.includes(newStatus)){
-          const i = patients.findIndex(p=>p.matter===matter);
-          if(i>=0){
-            patients[i].status = newStatus;
-            addNote("Patients", matter, `Assistant updated status → ${newStatus}`);
-            saveState();
-            renderPatients();
-            renderHome();
-            return `Updated <b>${escapeHtml(matter)}</b> status to <b>${escapeHtml(newStatus)}</b>.`;
-          }else{
-            return `Patient <b>${escapeHtml(matter)}</b> not found.`;
-          }
-        }else{
-          return `Status "${escapeHtml(newStatus)}" not valid. Valid: ${STATUS_OPTIONS.join(", ")}`;
-        }
-      }
-      return "Format: 'update M-10231 status to Scheduled'";
-    }
-
-    if(m.includes("show needs reply") || m==="needs reply"){
-      applyHomeFilter("needs_reply");
-      return "Filtered ✅ (Home → Priority). Click any Matter to open it in Patients.";
-    }
-    
-    if(m.includes("waiting on clinic")){
-      applyHomeFilter("waiting_clinic");
-      return "Filtered ✅ (Waiting on clinic).";
-    }
-    
-    if(m.startsWith("open ")){
-      const matter = msg.slice(5).trim();
-      openPatient(matter);
-      return `Opened <b>${escapeHtml(matter)}</b> in Patients.`;
-    }
-    
-    if(m.includes("pending")){
-      const pending = tasks.filter(t=>!["Done","Updated"].includes(t.progress)).length;
-      return `You have <b>${pending}</b> pending tasks. Want to filter by <b>Reply email</b> or <b>Follow-up clinic</b>?`;
-    }
-    
-    return "I can: <b>send email for M-XXXX</b>, <b>update M-XXXX status to ...</b>, <b>show needs reply</b>, <b>waiting on clinic</b>, or <b>open M-XXXX</b>.";
-  }
-  
-  document.getElementById("send").addEventListener("click", ()=>{
-    const input=document.getElementById("msg");
-    const msg=input.value.trim(); if(!msg) return;
-    appendBubble(escapeHtml(msg),"me"); input.value="";
-    setTimeout(()=>appendBubble(botReply(msg),"bot"),150);
-  });
-  
-  document.getElementById("msg").addEventListener("keydown",(e)=>{ if(e.key==="Enter") document.getElementById("send").click(); });
-
-  // =============================
-  //  Collapse assistant
-  // =============================
-  function toggleAssistant(){ document.body.classList.toggle("assistant-collapsed"); }
-  document.getElementById("btnCollapseAssistant").addEventListener("click", toggleAssistant);
-  document.getElementById("btnToggleAssistant").addEventListener("click", toggleAssistant);
-
-  // =============================
-  //  Quick Log modal (dynamic by page)
-  // =============================
-  const backdrop = document.getElementById("modalBackdrop");
-  function openModal(){ backdrop.classList.add("show"); }
-  function closeModal(){ backdrop.classList.remove("show"); }
-  window.closeModal = closeModal;
-  backdrop.addEventListener("click", (e)=>{ if(e.target===backdrop) closeModal(); });
-
-  function getActivePage(){
-    return pages.find(p => document.getElementById("page-"+p).classList.contains("active")) || "home";
-  }
-
-  function openQuickLog(){
-    const page = getActivePage();
-    const title = document.getElementById("quickLogTitle");
-    const body = document.getElementById("quickLogBody");
-
-    if(page==="patients"){
-      title.textContent = "➕ Quick Log (Add Patient)";
-      body.innerHTML = renderPatientForm();
-      initPatientForm();
-      openModal();
-      return;
-    }
-    if(page==="tasks"){
-      title.textContent = "➕ Quick Log (Add Task)";
-      body.innerHTML = renderTaskForm();
-      initTaskForm();
-      openModal();
-      return;
-    }
-    if(page==="notes" || page==="providers"){
-      title.textContent = "➕ Quick Log (Add Provider)";
-      body.innerHTML = renderProviderForm();
-      initProviderForm();
-      openModal();
-      return;
-    }
-  }
-  document.getElementById("btnQuickLog").addEventListener("click", openQuickLog);
-
-  // Initialize Quick Log forms
-  function initPatientForm(){
-    const elType=document.getElementById("fType");
-    const elStatus=document.getElementById("fStatus");
-    const elWaiting=document.getElementById("fWaiting");
-    if(elType) fillSelect(elType, TYPE_OPTIONS, false);
-    if(elStatus) fillSelect(elStatus, STATUS_OPTIONS, false);
-    if(elWaiting) fillSelect(elWaiting, WAITING_OPTIONS, false);
-  }
-  
-  function initTaskForm(){
-    const elType=document.getElementById("tType");
-    const elProg=document.getElementById("tProgress");
-    if(elType) fillSelect(elType, TASK_TYPE_OPTIONS, false);
-    if(elProg) fillSelect(elProg, TASK_PROGRESS_OPTIONS, false);
-    const d=new Date(); const pad=(n)=>String(n).padStart(2,"0");
-    const due=document.getElementById("tDue");
-    if(due) due.value = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-  }
-  
-  function initProviderForm(){
-    const el=document.getElementById("pService");
-    if(el) fillSelect(el, SERVICE_OPTIONS, false);
-  }
-
-  // Form renderers
-  function renderPatientForm(patient=null, idx=null){
-    const d=new Date(); const pad=(n)=>String(n).padStart(2,"0");
-    const today = `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-    
-    const isEdit = patient !== null;
-    const action = isEdit ? `savePatientEdit(${idx})` : "savePatientQuickLog()";
-    const buttonText = isEdit ? "Update" : "Save";
-    
-    return `
-      <div class="formgrid">
-        <div class="col4">
-          <label class="note">Matter</label>
-          <input class="input" id="fMatter" placeholder="e.g., 111002 or M-10255" value="${patient ? escapeHtml(patient.matter) : ''}"/>
-        </div>
-        <div class="col4">
-          <label class="note">Patient</label>
-          <input class="input" id="fPatient" placeholder="Full name" value="${patient ? escapeHtml(patient.patient) : ''}"/>
-        </div>
-        <div class="col4">
-          <label class="note">State</label>
-          <input class="input" id="fState" placeholder="e.g., GA" value="${patient ? escapeHtml(patient.state) : ''}"/>
-        </div>
-
-        <div class="col4">
-          <label class="note">Type</label>
-          <select id="fType">${TYPE_OPTIONS.map(o=>`<option ${patient && patient.type===o?'selected':''}>${o}</option>`).join('')}</select>
-        </div>
-        <div class="col4">
-          <label class="note">Provider</label>
-          <input class="input" id="fProvider" placeholder="Provider name" value="${patient ? escapeHtml(patient.provider) : ''}"/>
-        </div>
-        <div class="col4">
-          <label class="note">Requested Date</label>
-          <input class="input" id="fRequested" type="date" value="${patient ? patient.requestedDate : today}"/>
-        </div>
-
-        <div class="col4">
-          <label class="note">Sender</label>
-          <input class="input" id="fSender" placeholder="Slack/Email/name" value="${patient ? escapeHtml(patient.sender) : ''}"/>
-        </div>
-        <div class="col4">
-          <label class="note">Status</label>
-          <select id="fStatus">${STATUS_OPTIONS.map(o=>`<option ${patient && patient.status===o?'selected':''}>${o}</option>`).join('')}</select>
-        </div>
-        <div class="col4">
-          <label class="note">Waiting On</label>
-          <select id="fWaiting">${WAITING_OPTIONS.map(o=>`<option ${patient && patient.waiting===o?'selected':''}>${o}</option>`).join('')}</select>
-        </div>
-
-        <div class="col12">
-          <label class="note">Notes</label>
-          <textarea id="fNotes" placeholder="Anything you need to remember…">${patient ? escapeHtml(patient.notes) : ''}</textarea>
-          <div class="helper">Tip: put missing items here (DOB/DOA, MRI order, records, etc.).</div>
-        </div>
-
-        <div class="col4">
-          <label class="note">Due Date</label>
-          <input class="input" id="fDue" type="date" value="${patient ? patient.due : today}"/>
-        </div>
-        <div class="col8" style="display:flex;align-items:flex-end;gap:10px;justify-content:flex-end">
-          <button class="btn" onclick="closeModal()">Cancel</button>
-          ${isEdit ? `<button class="btn danger" onclick="deletePatient(${idx})">🗑️ Delete</button>` : ''}
-          <button class="btn primary" onclick="${action}">${buttonText}</button>
-        </div>
-      </div>
-    `;
-  }
-
-  function savePatientQuickLog(){
-    const p = {
-      matter: document.getElementById("fMatter").value.trim() || "(missing)",
-      patient: document.getElementById("fPatient").value.trim() || "(missing)",
-      state: document.getElementById("fState").value.trim() || "",
-      type: document.getElementById("fType").value,
-      provider: document.getElementById("fProvider").value.trim() || "",
-      requestedDate: document.getElementById("fRequested").value || "",
-      sender: document.getElementById("fSender").value.trim() || "",
-      status: document.getElementById("fStatus").value,
-      waiting: document.getElementById("fWaiting").value,
-      notes: document.getElementById("fNotes").value.trim() || "",
-      due: document.getElementById("fDue").value || "",
-    };
-    patients.unshift(p);
-    addNote("Patients", p.matter, "Added patient.");
-    saveState();
-    closeModal();
-    document.querySelector('.nav button[data-page="patients"]').click();
-    renderPatients(); renderHome(); renderEmailPickers();
-  }
-  window.savePatientQuickLog = savePatientQuickLog;
-
-  function savePatientEdit(idx){
-    const p = {
-      matter: document.getElementById("fMatter").value.trim() || "(missing)",
-      patient: document.getElementById("fPatient").value.trim() || "(missing)",
-      state: document.getElementById("fState").value.trim() || "",
-      type: document.getElementById("fType").value,
-      provider: document.getElementById("fProvider").value.trim() || "",
-      requestedDate: document.getElementById("fRequested").value || "",
-      sender: document.getElementById("fSender").value.trim() || "",
-      status: document.getElementById("fStatus").value,
-      waiting: document.getElementById("fWaiting").value,
-      notes: document.getElementById("fNotes").value.trim() || "",
-      due: document.getElementById("fDue").value || "",
-    };
-    patients[idx] = p;
-    addNote("Patients", p.matter, "Updated patient.");
-    saveState();
-    closeModal();
-    renderPatients(); renderHome(); renderEmailPickers();
-  }
-  window.savePatientEdit = savePatientEdit;
-
-  function renderTaskForm(task=null, idx=null){
-    const isEdit = task !== null;
-    const action = isEdit ? `saveTaskEdit(${idx})` : "saveTaskQuickLog()";
-    const buttonText = isEdit ? "Update" : "Save";
-    
-    return `
-      <div class="formgrid">
-        <div class="col3">
-          <label class="note">Priority</label>
-          <select id="tPriority">
-            <option ${task && task.priority==='High'?'selected':''}>High</option>
-            <option ${task && task.priority==='Medium'?'selected':!task?'selected':''}>Medium</option>
-            <option ${task && task.priority==='Low'?'selected':''}>Low</option>
-          </select>
-        </div>
-        <div class="col3">
-          <label class="note">Task Type</label>
-          <select id="tType">${TASK_TYPE_OPTIONS.map(o=>`<option ${task && task.taskType===o?'selected':''}>${o}</option>`).join('')}</select>
-        </div>
-        <div class="col3">
-          <label class="note">Progress</label>
-          <select id="tProgress">${TASK_PROGRESS_OPTIONS.map(o=>`<option ${task && task.progress===o?'selected':''}>${o}</option>`).join('')}</select>
-        </div>
-        <div class="col3">
-          <label class="note">Due</label>
-          <input class="input" id="tDue" type="date" value="${task ? task.due : ''}"/>
-        </div>
-
-        <div class="col4">
-          <label class="note">Matter</label>
-          <input class="input" id="tMatter" placeholder="e.g., M-10231" value="${task ? escapeHtml(task.matter) : ''}"/>
-        </div>
-        <div class="col8">
-          <label class="note">Description</label>
-          <input class="input" id="tDesc" placeholder="What needs to happen?" value="${task ? escapeHtml(task.desc) : ''}"/>
-        </div>
-
-        <div class="col12" style="display:flex;align-items:flex-end;gap:10px;justify-content:flex-end">
-          <button class="btn" onclick="closeModal()">Cancel</button>
-          ${isEdit ? `<button class="btn danger" onclick="deleteTask(${idx})">🗑️ Delete</button>` : ''}
-          <button class="btn primary" onclick="${action}">${buttonText}</button>
-        </div>
-      </div>
-    `;
-  }
-
-  function saveTaskQuickLog(){
-    const maxId = tasks.length > 0 ? Math.max(...tasks.map(t=>t.id || 0)) : 0;
-    const t = {
-      id: maxId + 1,
-      priority: document.getElementById("tPriority").value,
-      taskType: document.getElementById("tType").value,
-      matter: document.getElementById("tMatter").value.trim() || "(missing)",
-      desc: document.getElementById("tDesc").value.trim() || "(missing)",
-      progress: document.getElementById("tProgress").value,
-      due: document.getElementById("tDue").value || ""
-    };
-    tasks.unshift(t);
-    addNote("Tasks", t.matter, `Added task: ${t.taskType}.`);
-    saveState();
-    closeModal();
-    document.querySelector('.nav button[data-page="tasks"]').click();
-    renderTasks(); refreshPendingCount();
-  }
-  window.saveTaskQuickLog = saveTaskQuickLog;
-
-  function saveTaskEdit(idx){
-    const t = {
-      id: tasks[idx].id,
-      priority: document.getElementById("tPriority").value,
-      taskType: document.getElementById("tType").value,
-      matter: document.getElementById("tMatter").value.trim() || "(missing)",
-      desc: document.getElementById("tDesc").value.trim() || "(missing)",
-      progress: document.getElementById("tProgress").value,
-      due: document.getElementById("tDue").value || ""
-    };
-    tasks[idx] = t;
-    addNote("Tasks", t.matter, `Updated task: ${t.taskType}.`);
-    saveState();
-    closeModal();
-    renderTasks(); refreshPendingCount();
-  }
-  window.saveTaskEdit = saveTaskEdit;
-
-  function renderProviderForm(provider=null, idx=null){
-    const isEdit = provider !== null;
-    const action = isEdit ? `saveProviderEdit(${idx})` : "saveProviderQuickLog()";
-    const buttonText = isEdit ? "Update" : "Save";
-    
-    return `
-      <div class="formgrid">
-        <div class="col6">
-          <label class="note">Provider Name</label>
-          <input class="input" id="pName" placeholder="Provider / Clinic name" value="${provider ? escapeHtml(provider.provider) : ''}"/>
-        </div>
-        <div class="col3">
-          <label class="note">Service</label>
-          <select id="pService">${SERVICE_OPTIONS.map(o=>`<option ${provider && provider.services===o?'selected':''}>${o}</option>`).join('')}</select>
-        </div>
-        <div class="col3">
-          <label class="note">States</label>
-          <input class="input" id="pStates" placeholder="e.g., GA, FL" value="${provider ? escapeHtml(provider.states) : ''}"/>
-        </div>
-
-        <div class="col6">
-          <label class="note">Email</label>
-          <input class="input" id="pEmail" placeholder="referrals@clinic.com" value="${provider ? escapeHtml(provider.email) : ''}"/>
-        </div>
-        <div class="col3">
-          <label class="note">Method</label>
-          <select id="pMethod">
-            <option ${provider && provider.method==='Email'?'selected':''}>Email</option>
-            <option ${provider && provider.method==='Portal'?'selected':''}>Portal</option>
-            <option ${provider && provider.method==='Phone'?'selected':''}>Phone</option>
-            <option ${provider && provider.method==='Fax'?'selected':''}>Fax</option>
-          </select>
-        </div>
-        <div class="col3">
-          <label class="note">Phone (optional)</label>
-          <input class="input" id="pPhone" placeholder="(optional)" value="${provider ? escapeHtml(provider.phone || '') : ''}"/>
-        </div>
-
-        <div class="col12">
-          <label class="note">Notes</label>
-          <textarea id="pNotes" placeholder="Any operational notes…">${provider ? escapeHtml(provider.notes) : ''}</textarea>
-        </div>
-
-        <div class="col12" style="display:flex;align-items:flex-end;gap:10px;justify-content:flex-end">
-          <button class="btn" onclick="closeModal()">Cancel</button>
-          ${isEdit ? `<button class="btn danger" onclick="deleteProvider(${idx})">🗑️ Delete</button>` : ''}
-          <button class="btn primary" onclick="${action}">${buttonText}</button>
-        </div>
-      </div>
-    `;
-  }
-
-  function saveProviderQuickLog(){
-    const maxId = providers.length > 0 ? Math.max(...providers.map(p=>p.id || 0)) : 0;
-    const p = {
-      id: maxId + 1,
-      provider: document.getElementById("pName").value.trim() || "(missing)",
-      states: document.getElementById("pStates").value.trim() || "",
-      services: document.getElementById("pService").value,
-      email: document.getElementById("pEmail").value.trim() || "",
-      method: document.getElementById("pMethod").value,
-      phone: document.getElementById("pPhone").value.trim() || "",
-      notes: document.getElementById("pNotes").value.trim() || ""
-    };
-    providers.unshift(p);
-    addNote("Providers", p.provider, "Added provider.");
-    saveState();
-    closeModal();
-    renderProviders(); renderProvidersTable("tblProvidersInNotes"); renderEmailPickers();
-  }
-  window.saveProviderQuickLog = saveProviderQuickLog;
-
-  function saveProviderEdit(idx){
-    const p = {
-      id: providers[idx].id,
-      provider: document.getElementById("pName").value.trim() || "(missing)",
-      states: document.getElementById("pStates").value.trim() || "",
-      services: document.getElementById("pService").value,
-      email: document.getElementById("pEmail").value.trim() || "",
-      method: document.getElementById("pMethod").value,
-      phone: document.getElementById("pPhone").value.trim() || "",
-      notes: document.getElementById("pNotes").value.trim() || ""
-    };
-    providers[idx] = p;
-    addNote("Providers", p.provider, "Updated provider.");
-    saveState();
-    closeModal();
-    renderProviders(); renderProvidersTable("tblProvidersInNotes"); renderEmailPickers();
-  }
-  window.saveProviderEdit = saveProviderEdit;
-
-  // =============================
-  //  Quick buttons (tasks)
-  // =============================
-  function quickTask(taskType, desc){
-    const maxId = tasks.length > 0 ? Math.max(...tasks.map(t=>t.id || 0)) : 0;
-    tasks.unshift({
-      id: maxId + 1,
-      priority:"Medium", 
-      taskType, 
-      matter:"(set)", 
-      desc, 
-      progress:"Open", 
-      due:"Today"
-    });
-    addNote("Tasks", "(set)", `Quick button: ${taskType}.`);
-    saveState();
-    renderTasks();
-    appendBubble(`Created a task: <b>${escapeHtml(taskType)}</b> — ${escapeHtml(desc)}. Edit the Matter in the table or use Quick Log to add a clean task.`,"bot");
-    refreshPendingCount();
-  }
-  window.quickTask = quickTask;
-
-  // =============================
-  //  Report Functions
-  // =============================
-  function regenerateReport(){
-    const lines=[
-      "Daily Report – Medical Dept",
-      "",
-      `Patients in system: ${patients.length}`,
-      `Open tasks: ${tasks.filter(t=>!["Done","Updated"].includes(t.progress)).length}`,
-      "",
-      "Key pending / issues:",
-      ...tasks.filter(t=>!["Done","Updated"].includes(t.progress)).slice(0,6).map(t=>`- ${t.matter}: ${t.taskType} — ${t.desc}`)
-    ];
-    document.getElementById("reportDraft").textContent=lines.join("\n");
-  }
-  
-  function copyReport(){
-    navigator.clipboard.writeText(document.getElementById("reportDraft").textContent)
-      .then(()=>alert("Copied ✅")).catch(()=>alert("Could not copy (browser permissions)."));
-  }
-  window.copyReport = copyReport;
-  window.regenerateReport = regenerateReport;
-
-  function saveReportMeta(){
-    const chk = document.getElementById("reportedChk").checked;
-    const dt = document.getElementById("reportedDate").value;
-    reportMeta = {reported: chk, reportedDate: dt || ""};
-
-    // log record
-    const record = {
-      savedAt: nowIso(),
-      reported: chk,
-      reportedDate: dt || "",
-      draft: document.getElementById("reportDraft").textContent || ""
-    };
-    reportLog.unshift(record);
-
-    document.getElementById("reportMetaNote").textContent = chk ? `Reported ✅  ${dt || "(date not set)"}` : "Not marked as reported.";
-    addNote("Reports", "4pm", chk ? `Saved report meta (Reported ✅).` : "Saved report meta.");
-    saveState();
-    renderReportLog();
-  }
-  window.saveReportMeta = saveReportMeta;
-  document.getElementById("btnSaveReportMeta").addEventListener("click", saveReportMeta);
-
-  document.getElementById("btnGenerateReport").addEventListener("click", ()=>{
-    regenerateReport();
-    document.querySelector('.nav button[data-page="reports"]').click();
-  });
-
-  // =============================
-  //  Email draft from Notes
-  // =============================
-  function openEmailDraft(){
-    const matter = document.getElementById("emailPatientPick").value;
-    const providerName = document.getElementById("emailProviderPick").value;
-    if(!matter || !providerName) return alert("Select patient + provider first.");
-    const patient = findPatient(matter);
-    const provider = findProviderByName(providerName);
-    if(!provider || !provider.email) return alert("That provider has no email saved yet.");
-    const emailTemplate = buildProviderEmailTemplate(patient, provider);
-    previewEmail(patient, provider, emailTemplate.subject, emailTemplate.body);
-  }
-  document.getElementById("btnOpenEmailDraft").addEventListener("click", openEmailDraft);
-
-  // =============================
-  //  Open patient helper
-  // =============================
-  function openPatient(matter){
-    document.querySelector('.nav button[data-page="patients"]').click();
-    patientSearch.value = matter;
-    renderPatients();
-  }
-  window.openPatient = openPatient;
-
-  function refreshPendingCount(){
-    const pending = tasks.filter(t=>!["Done","Updated"].includes(t.progress)).length;
-    document.getElementById("pendingCount").textContent = String(pending);
-  }
-
-  // =============================
-  //  Excel download (HTML-as-XLS)
-  // =============================
-  function tableToXlsHtml(tableEl, sheetName="Sheet1"){
-    const html = `
-      <html xmlns:o="urn:schemas-microsoft-com:office:office"
-            xmlns:x="urn:schemas-microsoft-com:office:excel"
-            xmlns="http://www.w3.org/TR/REC-html40">
-      <head>
-        <!--[if gte mso 9]><xml>
-          <x:ExcelWorkbook>
-            <x:ExcelWorksheets>
-              <x:ExcelWorksheet>
-                <x:Name>${sheetName}</x:Name>
-                <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions>
-              </x:ExcelWorksheet>
-            </x:ExcelWorksheets>
-          </x:ExcelWorkbook>
-        </xml><![endif]-->
-        <meta charset="utf-8"/>
-      </head>
-      <body>${tableEl.outerHTML}</body></html>`;
-    return html;
-  }
-
-  function downloadXls(filename, tableEl, sheetName){
-    const content = tableToXlsHtml(tableEl, sheetName);
-    const blob = new Blob([content], {type: "application/vnd.ms-excel"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  }
-
-  function downloadCurrentPageExcel(){
-    const page = getActivePage();
-    const firstTable = document.querySelector(`#page-${page} table.table`);
-    if(page==="reports"){
-      const t = document.getElementById("reportDraft").textContent;
-      const temp = document.createElement("table");
-      temp.innerHTML = `<tr><th>Report</th></tr><tr><td style="white-space:pre-wrap">${escapeHtml(t).replaceAll("\n","<br/>")}</td></tr>`;
-      return downloadXls("CommandCenter_REPORT.xls", temp, "Report");
-    }
-    if(!firstTable) return alert("No table found on this page.");
-    return downloadXls(`CommandCenter_${page.toUpperCase()}.xls`, firstTable, page);
-  }
-  window.downloadCurrentPageExcel = downloadCurrentPageExcel;
-  document.getElementById("btnDownloadExcel").addEventListener("click", downloadCurrentPageExcel);
-
-  // =============================
-  //  Home KPI click wiring
-  // =============================
-  document.querySelectorAll("[data-homefilter]").forEach(el=>{
-    el.addEventListener("click", ()=>applyHomeFilter(el.dataset.homefilter));
-  });
-  document.getElementById("btnClearHomeFilter").addEventListener("click", ()=>applyHomeFilter(""));
-
-  // =============================
-  //  Init
-  // =============================
-  fillSelect(document.getElementById("filterStatus"), STATUS_OPTIONS, true, "Status (all)");
-  fillSelect(document.getElementById("filterWaiting"), WAITING_OPTIONS, true, "Waiting On (all)");
-  fillSelect(document.getElementById("filterTaskStatus"), TASK_PROGRESS_OPTIONS, true, "Progress (all)");
-  fillSelect(document.getElementById("filterTaskType"), TASK_TYPE_OPTIONS, true, "Task Type (all)");
-  fillSelect(document.getElementById("filterService"), SERVICE_OPTIONS, true, "Service (all)");
-  fillSelect(document.getElementById("filterProviderState"), ["GA","FL","TX","CA","NY"], true, "State (all)");
-
-  document.getElementById("reportedChk").checked = !!reportMeta.reported;
-  document.getElementById("reportedDate").value = reportMeta.reportedDate || "";
-
-  renderHome();
-  renderPatients();
-  renderTasks();
-  renderProviders();
-  renderProvidersTable("tblProvidersInNotes");
-  renderNotesLog();
-  renderReportLog();
-  renderEmailPickers();
-  regenerateReport();
-  refreshPendingCount();
-  setQuickLogVisibility();
-  saveState();
+})();
 </script>
-
 </body>
 </html>
