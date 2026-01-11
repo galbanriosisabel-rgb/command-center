@@ -378,7 +378,7 @@
   
   .badge strong{color:var(--text)}
   
-  /* Chart Section Styles */
+  /* Chart Section Styles - IMPROVED */
   .charts-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -393,6 +393,9 @@
     padding: 16px;
     box-shadow: var(--shadow);
     transition: var(--transition);
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
   }
   
   .chart-card:hover {
@@ -406,10 +409,12 @@
     gap: 8px;
     margin-bottom: 16px;
     color: var(--text);
+    min-height: 40px;
   }
   
   .chart-placeholder {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     min-height: 200px;
@@ -419,6 +424,7 @@
     border-radius: 12px;
     background: rgba(0,0,0,.1);
     border: 1px dashed rgba(255,255,255,.1);
+    flex-grow: 1;
   }
   
   .chart-bar-container {
@@ -426,6 +432,7 @@
     flex-direction: column;
     gap: 8px;
     margin-top: 10px;
+    flex-grow: 1;
   }
   
   .chart-bar {
@@ -437,6 +444,7 @@
     border-radius: 8px;
     border-left: 4px solid;
     transition: var(--transition);
+    cursor: pointer;
   }
   
   .chart-bar:hover {
@@ -447,6 +455,9 @@
   .chart-bar-label {
     font-weight: 600;
     font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
   
   .chart-bar-value {
@@ -465,6 +476,13 @@
     padding: 12px;
     border-radius: 10px;
     border-left: 3px solid;
+    transition: var(--transition);
+    cursor: pointer;
+  }
+  
+  .stat-item:hover {
+    background: rgba(255,255,255,.08);
+    transform: translateY(-2px);
   }
   
   .stat-label {
@@ -476,6 +494,15 @@
   .stat-value {
     font-size: 20px;
     font-weight: 700;
+  }
+  
+  /* Patient Summary Card */
+  .patient-summary-card {
+    margin-top: 20px;
+  }
+  
+  .patient-summary-card .tools {
+    margin-bottom: 16px;
   }
   
   /* Modal */
@@ -596,7 +623,6 @@
   
   .assistantFoot input{
     flex:1;
-    /* FIX: Ensure input is immediately clickable */
     cursor: text;
   }
   
@@ -777,9 +803,17 @@
   // -----------------------------
   // State
   // -----------------------------
-  const STORAGE_KEY = "command_center_v6";
+  const STORAGE_KEY = "command_center_v7";
   const defaultState = () => ({
-    ui: { tab:"Home", patientSearch:"", patientStatus:"all", patientWaiting:"all", taskSearch:"", reportEditingId:null },
+    ui: { 
+      tab:"Home", 
+      patientSearch:"", 
+      patientStatus:"all", 
+      patientWaiting:"all", 
+      taskSearch:"", 
+      reportEditingId:null,
+      chartSearch: ""  // NEW: Search for charts section
+    },
     patients: [],
     tasks: [],
     reports: [],
@@ -863,7 +897,7 @@
   // -----------------------------
   // Rendering
   // -----------------------------
-  const TABS = ["Home","Patients","Tasks","Charts","Reports"]; // Added Charts tab
+  const TABS = ["Home","Patients","Tasks","Charts","Reports"];
 
   function renderTabs(){
     const el = $("#tabs");
@@ -877,7 +911,7 @@
     if(state.ui.tab==="Home") page.innerHTML = renderHome();
     if(state.ui.tab==="Patients") page.innerHTML = renderPatients();
     if(state.ui.tab==="Tasks") page.innerHTML = renderTasks();
-    if(state.ui.tab==="Charts") page.innerHTML = renderCharts(); // New Charts section
+    if(state.ui.tab==="Charts") page.innerHTML = renderCharts();
     if(state.ui.tab==="Reports") page.innerHTML = renderReports();
     wirePage();
     saveState();
@@ -944,9 +978,9 @@
     `;
   }
 
-  function tablePatients(list, {compact=false}={}){
+  function tablePatients(list, {compact=false, showActions=true}={}){
     if(list.length===0){
-      return `<div class="mini">No patients yet. Use <strong>Quick Log</strong> to add one.</div>`;
+      return `<div class="mini">No patients found.</div>`;
     }
     const rows = list.map(p => {
       const matter = escapeHtml(p.matter);
@@ -972,10 +1006,10 @@
           <td>${statusSel}</td>
           <td>${waitSel}</td>
           ${compact ? "" : `<td style="max-width:320px">${escapeHtml(p.notes||"")}</td>`}
-          <td class="rowActions">
+          ${showActions ? `<td class="rowActions">
             <button class="iconBtn" data-action="edit_patient" data-matter="${matter}" title="Edit">${ICON_EDIT}</button>
             <button class="iconBtn danger" data-action="del_patient" data-matter="${matter}" title="Delete">${ICON_TRASH}</button>
-          </td>
+          </td>` : ''}
         </tr>
       `;
     }).join("");
@@ -988,7 +1022,7 @@
         ${compact ? "" : "<th>Requested</th><th>Sender</th>"}
         <th>Status</th><th>Waiting On</th>
         ${compact ? "" : "<th>Notes</th>"}
-        <th></th>
+        ${showActions ? "<th></th>" : ""}
       </tr>
     `;
 
@@ -1003,13 +1037,14 @@
   }
 
   function renderPatients(){
+    // FIX: This function was missing - reimplementing it
     return `
       <div class="pageTitle">Patients</div>
       <p class="pageHint">Your operational list</p>
 
       <div class="card">
         <div class="tools">
-          <input class="input" id="patientSearch" placeholder="Search by patient, matter, state, provider, notes" value="${escapeHtml(state.ui.patientSearch||"")}"/>
+          <input class="input" id="patientSearch" placeholder="Search by patient name, matter number, provider, notes..." value="${escapeHtml(state.ui.patientSearch||"")}"/>
           <select id="patientStatusFilter">
             ${["all", ...OPTIONS.patientStatus].map(v=>`<option value="${v}" ${state.ui.patientStatus===v?"selected":""}>Status (${v})</option>`).join("")}
           </select>
@@ -1043,7 +1078,7 @@
 
   function tableTasks(list, {compact=false}={}){
     if(list.length===0){
-      return `<div class="mini">No tasks yet. Use <strong>Quick Log</strong> to add one.</div>`;
+      return `<div class="mini">No tasks found.</div>`;
     }
     const rows = list.map(t => {
       const id = escapeHtml(t.id);
@@ -1098,7 +1133,7 @@
 
       <div class="card">
         <div class="tools">
-          <input class="input" id="taskSearch" placeholder="Search by matter, type, description" value="${escapeHtml(state.ui.taskSearch||"")}"/>
+          <input class="input" id="taskSearch" placeholder="Search by matter, task type, description..." value="${escapeHtml(state.ui.taskSearch||"")}"/>
           <button class="btn" id="btnQuickTask">+ Quick Log</button>
           <button class="btn" id="taskClear">Clear</button>
         </div>
@@ -1117,7 +1152,7 @@
     });
   }
 
-  // NEW: Charts Section
+  // FIXED: Charts Section with working data display and click functionality
   function renderCharts(){
     // Calculate chart data
     const statusCounts = {};
@@ -1125,11 +1160,13 @@
     const typeCounts = {};
     const priorityCounts = {};
     
+    // Initialize counts
     OPTIONS.patientStatus.forEach(s => statusCounts[s] = 0);
     OPTIONS.waitingOn.forEach(w => waitingCounts[w] = 0);
     OPTIONS.patientTypes.forEach(t => typeCounts[t] = 0);
     OPTIONS.taskPriority.forEach(p => priorityCounts[p] = 0);
     
+    // Count actual data
     state.patients.forEach(p => {
       if(p.status) statusCounts[p.status] = (statusCounts[p.status] || 0) + 1;
       if(p.waitingOn) waitingCounts[p.waitingOn] = (waitingCounts[p.waitingOn] || 0) + 1;
@@ -1143,39 +1180,42 @@
     // Sort and get top categories
     const topStatuses = Object.entries(statusCounts)
       .sort((a,b) => b[1] - a[1])
-      .slice(0, 5);
+      .slice(0, 6);
     
     const topWaiting = Object.entries(waitingCounts)
       .sort((a,b) => b[1] - a[1])
-      .slice(0, 5);
+      .slice(0, 6);
     
     const topTypes = Object.entries(typeCounts)
       .sort((a,b) => b[1] - a[1])
-      .slice(0, 5);
+      .slice(0, 6);
     
     // Color palette
     const colors = ["#d10f2f", "#7dd3fc", "#22c55e", "#f59e0b", "#a855f7", "#ef4444", "#3b82f6"];
     
+    // Filter patients based on chart search
+    const filteredPatientsList = filterPatientsForCharts();
+    
     return `
       <div class="pageTitle">Charts & Analytics</div>
-      <p class="pageHint">Visual overview of your data</p>
+      <p class="pageHint">Visual overview of your data. Click on any chart item to filter patients.</p>
       
       <div class="card">
         <h3>📊 Summary Statistics</h3>
         <div class="stat-grid">
-          <div class="stat-item" style="border-left-color: #d10f2f">
+          <div class="stat-item" style="border-left-color: #d10f2f" data-action="chart_filter" data-filter="type:all">
             <div class="stat-label">Total Patients</div>
             <div class="stat-value">${state.patients.length}</div>
           </div>
-          <div class="stat-item" style="border-left-color: #7dd3fc">
+          <div class="stat-item" style="border-left-color: #7dd3fc" data-action="chart_filter" data-filter="progress:Open">
             <div class="stat-label">Open Tasks</div>
             <div class="stat-value">${state.tasks.filter(t => t.progress === 'Open').length}</div>
           </div>
-          <div class="stat-item" style="border-left-color: #22c55e">
+          <div class="stat-item" style="border-left-color: #22c55e" data-action="chart_filter" data-filter="created:today">
             <div class="stat-label">Patients Today</div>
             <div class="stat-value">${state.patients.filter(p => new Date(p.createdAt).toDateString() === new Date().toDateString()).length}</div>
           </div>
-          <div class="stat-item" style="border-left-color: #f59e0b">
+          <div class="stat-item" style="border-left-color: #f59e0b" data-action="chart_filter" data-filter="status:Needs reply">
             <div class="stat-label">Needs Reply</div>
             <div class="stat-value">${state.patients.filter(p => p.status === 'Needs reply').length}</div>
           </div>
@@ -1187,11 +1227,20 @@
           <h3>${ICON_CHART} Patient Status Distribution</h3>
           <div class="chart-bar-container">
             ${topStatuses.map(([status, count], i) => `
-              <div class="chart-bar" style="border-left-color: ${colors[i % colors.length]}">
-                <div class="chart-bar-label">${escapeHtml(status)}</div>
+              <div class="chart-bar" style="border-left-color: ${colors[i % colors.length]}" data-action="chart_filter" data-filter="status:${escapeHtml(status)}">
+                <div class="chart-bar-label">
+                  <span style="width:10px;height:10px;border-radius:50%;background:${colors[i % colors.length]};display:inline-block"></span>
+                  ${escapeHtml(status)}
+                </div>
                 <div class="chart-bar-value">${count}</div>
               </div>
             `).join('')}
+            ${topStatuses.length === 0 ? `
+              <div class="chart-placeholder">
+                <div>No patient status data available</div>
+                <div class="mini">Add patients to see status distribution</div>
+              </div>
+            ` : ''}
           </div>
         </div>
         
@@ -1199,11 +1248,20 @@
           <h3>${ICON_CHART} Waiting On Distribution</h3>
           <div class="chart-bar-container">
             ${topWaiting.map(([waiting, count], i) => `
-              <div class="chart-bar" style="border-left-color: ${colors[(i+2) % colors.length]}">
-                <div class="chart-bar-label">${escapeHtml(waiting)}</div>
+              <div class="chart-bar" style="border-left-color: ${colors[(i+2) % colors.length]}" data-action="chart_filter" data-filter="waiting:${escapeHtml(waiting)}">
+                <div class="chart-bar-label">
+                  <span style="width:10px;height:10px;border-radius:50%;background:${colors[(i+2) % colors.length]};display:inline-block"></span>
+                  ${escapeHtml(waiting)}
+                </div>
                 <div class="chart-bar-value">${count}</div>
               </div>
             `).join('')}
+            ${topWaiting.length === 0 ? `
+              <div class="chart-placeholder">
+                <div>No waiting on data available</div>
+                <div class="mini">Add patients to see waiting on distribution</div>
+              </div>
+            ` : ''}
           </div>
         </div>
         
@@ -1211,36 +1269,70 @@
           <h3>${ICON_CHART} Patient Types</h3>
           <div class="chart-bar-container">
             ${topTypes.map(([type, count], i) => `
-              <div class="chart-bar" style="border-left-color: ${colors[(i+4) % colors.length]}">
-                <div class="chart-bar-label">${escapeHtml(type)}</div>
+              <div class="chart-bar" style="border-left-color: ${colors[(i+4) % colors.length]}" data-action="chart_filter" data-filter="type:${escapeHtml(type)}">
+                <div class="chart-bar-label">
+                  <span style="width:10px;height:10px;border-radius:50%;background:${colors[(i+4) % colors.length]};display:inline-block"></span>
+                  ${escapeHtml(type)}
+                </div>
                 <div class="chart-bar-value">${count}</div>
               </div>
             `).join('')}
-          </div>
-        </div>
-        
-        <div class="chart-card">
-          <h3>${ICON_CHART} Task Priority</h3>
-          <div class="chart-bar-container">
-            ${Object.entries(priorityCounts).map(([priority, count], i) => `
-              <div class="chart-bar" style="border-left-color: ${colors[(i+1) % colors.length]}">
-                <div class="chart-bar-label">${escapeHtml(priority)}</div>
-                <div class="chart-bar-value">${count}</div>
+            ${topTypes.length === 0 ? `
+              <div class="chart-placeholder">
+                <div>No patient type data available</div>
+                <div class="mini">Add patients to see type distribution</div>
               </div>
-            `).join('')}
+            ` : ''}
           </div>
         </div>
       </div>
       
+      <!-- NEW: Patient Summary Card with Search -->
+      <div class="card patient-summary-card">
+        <h3>📋 Patient Summary</h3>
+        <p class="pageHint">All patients data collected from all sections. Search by name or matter number.</p>
+        
+        <div class="tools">
+          <input class="input" id="chartSearch" placeholder="Search by patient name or matter number..." value="${escapeHtml(state.ui.chartSearch || "")}"/>
+          <button class="btn" id="chartSearchClear">Clear Search</button>
+        </div>
+        
+        <div style="overflow: auto; max-height: 400px;">
+          ${filteredPatientsList.length > 0 ? tablePatients(filteredPatientsList, {compact: true, showActions: false}) : `
+            <div class="chart-placeholder" style="min-height: 150px;">
+              <div>No patients found</div>
+              <div class="mini">Try adding patients or adjusting your search</div>
+            </div>
+          `}
+        </div>
+        
+        <div class="mini" style="margin-top: 8px;">
+          Showing ${filteredPatientsList.length} of ${state.patients.length} patients
+          ${state.ui.chartSearch ? ` • Filtered by: "${escapeHtml(state.ui.chartSearch)}"` : ''}
+        </div>
+      </div>
+      
       <div class="card" style="margin-top: 20px;">
-        <h3>📈 Data Trends</h3>
+        <h3>📈 Data Trends & Insights</h3>
         <div class="mini">
-          <p>This section provides visual insights into your patient and task data. Use these charts to identify patterns and prioritize your work.</p>
+          <p>This section provides visual insights into your patient and task data. Click on any chart item to filter the patient list below.</p>
           <p><strong>Total Records:</strong> ${state.patients.length} patients, ${state.tasks.length} tasks, ${state.reports.length} saved reports</p>
-          <p><strong>Last Update:</strong> ${new Date().toLocaleString()}</p>
+          <p><strong>Data Last Updated:</strong> ${new Date().toLocaleString()}</p>
+          <p><strong>Most Common Status:</strong> ${topStatuses.length > 0 ? topStatuses[0][0] + ' (' + topStatuses[0][1] + ' patients)' : 'No data'}</p>
+          <p><strong>Most Common Type:</strong> ${topTypes.length > 0 ? topTypes[0][0] + ' (' + topTypes[0][1] + ' patients)' : 'No data'}</p>
         </div>
       </div>
     `;
+  }
+
+  function filterPatientsForCharts() {
+    const searchTerm = lower(state.ui.chartSearch || "");
+    if (!searchTerm) return state.patients;
+    
+    return state.patients.filter(p => {
+      const hay = lower([p.matter, p.patient, p.provider, p.notes].join(" "));
+      return hay.includes(searchTerm);
+    });
   }
 
   function renderReports(){
@@ -1300,10 +1392,10 @@
   }
 
   // -----------------------------
-  // Page wiring (events)
+  // Page wiring (events) - COMPLETELY REWRITTEN
   // -----------------------------
   function wirePage(){
-    // Tabs (mobile: click on tabs when visible)
+    // Tabs
     $$(".tab").forEach(t => t.addEventListener("click", () => { 
       state.ui.tab = t.dataset.tab; 
       render(); 
@@ -1311,52 +1403,194 @@
 
     // Home KPI pills
     $$("[data-action^='home_']").forEach(el => el.addEventListener("click", () => {
-      if(el.dataset.action==="home_needs_reply"){ state.ui.tab="Patients"; state.ui.patientStatus="Needs reply"; state.ui.patientWaiting="all"; state.ui.patientSearch=""; }
-      if(el.dataset.action==="home_waiting_clinic"){ state.ui.tab="Patients"; state.ui.patientWaiting="Clinic"; state.ui.patientStatus="all"; state.ui.patientSearch=""; }
-      if(el.dataset.action==="home_new_today"){ state.ui.tab="Patients"; state.ui.patientStatus="all"; state.ui.patientWaiting="all"; state.ui.patientSearch=""; }
-      if(el.dataset.action==="home_overdue"){ state.ui.tab="Tasks"; state.ui.taskSearch=""; }
+      if(el.dataset.action==="home_needs_reply"){ 
+        state.ui.tab="Patients"; 
+        state.ui.patientStatus="Needs reply"; 
+        state.ui.patientWaiting="all"; 
+        state.ui.patientSearch=""; 
+      }
+      if(el.dataset.action==="home_waiting_clinic"){ 
+        state.ui.tab="Patients"; 
+        state.ui.patientWaiting="Clinic"; 
+        state.ui.patientStatus="all"; 
+        state.ui.patientSearch=""; 
+      }
+      if(el.dataset.action==="home_new_today"){ 
+        state.ui.tab="Patients"; 
+        state.ui.patientStatus="all"; 
+        state.ui.patientWaiting="all"; 
+        state.ui.patientSearch=""; 
+      }
+      if(el.dataset.action==="home_overdue"){ 
+        state.ui.tab="Tasks"; 
+        state.ui.taskSearch=""; 
+      }
       render();
     }));
 
-    // Patients tools - FIX: Ensure inputs are immediately focusable
+    // FIXED: Patients tools with working search
     const ps = $("#patientSearch");
     if(ps){
-      // Ensure focus works immediately
-      ps.addEventListener("focus", (e) => e.target.select());
-      ps.addEventListener("input", () => { 
-        state.ui.patientSearch = ps.value; 
-        saveState(); 
+      // Working input handler
+      ps.addEventListener("input", (e) => {
+        state.ui.patientSearch = e.target.value;
+        saveState();
+        // No auto-render here - we'll use a debounced approach
+      });
+      
+      // Add debounced search
+      let searchTimeout;
+      ps.addEventListener("keyup", (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+          render();
+        }, 300);
+      });
+      
+      // Enter key to search immediately
+      ps.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          render();
+        }
+      });
+      
+      // Other filters
+      $("#patientStatusFilter")?.addEventListener("change", (e) => { 
+        state.ui.patientStatus = e.target.value; 
         render(); 
       });
-      $("#patientStatusFilter").addEventListener("change", (e)=>{ state.ui.patientStatus = e.target.value; render(); });
-      $("#patientWaitingFilter").addEventListener("change", (e)=>{ state.ui.patientWaiting = e.target.value; render(); });
-      $("#patientClear").addEventListener("click", ()=>{ state.ui.patientSearch=""; state.ui.patientStatus="all"; state.ui.patientWaiting="all"; render(); });
-      $("#btnQuickPatient").addEventListener("click", openQuickPatient);
+      
+      $("#patientWaitingFilter")?.addEventListener("change", (e) => { 
+        state.ui.patientWaiting = e.target.value; 
+        render(); 
+      });
+      
+      $("#patientClear")?.addEventListener("click", () => { 
+        state.ui.patientSearch = ""; 
+        state.ui.patientStatus = "all"; 
+        state.ui.patientWaiting = "all"; 
+        render(); 
+      });
+      
+      $("#btnQuickPatient")?.addEventListener("click", openQuickPatient);
     }
 
-    // Tasks tools - FIX: Ensure inputs are immediately focusable
+    // FIXED: Tasks tools with working search
     const ts = $("#taskSearch");
     if(ts){
-      // Ensure focus works immediately
-      ts.addEventListener("focus", (e) => e.target.select());
-      ts.addEventListener("input", () => { 
-        state.ui.taskSearch = ts.value; 
-        saveState(); 
+      // Working input handler
+      ts.addEventListener("input", (e) => {
+        state.ui.taskSearch = e.target.value;
+        saveState();
+        // No auto-render here - we'll use a debounced approach
+      });
+      
+      // Add debounced search
+      let taskSearchTimeout;
+      ts.addEventListener("keyup", (e) => {
+        clearTimeout(taskSearchTimeout);
+        taskSearchTimeout = setTimeout(() => {
+          render();
+        }, 300);
+      });
+      
+      // Enter key to search immediately
+      ts.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          render();
+        }
+      });
+      
+      $("#taskClear")?.addEventListener("click", () => { 
+        state.ui.taskSearch = ""; 
         render(); 
       });
-      $("#taskClear").addEventListener("click", ()=>{ state.ui.taskSearch=""; render(); });
-      $("#btnQuickTask").addEventListener("click", openQuickTask);
+      
+      $("#btnQuickTask")?.addEventListener("click", openQuickTask);
     }
+
+    // NEW: Charts section search
+    const cs = $("#chartSearch");
+    if(cs){
+      cs.addEventListener("input", (e) => {
+        state.ui.chartSearch = e.target.value;
+        saveState();
+      });
+      
+      // Add debounced search for charts
+      let chartSearchTimeout;
+      cs.addEventListener("keyup", (e) => {
+        clearTimeout(chartSearchTimeout);
+        chartSearchTimeout = setTimeout(() => {
+          render();
+        }, 300);
+      });
+      
+      $("#chartSearchClear")?.addEventListener("click", () => { 
+        state.ui.chartSearch = ""; 
+        render(); 
+      });
+    }
+
+    // Charts filter clicks
+    $$("[data-action='chart_filter']").forEach(el => {
+      el.addEventListener("click", (e) => {
+        const filter = el.dataset.filter;
+        if (filter) {
+          const [type, value] = filter.split(":");
+          if (type === "status") {
+            state.ui.tab = "Patients";
+            state.ui.patientStatus = value;
+            state.ui.patientWaiting = "all";
+            state.ui.patientSearch = "";
+            toast("Filter Applied", `Showing patients with status: ${value}`);
+          } else if (type === "waiting") {
+            state.ui.tab = "Patients";
+            state.ui.patientWaiting = value;
+            state.ui.patientStatus = "all";
+            state.ui.patientSearch = "";
+            toast("Filter Applied", `Showing patients waiting on: ${value}`);
+          } else if (type === "type") {
+            state.ui.tab = "Patients";
+            state.ui.patientSearch = value;
+            state.ui.patientStatus = "all";
+            state.ui.patientWaiting = "all";
+            toast("Filter Applied", `Showing patients of type: ${value}`);
+          } else if (type === "progress") {
+            state.ui.tab = "Tasks";
+            state.ui.taskSearch = "";
+            toast("Filter Applied", `Showing tasks with progress: ${value}`);
+          } else if (type === "created") {
+            state.ui.tab = "Patients";
+            state.ui.patientSearch = "today";
+            state.ui.patientStatus = "all";
+            state.ui.patientWaiting = "all";
+            toast("Filter Applied", "Showing patients created today");
+          } else if (type === "all") {
+            state.ui.tab = "Patients";
+            state.ui.patientSearch = "";
+            state.ui.patientStatus = "all";
+            state.ui.patientWaiting = "all";
+            toast("Filter Cleared", "Showing all patients");
+          }
+          render();
+        }
+      });
+    });
 
     // Reports tools
     if($("#reportText")){
-      $("#btnGenerateHere").addEventListener("click", () => { generateDraftInto("#reportText"); });
-      $("#btnCopyReport").addEventListener("click", copyReport);
-      $("#btnSaveReport").addEventListener("click", saveReportFromTextarea);
-      $("#btnClearReport").addEventListener("click", ()=>{ state.ui.reportEditingId=null; state.ui.currentDraft=""; render(); });
+      $("#btnGenerateHere")?.addEventListener("click", () => { generateDraftInto("#reportText"); });
+      $("#btnCopyReport")?.addEventListener("click", copyReport);
+      $("#btnSaveReport")?.addEventListener("click", saveReportFromTextarea);
+      $("#btnClearReport")?.addEventListener("click", () => { 
+        state.ui.reportEditingId = null; 
+        state.ui.currentDraft = ""; 
+        render(); 
+      });
     }
 
-    // Delegated actions
+    // Delegated actions for the entire page
     $("#page").addEventListener("click", (e)=>{
       const actEl = e.target.closest("[data-action]");
       if(!actEl) return;
@@ -1441,7 +1675,6 @@
       render();
     });
     
-    // FIX: Focus first input
     setTimeout(() => {
       $("#ql_matter")?.focus();
     }, 100);
@@ -1495,9 +1728,8 @@
     const p = state.patients.find(x => x.matter===matter);
     if(!p) return;
     p[field] = norm(value);
-    // auto: if waitingOn Clinic and status empty, keep status
     addAssistantSystem(`Patient ${matter}: set ${field} → ${p[field]}`);
-    render(); // updates KPIs
+    render();
   }
 
   // -----------------------------
@@ -1532,7 +1764,6 @@
       render();
     });
     
-    // FIX: Focus first input
     setTimeout(() => {
       $("#qt_matter")?.focus();
     }, 100);
@@ -1617,8 +1848,7 @@
     state.ui.currentDraft = draft;
     state.ui.reportEditingId = null;
     toast("Draft generated","4pm draft was generated from current Patients + Tasks.");
-    render(); // ensures textarea reflects currentDraft in Reports tab too
-    // if not on Reports, keep it stored
+    render();
   }
 
   function copyReport(){
@@ -1655,7 +1885,7 @@
   }
 
   // -----------------------------
-  // Assistant - IMPROVED
+  // Assistant
   // -----------------------------
   function renderAssistant(){
     const panel = $("#assistant");
@@ -1665,7 +1895,6 @@
     const body = $("#assistantBody");
     const chat = state.assistant.chat || [];
     
-    // Command suggestions
     const suggestions = [
       {cmd: "show needs reply", desc: "Show patients needing reply"},
       {cmd: "open 107853", desc: "Open specific patient"},
@@ -1693,7 +1922,6 @@
       </div>
     `).join("") + suggestionsHtml;
 
-    // Add event listeners to command chips
     $$(".command-chip").forEach(chip => {
       chip.addEventListener("click", () => {
         const cmd = chip.dataset.command;
@@ -1702,7 +1930,6 @@
       });
     });
 
-    // autoscroll
     body.scrollTop = body.scrollHeight;
   }
 
@@ -1721,17 +1948,14 @@
     return m ? m[1] : null;
   }
 
-  // IMPROVED: Enhanced assistant with more capabilities
   function assistantRespond(input){
     const msg = lower(input);
 
-    // Show command help
     if(msg.includes("help") || msg === "?") {
       addAssistant("sys", "I can help you with: • show needs reply • open [matter] • update patient [matter] [field=value] • export data • generate report • show charts • what's pending • clear search • add patient • add task");
       return;
     }
 
-    // Commands
     if(msg.includes("show needs reply") || msg==="needs reply"){
       state.ui.tab="Patients"; state.ui.patientStatus="Needs reply"; state.ui.patientWaiting="all"; state.ui.patientSearch="";
       addAssistant("sys","Showing patients/tasks that need reply.");
@@ -1757,7 +1981,6 @@
       }
     }
 
-    // "give an update about <name>" or "what's the status of <name>"
     if(msg.includes("give an update") || msg.includes("update about") || msg.includes("status of") || msg.includes("what about")){
       const name = input.split(/about|of/i)[1]?.trim();
       const p = name ? state.patients.find(x => lower(x.patient).includes(lower(name)) || x.matter === name) : null;
@@ -1770,7 +1993,6 @@
       return;
     }
 
-    // "what's pending" or "what do I have pending"
     if(msg.includes("what's pending") || msg.includes("what do i have") || msg.includes("pending items")) {
       const overdueTasks = state.tasks.filter(t => t.progress === "Open").length;
       const needsReplyPatients = state.patients.filter(p => p.status === "Needs reply").length;
@@ -1778,25 +2000,23 @@
       return;
     }
 
-    // "clear search" or "clear filters"
     if(msg.includes("clear search") || msg.includes("clear filters")) {
       state.ui.patientSearch = "";
       state.ui.patientStatus = "all";
       state.ui.patientWaiting = "all";
       state.ui.taskSearch = "";
+      state.ui.chartSearch = "";
       addAssistant("sys", "Cleared all search filters.");
       render();
       return;
     }
 
-    // "export data" or "download excel"
     if(msg.includes("export data") || msg.includes("download excel") || msg.includes("download data")) {
       downloadCSV();
       addAssistant("sys", "Downloading all patient data as Excel file.");
       return;
     }
 
-    // "generate report" 
     if(msg.includes("generate report") || msg.includes("create report")) {
       state.ui.tab = "Reports";
       generateDraftInto("#reportText");
@@ -1804,21 +2024,18 @@
       return;
     }
 
-    // "add patient" or "new patient"
     if(msg.includes("add patient") || msg.includes("new patient")) {
       openQuickPatient();
       addAssistant("sys", "Opening Quick Log to add a new patient.");
       return;
     }
 
-    // "add task" or "new task"
     if(msg.includes("add task") || msg.includes("new task")) {
       openQuickTask();
       addAssistant("sys", "Opening Quick Log to add a new task.");
       return;
     }
 
-    // Update patient by structured params
     if(msg.includes("update patient") || msg.includes("update the patient") || msg.includes("update the patient file")){
       const matter = parseMatterFromText(input) || state.assistant.lastMatter;
       if(!matter){
@@ -1831,7 +2048,6 @@
         return;
       }
 
-      // Natural language: "to waiting on clinic"
       if(msg.includes("waiting on clinic") || msg.includes("waiting-on clinic")){
         p.waitingOn = "Clinic";
         if(!p.status) p.status = "Sent to clinic";
@@ -1841,7 +2057,6 @@
         return;
       }
 
-      // Parse key=value pairs
       const pairs = Array.from(input.matchAll(/\b(status|waitingOn|type|provider|state|patient|sender|requestedDate)\s*=\s*([^,\n]+)/gi));
       if(pairs.length===0){
         addAssistant("sys","Tell me what to change. Example: update patient 107853 status=Needs reply waitingOn=You");
@@ -1857,7 +2072,6 @@
       return;
     }
 
-    // fallback: if message includes a matter number, show summary
     const m = parseMatterFromText(input);
     if(m){
       const p = state.patients.find(x => x.matter===m);
@@ -1874,28 +2088,24 @@
   }
 
   // -----------------------------
-  // CSV download (Excel-friendly) - IMPROVED to include all data
+  // CSV download
   // -----------------------------
   function downloadCSV(){
-    // Create patients CSV
     const patientHeaders = ["Matter","Patient","State","Type","Provider","Provider Email","Requested Date","Sender","Status","Waiting On","Notes", "Created At"];
     const patientRows = state.patients.map(p => [
       p.matter, p.patient, p.state, p.type, p.provider, p.providerEmail, p.requestedDate, p.sender, p.status, p.waitingOn, p.notes, p.createdAt
     ]);
     
-    // Create tasks CSV
     const taskHeaders = ["ID","Matter","Task Type","Priority","Progress","Description","Created At"];
     const taskRows = state.tasks.map(t => [
       t.id, t.matter, t.taskType, t.priority, t.progress, t.description, t.createdAt
     ]);
     
-    // Create reports CSV
     const reportHeaders = ["ID","Date/Time","Report Text"];
     const reportRows = state.reports.map(r => [
       r.id, r.when, r.text
     ]);
     
-    // Combine all into one CSV with sections
     const csvContent = [
       "MEDICAL DEPARTMENT COMMAND CENTER - FULL DATA EXPORT",
       `Exported: ${new Date().toLocaleString()}`,
@@ -1950,7 +2160,6 @@
   $("#btnDownload").addEventListener("click", downloadCSV);
 
   $("#btnGenerate").addEventListener("click", ()=>{
-    // Generate draft and route to Reports
     state.ui.tab = "Reports";
     state.ui.reportEditingId = null;
     state.ui.currentDraft = generateDraft();
@@ -1966,7 +2175,6 @@
     input.value = "";
     assistantRespond(text);
     
-    // Keep focus on input
     setTimeout(() => input.focus(), 50);
   });
 
@@ -1976,18 +2184,13 @@
       $("#assistantSend").click(); 
     }
   });
-  
-  // FIX: Ensure assistant input is immediately focusable
-  $("#assistantInput").addEventListener("focus", (e) => {
-    e.target.select();
-  });
 
-  // Initialize assistant with welcome message
+  // Initialize assistant
   if(state.assistant.chat.length === 0) {
     addAssistant("sys", "Hello! I'm your medical command center assistant. I can help you manage patients, tasks, generate reports, and more. Try typing 'help' to see what I can do.");
   }
 
-  // If something breaks, show it.
+  // Error handling
   window.addEventListener("error", (e)=>{
     console.error(e.error||e.message);
     toast("Script error", "Something crashed. Refresh and try again. If it persists, tell me what you clicked.");
