@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Medical Department Command Center — Prototype</title>
+<title>Medical Department Command Center — Enhanced</title>
 <style>
   :root{
     --bg:#0b0d10; --panel:#11151b; --panel2:#0f1318; --card:#141a22;
@@ -13,42 +13,149 @@
     --r:18px; --r2:14px;
     --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
     --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    --accent: linear-gradient(135deg, #d10f2f 0%, #7dd3fc 100%);
+    --accent-glow: 0 0 20px rgba(209, 15, 47, 0.4);
+    --transition: all 0.3s ease;
+    --chart-bg: rgba(20, 26, 34, 0.9);
   }
+  
+  /* Animations */
+  @keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+  }
+  
+  @keyframes slideIn {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  
+  @keyframes glow {
+    0% { box-shadow: 0 0 5px rgba(209, 15, 47, 0.5); }
+    50% { box-shadow: 0 0 20px rgba(209, 15, 47, 0.8); }
+    100% { box-shadow: 0 0 5px rgba(209, 15, 47, 0.5); }
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
+  }
+  
   *{box-sizing:border-box}
+  
   body{
     margin:0; font-family:var(--sans); color:var(--text);
     background: radial-gradient(1200px 600px at 10% 0%, rgba(209,15,47,.18), transparent 55%),
                 radial-gradient(900px 600px at 95% 15%, rgba(125,211,252,.12), transparent 60%),
                 linear-gradient(180deg, #07080a, #0b0d10 20%, #0b0d10);
     min-height:100vh;
+    overflow-x: hidden;
   }
+  
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: rgba(209, 15, 47, 0.5);
+    border-radius: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(209, 15, 47, 0.8);
+  }
+  
   a{color:var(--link); text-decoration:none}
+  
   .topbar{
     position:sticky; top:0; z-index:10;
     backdrop-filter: blur(10px);
-    background: rgba(9,11,14,.72);
+    background: rgba(9,11,14,.85);
     border-bottom:1px solid rgba(255,255,255,.06);
+    animation: slideIn 0.5s ease-out;
   }
+  
   .topbar-inner{
     max-width:1200px; margin:0 auto; padding:14px 16px;
     display:flex; align-items:center; gap:12px;
   }
+  
   .brand{
     display:flex; align-items:center; gap:10px; min-width:260px;
   }
-  .dot{width:12px; height:12px; border-radius:50%; background:var(--red); box-shadow:0 0 0 6px rgba(209,15,47,.15)}
-  .title{font-weight:800; letter-spacing:.2px}
+  
+  .dot{
+    width:12px; height:12px; border-radius:50%; 
+    background:var(--red); 
+    box-shadow:0 0 0 6px rgba(209,15,47,.15);
+    animation: pulse 2s infinite;
+  }
+  
+  .title{
+    font-weight:800; letter-spacing:.2px;
+    background: var(--accent);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
   .subtitle{color:var(--muted); font-size:13px}
+  
   .tabs{display:flex; gap:8px; flex:1}
+  
   .tab{
     padding:9px 12px; border-radius:999px;
     border:1px solid rgba(255,255,255,.08);
     background: rgba(255,255,255,.03);
     color:var(--text);
     cursor:pointer; user-select:none;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
   }
-  .tab.active{border-color: rgba(125,211,252,.25); box-shadow: inset 0 0 0 1px rgba(125,211,252,.18)}
+  
+  .tab:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  }
+  
+  .tab.active{
+    border-color: rgba(125,211,252,.25); 
+    background: rgba(125,211,252,.1);
+    box-shadow: inset 0 0 0 1px rgba(125,211,252,.18);
+    animation: glow 3s infinite;
+  }
+  
+  .tab::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    transition: left 0.7s;
+  }
+  
+  .tab:hover::after {
+    left: 100%;
+  }
+  
   .actionsBar{display:flex; gap:10px; align-items:center}
+  
   .btn{
     display:inline-flex; align-items:center; gap:10px;
     padding:10px 14px; border-radius:999px;
@@ -56,39 +163,132 @@
     background: rgba(255,255,255,.03);
     color:var(--text);
     cursor:pointer;
+    transition: var(--transition);
   }
+  
   .btn.primary{
     border-color: rgba(209,15,47,.45);
     background: linear-gradient(180deg, rgba(209,15,47,.25), rgba(209,15,47,.12));
   }
-  .btn:hover{border-color: rgba(255,255,255,.22)}
+  
+  .btn:hover{
+    border-color: rgba(255,255,255,.22);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  }
+  
+  .btn.primary:hover {
+    animation: pulse 1s infinite;
+    box-shadow: var(--accent-glow);
+  }
+  
   .btn svg{width:18px; height:18px; fill:currentColor; opacity:.9}
-  .container{max-width:1200px; margin:0 auto; padding:18px 16px 90px}
-  .pageTitle{font-size:28px; font-weight:900; margin:14px 0 4px}
+  
+  .container{
+    max-width:1200px; margin:0 auto; padding:18px 16px 90px;
+    animation: fadeIn 0.7s ease-out;
+  }
+  
+  .pageTitle{
+    font-size:28px; font-weight:900; margin:14px 0 4px;
+    position: relative;
+    display: inline-block;
+  }
+  
+  .pageTitle::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: var(--accent);
+    border-radius: 2px;
+  }
+  
   .pageHint{color:var(--muted); margin:0 0 16px}
+  
   .grid2{display:grid; grid-template-columns: 1.2fr .8fr; gap:14px}
-  .kpis{display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:12px; margin:10px 0 14px}
+  
+  .kpis{
+    display:grid; 
+    grid-template-columns: repeat(4, minmax(0,1fr)); 
+    gap:12px; 
+    margin:10px 0 14px;
+  }
+  
   .kpi{
     background: rgba(255,255,255,.03);
     border:1px solid rgba(255,255,255,.08);
     border-radius: var(--r);
     padding:14px 14px 12px;
     box-shadow: var(--shadow);
+    transition: var(--transition);
+    animation: slideIn 0.5s ease-out backwards;
   }
+  
+  .kpi:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+  }
+  
   .kpi .label{display:flex; align-items:center; gap:10px; color:var(--muted); font-weight:700}
-  .pill{display:inline-flex; align-items:center; gap:8px; padding:7px 10px; border-radius:999px;
-    border:1px solid rgba(255,255,255,.10); background: rgba(255,255,255,.02); color:var(--text); cursor:pointer;}
+  
+  .pill{
+    display:inline-flex; align-items:center; gap:8px; 
+    padding:7px 10px; border-radius:999px;
+    border:1px solid rgba(255,255,255,.10); 
+    background: rgba(255,255,255,.02); 
+    color:var(--text); 
+    cursor:pointer;
+    transition: var(--transition);
+  }
+  
+  .pill:hover {
+    background: rgba(255,255,255,.08);
+    transform: scale(1.05);
+  }
+  
   .pill .miniDot{width:10px; height:10px; border-radius:50%;}
-  .bigNum{font-size:34px; font-weight:900; margin-top:8px}
+  
+  .bigNum{
+    font-size:34px; font-weight:900; margin-top:8px;
+    background: var(--accent);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
   .card{
     background: rgba(255,255,255,.03);
     border:1px solid rgba(255,255,255,.08);
     border-radius: var(--r);
     padding:14px;
     box-shadow: var(--shadow);
+    transition: var(--transition);
+    animation: fadeIn 0.7s ease-out backwards;
   }
-  .card h3{margin:0 0 10px; font-size:16px; letter-spacing:.2px}
-  .tools{display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:12px}
+  
+  .card:hover {
+    box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+    border-color: rgba(255,255,255,.12);
+  }
+  
+  .card h3{
+    margin:0 0 10px; 
+    font-size:16px; 
+    letter-spacing:.2px;
+    color: var(--link);
+  }
+  
+  .tools{
+    display:flex; 
+    flex-wrap:wrap; 
+    gap:10px; 
+    align-items:center; 
+    margin-bottom:12px;
+  }
+  
   .input, select, textarea{
     width:100%;
     padding:10px 12px;
@@ -97,16 +297,34 @@
     background: rgba(0,0,0,.18);
     color: var(--text);
     outline:none;
+    transition: var(--transition);
+    font-family: var(--sans);
   }
+  
+  /* FIX: Search input focus */
+  .input:focus, select:focus, textarea:focus {
+    border-color: rgba(125,211,252,.5);
+    box-shadow: 0 0 0 2px rgba(125,211,252,.2);
+  }
+  
+  /* Ensure inputs are immediately clickable */
+  .input, select {
+    cursor: text;
+  }
+  
   textarea{min-height:120px; resize:vertical}
+  
   .tools .input, .tools select{width:auto; min-width:240px}
   .tools select{min-width:190px}
+  
   .mini{color:var(--muted); font-size:12px}
+  
   table{width:100%; border-collapse:separate; border-spacing:0}
   th, td{padding:10px 10px; border-bottom:1px solid rgba(255,255,255,.08); vertical-align:top}
   th{color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.12em; text-align:left}
   td{font-size:14px}
   .nowrap{white-space:nowrap}
+  
   .cellSelect{
     width:100%;
     padding:8px 10px;
@@ -114,8 +332,17 @@
     border:1px solid rgba(255,255,255,.10);
     background: rgba(0,0,0,.18);
     color:var(--text);
+    transition: var(--transition);
+    cursor: pointer;
   }
+  
+  .cellSelect:focus {
+    border-color: rgba(125,211,252,.5);
+    box-shadow: 0 0 0 2px rgba(125,211,252,.2);
+  }
+  
   .rowActions{white-space:nowrap}
+  
   .iconBtn{
     display:inline-flex; align-items:center; justify-content:center;
     width:34px; height:34px; border-radius:12px;
@@ -124,20 +351,140 @@
     color: var(--text);
     cursor:pointer;
     margin-right:6px;
+    transition: var(--transition);
   }
+  
   .iconBtn svg{width:18px; height:18px; fill:currentColor; opacity:.92}
   .iconBtn.danger{border-color: rgba(239,68,68,.35); color: var(--bad)}
-  .iconBtn:hover{border-color: rgba(255,255,255,.22)}
+  
+  .iconBtn:hover{
+    border-color: rgba(255,255,255,.22);
+    transform: translateY(-2px) scale(1.1);
+    box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+  }
+  
   .badge{
     display:inline-flex; align-items:center; gap:8px;
     padding:6px 10px; border-radius:999px;
     border:1px solid rgba(255,255,255,.10);
     background: rgba(255,255,255,.02);
     font-size:12px; color:var(--muted);
+    transition: var(--transition);
   }
+  
+  .badge:hover {
+    background: rgba(255,255,255,.08);
+  }
+  
   .badge strong{color:var(--text)}
+  
+  /* Chart Section Styles */
+  .charts-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+  }
+  
+  .chart-card {
+    background: var(--chart-bg);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: var(--r);
+    padding: 16px;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+  }
+  
+  .chart-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+  }
+  
+  .chart-card h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+  
+  .chart-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    color: var(--muted);
+    text-align: center;
+    padding: 20px;
+    border-radius: 12px;
+    background: rgba(0,0,0,.1);
+    border: 1px dashed rgba(255,255,255,.1);
+  }
+  
+  .chart-bar-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  
+  .chart-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: rgba(255,255,255,.03);
+    border-radius: 8px;
+    border-left: 4px solid;
+    transition: var(--transition);
+  }
+  
+  .chart-bar:hover {
+    background: rgba(255,255,255,.08);
+    transform: translateX(5px);
+  }
+  
+  .chart-bar-label {
+    font-weight: 600;
+    font-size: 14px;
+  }
+  
+  .chart-bar-value {
+    font-weight: 700;
+    font-size: 16px;
+  }
+  
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  .stat-item {
+    background: rgba(255,255,255,.03);
+    padding: 12px;
+    border-radius: 10px;
+    border-left: 3px solid;
+  }
+  
+  .stat-label {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 5px;
+  }
+  
+  .stat-value {
+    font-size: 20px;
+    font-weight: 700;
+  }
+  
   /* Modal */
-  .backdrop{position:fixed; inset:0; background:rgba(0,0,0,.6); display:none; z-index:50; align-items:center; justify-content:center; padding:20px}
+  .backdrop{
+    position:fixed; inset:0; background:rgba(0,0,0,.6); 
+    display:none; z-index:50; align-items:center; justify-content:center; padding:20px;
+    animation: fadeIn 0.3s ease-out;
+  }
+  
   .modal{
     width:min(920px, 95vw);
     background: rgba(15,19,24,.92);
@@ -145,45 +492,192 @@
     border-radius: 22px;
     box-shadow: 0 30px 90px rgba(0,0,0,.6);
     overflow:hidden;
+    animation: slideIn 0.4s ease-out;
   }
-  .modalHead{display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid rgba(255,255,255,.08)}
+  
+  .modalHead{
+    display:flex; align-items:center; justify-content:space-between; 
+    padding:14px 16px; border-bottom:1px solid rgba(255,255,255,.08)
+  }
+  
   .modalHead h2{margin:0; font-size:18px}
+  
   .modalBody{padding:14px 16px}
+  
   .modalGrid{display:grid; grid-template-columns:1fr 1fr; gap:10px}
-  .modalFoot{display:flex; justify-content:space-between; gap:10px; padding:14px 16px; border-top:1px solid rgba(255,255,255,.08)}
-  .toastWrap{position:fixed; right:16px; bottom:16px; display:flex; flex-direction:column; gap:10px; z-index:60}
-  .toast{background:rgba(15,19,24,.92); border:1px solid rgba(255,255,255,.12); border-radius:16px; padding:10px 12px; box-shadow: var(--shadow); width: min(420px, 92vw)}
+  
+  .modalFoot{
+    display:flex; justify-content:space-between; gap:10px; 
+    padding:14px 16px; border-top:1px solid rgba(255,255,255,.08)
+  }
+  
+  .toastWrap{
+    position:fixed; right:16px; bottom:16px; 
+    display:flex; flex-direction:column; gap:10px; z-index:60
+  }
+  
+  .toast{
+    background:rgba(15,19,24,.92); 
+    border:1px solid rgba(255,255,255,.12); 
+    border-radius:16px; 
+    padding:10px 12px; 
+    box-shadow: var(--shadow); 
+    width: min(420px, 92vw);
+    animation: slideIn 0.5s ease-out;
+  }
+  
   .toast .t{font-weight:800}
   .toast .m{color:var(--muted); font-size:13px; margin-top:4px}
-  /* Assistant */
+  
+  /* Assistant - Improved */
   .assistant{
     position:fixed; right:16px; bottom:16px;
     width:min(420px, 92vw);
     max-height: 70vh;
-    background: rgba(15,19,24,.92);
+    background: rgba(15,19,24,.95);
     border:1px solid rgba(255,255,255,.12);
     border-radius: 22px;
     box-shadow: 0 30px 80px rgba(0,0,0,.55);
     overflow:hidden;
     display:none;
     z-index:70;
+    animation: slideIn 0.5s ease-out;
   }
-  .assistantHead{display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.08)}
-  .assistantHead .name{display:flex; align-items:center; gap:10px; font-weight:900}
-  .assistantHead .pending{color:var(--muted); font-size:13px}
-  .assistantBody{padding:12px 12px 0; overflow:auto; max-height: calc(70vh - 120px)}
-  .bubble{border:1px solid rgba(255,255,255,.10); background: rgba(255,255,255,.03); border-radius: 18px; padding:10px 12px; margin-bottom:10px}
-  .bubble.me{border-color: rgba(125,211,252,.18)}
-  .bubble .small{color:var(--muted); font-size:12px; margin-top:6px}
-  .assistantFoot{padding:12px; border-top:1px solid rgba(255,255,255,.08); display:flex; gap:10px}
-  .assistantFoot input{flex:1}
-  .ghostBtn{background:transparent; border:1px solid rgba(255,255,255,.10); color:var(--text); border-radius:999px; padding:9px 12px; cursor:pointer}
-  .ghostBtn:hover{border-color: rgba(255,255,255,.22)}
+  
+  .assistantHead{
+    display:flex; align-items:center; justify-content:space-between; 
+    padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.08);
+    background: rgba(20,26,34,0.8);
+  }
+  
+  .assistantHead .name{
+    display:flex; align-items:center; gap:10px; font-weight:900;
+  }
+  
+  .assistantHead .pending{
+    color:var(--muted); font-size:13px;
+    animation: pulse 2s infinite;
+  }
+  
+  .assistantBody{
+    padding:12px 12px 0; overflow:auto; max-height: calc(70vh - 120px)
+  }
+  
+  .bubble{
+    border:1px solid rgba(255,255,255,.10); 
+    background: rgba(255,255,255,.03); 
+    border-radius: 18px; 
+    padding:10px 12px; 
+    margin-bottom:10px;
+    animation: slideIn 0.3s ease-out;
+  }
+  
+  .bubble.me{
+    border-color: rgba(125,211,252,.18);
+    background: rgba(125,211,252,.05);
+    margin-left: 20px;
+  }
+  
+  .bubble.sys{
+    border-color: rgba(34,197,94,.18);
+    background: rgba(34,197,94,.05);
+    margin-right: 20px;
+  }
+  
+  .bubble .small{
+    color:var(--muted); font-size:12px; margin-top:6px;
+  }
+  
+  .assistantFoot{
+    padding:12px; border-top:1px solid rgba(255,255,255,.08); 
+    display:flex; gap:10px;
+    background: rgba(20,26,34,0.8);
+  }
+  
+  .assistantFoot input{
+    flex:1;
+    /* FIX: Ensure input is immediately clickable */
+    cursor: text;
+  }
+  
+  .assistantFoot input:focus {
+    border-color: rgba(125,211,252,.5);
+    box-shadow: 0 0 0 2px rgba(125,211,252,.2);
+  }
+  
+  .ghostBtn{
+    background:transparent; border:1px solid rgba(255,255,255,.10); 
+    color:var(--text); border-radius:999px; padding:9px 12px; cursor:pointer;
+    transition: var(--transition);
+  }
+  
+  .ghostBtn:hover{
+    border-color: rgba(255,255,255,.22);
+    background: rgba(255,255,255,.05);
+  }
+  
+  /* Assistant command suggestions */
+  .command-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+    padding: 8px;
+    background: rgba(255,255,255,.02);
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.05);
+  }
+  
+  .command-chip {
+    padding: 6px 10px;
+    background: rgba(125,211,252,.1);
+    border: 1px solid rgba(125,211,252,.2);
+    border-radius: 999px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  
+  .command-chip:hover {
+    background: rgba(125,211,252,.2);
+    transform: scale(1.05);
+  }
+  
+  /* Visual effects */
+  .glowing-dot {
+    position: relative;
+  }
+  
+  .glowing-dot::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--red);
+    filter: blur(8px);
+    opacity: 0.7;
+    z-index: -1;
+  }
+  
+  .floating {
+    animation: float 3s ease-in-out infinite;
+  }
+  
   @media (max-width: 980px){
     .grid2{grid-template-columns: 1fr}
     .kpis{grid-template-columns: repeat(2, minmax(0,1fr))}
     .brand{min-width:auto}
     .tabs{display:none}
+    .charts-container {
+      grid-template-columns: 1fr;
+    }
+    .stat-grid {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
 </head>
@@ -191,27 +685,27 @@
   <div class="topbar">
     <div class="topbar-inner">
       <div class="brand">
-        <div class="dot"></div>
+        <div class="dot glowing-dot"></div>
         <div>
           <div class="title">Command Center</div>
-          <div class="subtitle">Medical Department • Prototype</div>
+          <div class="subtitle">Medical Department • Enhanced</div>
         </div>
       </div>
 
       <div class="tabs" id="tabs"></div>
 
       <div class="actionsBar">
-        <button class="btn" id="btnToggleAssistant" title="Toggle assistant">
+        <button class="btn floating" id="btnToggleAssistant" title="Toggle assistant">
           <svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7v4a3 3 0 0 0 3 3h1v3l3-3h3a3 3 0 0 0 3-3V9a7 7 0 0 0-7-7zm-2 9h4v2h-4v-2zm0-4h4v2h-4V7z"/></svg>
-          Toggle Assistant
+          Assistant
         </button>
         <button class="btn" id="btnDownload" title="Download CSV">
           <svg viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zM12 2v12l4-4 1.4 1.4L12 18l-5.4-5.6L8 10l4 4V2h0z"/></svg>
-          Download Excel
+          Export Data
         </button>
         <button class="btn primary" id="btnGenerate" title="Generate 4pm draft">
           <svg viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7l-4-4zm-2 16H7v-2h10v2zm0-4H7v-2h10v2zm-3-7H6V6h8v2z"/></svg>
-          Generate 4pm Draft
+          Generate Report
         </button>
       </div>
     </div>
@@ -245,9 +739,12 @@
       <div class="name"><span class="dot" style="width:10px;height:10px;box-shadow:none"></span> Isabel's Assistant</div>
       <div class="pending"><span id="pendingCount">0</span> pending</div>
     </div>
-    <div class="assistantBody" id="assistantBody"></div>
+    <div class="assistantBody" id="assistantBody">
+      <!-- Command suggestions will be inserted here -->
+      <div id="commandSuggestions" class="command-suggestions"></div>
+    </div>
     <div class="assistantFoot">
-      <input class="input" id="assistantInput" placeholder="Example: 'show needs reply' or 'update patient 107853 waitingOn=Clinic'"/>
+      <input class="input" id="assistantInput" placeholder="Ask me anything: 'show pending', 'update patient', 'export data', 'generate report'"/>
       <button class="btn primary" id="assistantSend">Send</button>
     </div>
   </div>
@@ -263,6 +760,7 @@
   const ICON_TRASH = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7h12l-1 14H7L6 7zm3-3h6l1 2H8l1-2z"/></svg>`;
   const ICON_EMAIL = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4-8 5L4 8V6l8 5 8-5v2z"/></svg>`;
   const ICON_SAVE = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7l-4-4zM12 19a3 3 0 1 1 0-6 3 3 0 0 1 0 6zM6 8V5h10v3H6z"/></svg>`;
+  const ICON_CHART = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>`;
 
   // -----------------------------
   // Options (Dropdowns)
@@ -279,7 +777,7 @@
   // -----------------------------
   // State
   // -----------------------------
-  const STORAGE_KEY = "command_center_v5";
+  const STORAGE_KEY = "command_center_v6";
   const defaultState = () => ({
     ui: { tab:"Home", patientSearch:"", patientStatus:"all", patientWaiting:"all", taskSearch:"", reportEditingId:null },
     patients: [],
@@ -301,6 +799,7 @@
   const buildOptions = (list, selected) => list.map(v => `<option value="${escapeHtml(v)}" ${v===selected?"selected":""}>${escapeHtml(v)}</option>`).join("");
   const nowStamp = () => new Date().toLocaleString();
   const cryptoId = () => (crypto?.randomUUID?.() || ("id_"+Math.random().toString(16).slice(2)+Date.now()));
+  
   function toast(title, msg){
     const wrap = $("#toasts");
     const el = document.createElement("div");
@@ -315,6 +814,7 @@
     try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){ console.warn(e); }
     $("#pendingCount").textContent = String(state.assistant.pending||0);
   }
+  
   function loadState(){
     try{
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -342,12 +842,20 @@
     modalHint.textContent = hint || "";
     modalOnSave = onSave || null;
     backdrop.style.display="flex";
+    
+    // FIX: Focus first input in modal
+    setTimeout(() => {
+      const firstInput = modalBody.querySelector('input, select, textarea');
+      if (firstInput) firstInput.focus();
+    }, 100);
   }
+  
   function closeModal(){
     backdrop.style.display="none";
     modalBody.innerHTML = "";
     modalOnSave = null;
   }
+  
   $("#modalClose").addEventListener("click", closeModal);
   $("#modalCancel").addEventListener("click", closeModal);
   $("#modalSave").addEventListener("click", () => { if(modalOnSave) modalOnSave(); });
@@ -355,7 +863,7 @@
   // -----------------------------
   // Rendering
   // -----------------------------
-  const TABS = ["Home","Patients","Tasks","Reports"];
+  const TABS = ["Home","Patients","Tasks","Charts","Reports"]; // Added Charts tab
 
   function renderTabs(){
     const el = $("#tabs");
@@ -369,6 +877,7 @@
     if(state.ui.tab==="Home") page.innerHTML = renderHome();
     if(state.ui.tab==="Patients") page.innerHTML = renderPatients();
     if(state.ui.tab==="Tasks") page.innerHTML = renderTasks();
+    if(state.ui.tab==="Charts") page.innerHTML = renderCharts(); // New Charts section
     if(state.ui.tab==="Reports") page.innerHTML = renderReports();
     wirePage();
     saveState();
@@ -408,7 +917,7 @@
     const inbox = state.tasks.filter(t => lower(t.progress)==="open").slice(0, 12);
 
     return `
-      <div class="pageTitle">Home</div>
+      <div class="pageTitle">Dashboard</div>
       <p class="pageHint">Quick view of what matters today</p>
 
       <div class="kpis">
@@ -420,7 +929,7 @@
 
       <div class="grid2">
         <div class="card">
-          <h3>📌 Priority (Today)</h3>
+          <h3>📌 Priority Patients (Today)</h3>
           <div class="tools">
             <span class="badge">Tip: click a KPI tag above to filter lists.</span>
           </div>
@@ -608,6 +1117,132 @@
     });
   }
 
+  // NEW: Charts Section
+  function renderCharts(){
+    // Calculate chart data
+    const statusCounts = {};
+    const waitingCounts = {};
+    const typeCounts = {};
+    const priorityCounts = {};
+    
+    OPTIONS.patientStatus.forEach(s => statusCounts[s] = 0);
+    OPTIONS.waitingOn.forEach(w => waitingCounts[w] = 0);
+    OPTIONS.patientTypes.forEach(t => typeCounts[t] = 0);
+    OPTIONS.taskPriority.forEach(p => priorityCounts[p] = 0);
+    
+    state.patients.forEach(p => {
+      if(p.status) statusCounts[p.status] = (statusCounts[p.status] || 0) + 1;
+      if(p.waitingOn) waitingCounts[p.waitingOn] = (waitingCounts[p.waitingOn] || 0) + 1;
+      if(p.type) typeCounts[p.type] = (typeCounts[p.type] || 0) + 1;
+    });
+    
+    state.tasks.forEach(t => {
+      if(t.priority) priorityCounts[t.priority] = (priorityCounts[t.priority] || 0) + 1;
+    });
+    
+    // Sort and get top categories
+    const topStatuses = Object.entries(statusCounts)
+      .sort((a,b) => b[1] - a[1])
+      .slice(0, 5);
+    
+    const topWaiting = Object.entries(waitingCounts)
+      .sort((a,b) => b[1] - a[1])
+      .slice(0, 5);
+    
+    const topTypes = Object.entries(typeCounts)
+      .sort((a,b) => b[1] - a[1])
+      .slice(0, 5);
+    
+    // Color palette
+    const colors = ["#d10f2f", "#7dd3fc", "#22c55e", "#f59e0b", "#a855f7", "#ef4444", "#3b82f6"];
+    
+    return `
+      <div class="pageTitle">Charts & Analytics</div>
+      <p class="pageHint">Visual overview of your data</p>
+      
+      <div class="card">
+        <h3>📊 Summary Statistics</h3>
+        <div class="stat-grid">
+          <div class="stat-item" style="border-left-color: #d10f2f">
+            <div class="stat-label">Total Patients</div>
+            <div class="stat-value">${state.patients.length}</div>
+          </div>
+          <div class="stat-item" style="border-left-color: #7dd3fc">
+            <div class="stat-label">Open Tasks</div>
+            <div class="stat-value">${state.tasks.filter(t => t.progress === 'Open').length}</div>
+          </div>
+          <div class="stat-item" style="border-left-color: #22c55e">
+            <div class="stat-label">Patients Today</div>
+            <div class="stat-value">${state.patients.filter(p => new Date(p.createdAt).toDateString() === new Date().toDateString()).length}</div>
+          </div>
+          <div class="stat-item" style="border-left-color: #f59e0b">
+            <div class="stat-label">Needs Reply</div>
+            <div class="stat-value">${state.patients.filter(p => p.status === 'Needs reply').length}</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="charts-container">
+        <div class="chart-card">
+          <h3>${ICON_CHART} Patient Status Distribution</h3>
+          <div class="chart-bar-container">
+            ${topStatuses.map(([status, count], i) => `
+              <div class="chart-bar" style="border-left-color: ${colors[i % colors.length]}">
+                <div class="chart-bar-label">${escapeHtml(status)}</div>
+                <div class="chart-bar-value">${count}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        
+        <div class="chart-card">
+          <h3>${ICON_CHART} Waiting On Distribution</h3>
+          <div class="chart-bar-container">
+            ${topWaiting.map(([waiting, count], i) => `
+              <div class="chart-bar" style="border-left-color: ${colors[(i+2) % colors.length]}">
+                <div class="chart-bar-label">${escapeHtml(waiting)}</div>
+                <div class="chart-bar-value">${count}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        
+        <div class="chart-card">
+          <h3>${ICON_CHART} Patient Types</h3>
+          <div class="chart-bar-container">
+            ${topTypes.map(([type, count], i) => `
+              <div class="chart-bar" style="border-left-color: ${colors[(i+4) % colors.length]}">
+                <div class="chart-bar-label">${escapeHtml(type)}</div>
+                <div class="chart-bar-value">${count}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        
+        <div class="chart-card">
+          <h3>${ICON_CHART} Task Priority</h3>
+          <div class="chart-bar-container">
+            ${Object.entries(priorityCounts).map(([priority, count], i) => `
+              <div class="chart-bar" style="border-left-color: ${colors[(i+1) % colors.length]}">
+                <div class="chart-bar-label">${escapeHtml(priority)}</div>
+                <div class="chart-bar-value">${count}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+      
+      <div class="card" style="margin-top: 20px;">
+        <h3>📈 Data Trends</h3>
+        <div class="mini">
+          <p>This section provides visual insights into your patient and task data. Use these charts to identify patterns and prioritize your work.</p>
+          <p><strong>Total Records:</strong> ${state.patients.length} patients, ${state.tasks.length} tasks, ${state.reports.length} saved reports</p>
+          <p><strong>Last Update:</strong> ${new Date().toLocaleString()}</p>
+        </div>
+      </div>
+    `;
+  }
+
   function renderReports(){
     const current = state.ui.reportEditingId ? state.reports.find(r => r.id===state.ui.reportEditingId) : null;
     const label = state.ui.reportEditingId ? `Editing saved report • ${current ? current.when : ""}` : "4pm report";
@@ -669,7 +1304,10 @@
   // -----------------------------
   function wirePage(){
     // Tabs (mobile: click on tabs when visible)
-    $$(".tab").forEach(t => t.addEventListener("click", () => { state.ui.tab = t.dataset.tab; render(); }));
+    $$(".tab").forEach(t => t.addEventListener("click", () => { 
+      state.ui.tab = t.dataset.tab; 
+      render(); 
+    }));
 
     // Home KPI pills
     $$("[data-action^='home_']").forEach(el => el.addEventListener("click", () => {
@@ -680,20 +1318,32 @@
       render();
     }));
 
-    // Patients tools
+    // Patients tools - FIX: Ensure inputs are immediately focusable
     const ps = $("#patientSearch");
     if(ps){
-      ps.addEventListener("input", () => { state.ui.patientSearch = ps.value; saveState(); render(); });
+      // Ensure focus works immediately
+      ps.addEventListener("focus", (e) => e.target.select());
+      ps.addEventListener("input", () => { 
+        state.ui.patientSearch = ps.value; 
+        saveState(); 
+        render(); 
+      });
       $("#patientStatusFilter").addEventListener("change", (e)=>{ state.ui.patientStatus = e.target.value; render(); });
       $("#patientWaitingFilter").addEventListener("change", (e)=>{ state.ui.patientWaiting = e.target.value; render(); });
       $("#patientClear").addEventListener("click", ()=>{ state.ui.patientSearch=""; state.ui.patientStatus="all"; state.ui.patientWaiting="all"; render(); });
       $("#btnQuickPatient").addEventListener("click", openQuickPatient);
     }
 
-    // Tasks tools
+    // Tasks tools - FIX: Ensure inputs are immediately focusable
     const ts = $("#taskSearch");
     if(ts){
-      ts.addEventListener("input", () => { state.ui.taskSearch = ts.value; saveState(); render(); });
+      // Ensure focus works immediately
+      ts.addEventListener("focus", (e) => e.target.select());
+      ts.addEventListener("input", () => { 
+        state.ui.taskSearch = ts.value; 
+        saveState(); 
+        render(); 
+      });
       $("#taskClear").addEventListener("click", ()=>{ state.ui.taskSearch=""; render(); });
       $("#btnQuickTask").addEventListener("click", openQuickTask);
     }
@@ -790,6 +1440,11 @@
       closeModal();
       render();
     });
+    
+    // FIX: Focus first input
+    setTimeout(() => {
+      $("#ql_matter")?.focus();
+    }, 100);
   }
 
   function editPatient(matter){
@@ -876,6 +1531,11 @@
       closeModal();
       render();
     });
+    
+    // FIX: Focus first input
+    setTimeout(() => {
+      $("#qt_matter")?.focus();
+    }, 100);
   }
 
   function editTask(id){
@@ -995,7 +1655,7 @@
   }
 
   // -----------------------------
-  // Assistant
+  // Assistant - IMPROVED
   // -----------------------------
   function renderAssistant(){
     const panel = $("#assistant");
@@ -1004,12 +1664,43 @@
 
     const body = $("#assistantBody");
     const chat = state.assistant.chat || [];
+    
+    // Command suggestions
+    const suggestions = [
+      {cmd: "show needs reply", desc: "Show patients needing reply"},
+      {cmd: "open 107853", desc: "Open specific patient"},
+      {cmd: "update patient 107853 waitingOn=Clinic", desc: "Update patient info"},
+      {cmd: "export data", desc: "Download all data as Excel"},
+      {cmd: "generate report", desc: "Generate 4pm report"},
+      {cmd: "show charts", desc: "View analytics"},
+      {cmd: "what's pending", desc: "Show pending items"},
+      {cmd: "clear search", desc: "Clear all filters"},
+      {cmd: "add patient", desc: "Add new patient"}
+    ];
+    
+    const suggestionsHtml = `
+      <div class="command-suggestions" id="commandSuggestions">
+        ${suggestions.map(s => `
+          <div class="command-chip" data-command="${s.cmd}">${s.cmd}</div>
+        `).join('')}
+      </div>
+    `;
+    
     body.innerHTML = chat.map(m => `
-      <div class="bubble ${m.role==="me"?"me":""}">
+      <div class="bubble ${m.role}">
         ${escapeHtml(m.text)}
         ${m.meta ? `<div class="small">${escapeHtml(m.meta)}</div>` : ""}
       </div>
-    `).join("");
+    `).join("") + suggestionsHtml;
+
+    // Add event listeners to command chips
+    $$(".command-chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        const cmd = chip.dataset.command;
+        $("#assistantInput").value = cmd;
+        $("#assistantSend").click();
+      });
+    });
 
     // autoscroll
     body.scrollTop = body.scrollHeight;
@@ -1020,6 +1711,7 @@
     saveState();
     renderAssistant();
   }
+  
   function addAssistantSystem(text){
     addAssistant("sys", text);
   }
@@ -1029,13 +1721,26 @@
     return m ? m[1] : null;
   }
 
+  // IMPROVED: Enhanced assistant with more capabilities
   function assistantRespond(input){
     const msg = lower(input);
+
+    // Show command help
+    if(msg.includes("help") || msg === "?") {
+      addAssistant("sys", "I can help you with: • show needs reply • open [matter] • update patient [matter] [field=value] • export data • generate report • show charts • what's pending • clear search • add patient • add task");
+      return;
+    }
 
     // Commands
     if(msg.includes("show needs reply") || msg==="needs reply"){
       state.ui.tab="Patients"; state.ui.patientStatus="Needs reply"; state.ui.patientWaiting="all"; state.ui.patientSearch="";
       addAssistant("sys","Showing patients/tasks that need reply.");
+      render(); return;
+    }
+
+    if(msg.includes("show charts") || msg.includes("view analytics")) {
+      state.ui.tab = "Charts";
+      addAssistant("sys", "Opening charts and analytics.");
       render(); return;
     }
 
@@ -1052,10 +1757,10 @@
       }
     }
 
-    // "give an update about <name>"
-    if(msg.includes("give an update") || msg.includes("update about")){
-      const name = input.split(/about/i)[1]?.trim();
-      const p = name ? state.patients.find(x => lower(x.patient).includes(lower(name))) : null;
+    // "give an update about <name>" or "what's the status of <name>"
+    if(msg.includes("give an update") || msg.includes("update about") || msg.includes("status of") || msg.includes("what about")){
+      const name = input.split(/about|of/i)[1]?.trim();
+      const p = name ? state.patients.find(x => lower(x.patient).includes(lower(name)) || x.matter === name) : null;
       if(p){
         state.assistant.lastMatter = p.matter;
         addAssistant("sys", `Patient: ${p.patient} • Matter: ${p.matter} • Type: ${p.type||""} • Provider: ${p.provider||""} • Status: ${p.status||""} • Waiting On: ${p.waitingOn||""} • Requested: ${p.requestedDate||""}\nNotes: ${p.notes||""}`);
@@ -1065,7 +1770,55 @@
       return;
     }
 
-    // Update patient by structured params: update patient 107853 status=... waitingOn=...
+    // "what's pending" or "what do I have pending"
+    if(msg.includes("what's pending") || msg.includes("what do i have") || msg.includes("pending items")) {
+      const overdueTasks = state.tasks.filter(t => t.progress === "Open").length;
+      const needsReplyPatients = state.patients.filter(p => p.status === "Needs reply").length;
+      addAssistant("sys", `You have: • ${overdueTasks} open tasks • ${needsReplyPatients} patients needing reply • ${state.patients.filter(p => p.waitingOn === "Clinic").length} waiting on clinic`);
+      return;
+    }
+
+    // "clear search" or "clear filters"
+    if(msg.includes("clear search") || msg.includes("clear filters")) {
+      state.ui.patientSearch = "";
+      state.ui.patientStatus = "all";
+      state.ui.patientWaiting = "all";
+      state.ui.taskSearch = "";
+      addAssistant("sys", "Cleared all search filters.");
+      render();
+      return;
+    }
+
+    // "export data" or "download excel"
+    if(msg.includes("export data") || msg.includes("download excel") || msg.includes("download data")) {
+      downloadCSV();
+      addAssistant("sys", "Downloading all patient data as Excel file.");
+      return;
+    }
+
+    // "generate report" 
+    if(msg.includes("generate report") || msg.includes("create report")) {
+      state.ui.tab = "Reports";
+      generateDraftInto("#reportText");
+      addAssistant("sys", "Generated 4pm report and opened Reports tab.");
+      return;
+    }
+
+    // "add patient" or "new patient"
+    if(msg.includes("add patient") || msg.includes("new patient")) {
+      openQuickPatient();
+      addAssistant("sys", "Opening Quick Log to add a new patient.");
+      return;
+    }
+
+    // "add task" or "new task"
+    if(msg.includes("add task") || msg.includes("new task")) {
+      openQuickTask();
+      addAssistant("sys", "Opening Quick Log to add a new task.");
+      return;
+    }
+
+    // Update patient by structured params
     if(msg.includes("update patient") || msg.includes("update the patient") || msg.includes("update the patient file")){
       const matter = parseMatterFromText(input) || state.assistant.lastMatter;
       if(!matter){
@@ -1117,31 +1870,73 @@
       return;
     }
 
-    addAssistant("sys","Try: • show needs reply • open 107853 • give an update about <name> • update patient 107853 waitingOn=Clinic");
+    addAssistant("sys","Try: • help - show all commands • show needs reply • open 107853 • update patient 107853 • export data • generate report • what's pending");
   }
 
   // -----------------------------
-  // CSV download (Excel-friendly)
+  // CSV download (Excel-friendly) - IMPROVED to include all data
   // -----------------------------
   function downloadCSV(){
-    const headers = ["Matter","Patient","State","Type","Provider","Provider Email","Requested Date","Sender","Status","Waiting On","Notes"];
-    const rows = state.patients.map(p => [
-      p.matter,p.patient,p.state,p.type,p.provider,p.providerEmail,p.requestedDate,p.sender,p.status,p.waitingOn,p.notes
+    // Create patients CSV
+    const patientHeaders = ["Matter","Patient","State","Type","Provider","Provider Email","Requested Date","Sender","Status","Waiting On","Notes", "Created At"];
+    const patientRows = state.patients.map(p => [
+      p.matter, p.patient, p.state, p.type, p.provider, p.providerEmail, p.requestedDate, p.sender, p.status, p.waitingOn, p.notes, p.createdAt
     ]);
-    const csv = [headers, ...rows].map(r => r.map(v => {
-      const s = (v??"").toString().replace(/"/g,'""');
-      return `"${s}"`;
-    }).join(",")).join("\n");
+    
+    // Create tasks CSV
+    const taskHeaders = ["ID","Matter","Task Type","Priority","Progress","Description","Created At"];
+    const taskRows = state.tasks.map(t => [
+      t.id, t.matter, t.taskType, t.priority, t.progress, t.description, t.createdAt
+    ]);
+    
+    // Create reports CSV
+    const reportHeaders = ["ID","Date/Time","Report Text"];
+    const reportRows = state.reports.map(r => [
+      r.id, r.when, r.text
+    ]);
+    
+    // Combine all into one CSV with sections
+    const csvContent = [
+      "MEDICAL DEPARTMENT COMMAND CENTER - FULL DATA EXPORT",
+      `Exported: ${new Date().toLocaleString()}`,
+      "",
+      "=== PATIENTS ===",
+      patientHeaders.join(","),
+      ...patientRows.map(r => r.map(v => {
+        const s = (v??"").toString().replace(/"/g,'""');
+        return `"${s}"`;
+      }).join(",")),
+      "",
+      "=== TASKS ===",
+      taskHeaders.join(","),
+      ...taskRows.map(r => r.map(v => {
+        const s = (v??"").toString().replace(/"/g,'""');
+        return `"${s}"`;
+      }).join(",")),
+      "",
+      "=== SAVED REPORTS ===",
+      reportHeaders.join(","),
+      ...reportRows.map(r => r.map(v => {
+        const s = (v??"").toString().replace(/"/g,'""');
+        return `"${s}"`;
+      }).join(",")),
+      "",
+      `Total Patients: ${state.patients.length}`,
+      `Total Tasks: ${state.tasks.length}`,
+      `Total Reports: ${state.reports.length}`
+    ].join("\n");
 
-    const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+    const blob = new Blob([csvContent], {type:"text/csv;charset=utf-8"});
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `command-center-patients-${new Date().toISOString().slice(0,10)}.csv`;
+    a.download = `medical-command-center-full-export-${new Date().toISOString().slice(0,10)}.csv`;
     document.body.appendChild(a);
     a.click();
     a.remove();
     setTimeout(()=> URL.revokeObjectURL(url), 2000);
+    
+    toast("Data Exported", "All patient, task, and report data downloaded as CSV.");
   }
 
   // -----------------------------
@@ -1170,11 +1965,27 @@
     addAssistant("me", text);
     input.value = "";
     assistantRespond(text);
+    
+    // Keep focus on input
+    setTimeout(() => input.focus(), 50);
   });
 
   $("#assistantInput").addEventListener("keydown", (e)=>{
-    if(e.key==="Enter"){ e.preventDefault(); $("#assistantSend").click(); }
+    if(e.key==="Enter"){ 
+      e.preventDefault(); 
+      $("#assistantSend").click(); 
+    }
   });
+  
+  // FIX: Ensure assistant input is immediately focusable
+  $("#assistantInput").addEventListener("focus", (e) => {
+    e.target.select();
+  });
+
+  // Initialize assistant with welcome message
+  if(state.assistant.chat.length === 0) {
+    addAssistant("sys", "Hello! I'm your medical command center assistant. I can help you manage patients, tasks, generate reports, and more. Try typing 'help' to see what I can do.");
+  }
 
   // If something breaks, show it.
   window.addEventListener("error", (e)=>{
