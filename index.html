@@ -3,7 +3,9 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Medical Department Command Center — Enhanced</title>
+<title>Medical Department Command Center — Enhanced with Charts</title>
+<!-- Chart.js para gráficos visuales -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
   :root{
     --bg:#0b0d10; --panel:#11151b; --panel2:#0f1318; --card:#141a22;
@@ -17,6 +19,7 @@
     --accent-glow: 0 0 20px rgba(209, 15, 47, 0.4);
     --transition: all 0.3s ease;
     --chart-bg: rgba(20, 26, 34, 0.9);
+    --chart-colors: #d10f2f, #7dd3fc, #22c55e, #f59e0b, #a855f7, #3b82f6, #ef4444, #8b5cf6;
   }
   
   /* Animations */
@@ -301,13 +304,11 @@
     font-family: var(--sans);
   }
   
-  /* FIX: Search input focus */
   .input:focus, select:focus, textarea:focus {
     border-color: rgba(125,211,252,.5);
     box-shadow: 0 0 0 2px rgba(125,211,252,.2);
   }
   
-  /* Ensure inputs are immediately clickable */
   .input, select {
     cursor: text;
   }
@@ -378,11 +379,11 @@
   
   .badge strong{color:var(--text)}
   
-  /* Chart Section Styles - IMPROVED */
+  /* Chart Section Styles */
   .charts-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 20px;
     margin-top: 20px;
   }
   
@@ -390,12 +391,13 @@
     background: var(--chart-bg);
     border: 1px solid rgba(255,255,255,.08);
     border-radius: var(--r);
-    padding: 16px;
+    padding: 18px;
     box-shadow: var(--shadow);
     transition: var(--transition);
-    min-height: 280px;
     display: flex;
     flex-direction: column;
+    height: 100%;
+    min-height: 340px;
   }
   
   .chart-card:hover {
@@ -410,6 +412,9 @@
     margin-bottom: 16px;
     color: var(--text);
     min-height: 40px;
+    font-size: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255,255,255,.05);
   }
   
   .chart-placeholder {
@@ -417,52 +422,68 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 200px;
+    flex-grow: 1;
     color: var(--muted);
     text-align: center;
-    padding: 20px;
+    padding: 30px 20px;
     border-radius: 12px;
-    background: rgba(0,0,0,.1);
-    border: 1px dashed rgba(255,255,255,.1);
-    flex-grow: 1;
-  }
-  
-  .chart-bar-container {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    background: rgba(0,0,0,.08);
+    border: 1px dashed rgba(255,255,255,.08);
     margin-top: 10px;
+  }
+  
+  /* Contenedor del gráfico */
+  .chart-canvas-container {
+    position: relative;
     flex-grow: 1;
+    margin: 0;
+    padding: 0;
+    background: transparent !important;
   }
   
-  .chart-bar {
+  /* Canvas del gráfico */
+  .chart-canvas {
+    width: 100% !important;
+    height: 220px !important;
+    max-height: 220px !important;
+    background: transparent !important;
+  }
+  
+  .chart-legend {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 12px;
-    background: rgba(255,255,255,.03);
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 12px;
+    padding: 8px;
+    background: rgba(0,0,0,.1);
     border-radius: 8px;
-    border-left: 4px solid;
-    transition: var(--transition);
-    cursor: pointer;
+    font-size: 11px;
+    max-height: 80px;
+    overflow-y: auto;
   }
   
-  .chart-bar:hover {
-    background: rgba(255,255,255,.08);
-    transform: translateX(5px);
-  }
-  
-  .chart-bar-label {
-    font-weight: 600;
-    font-size: 14px;
+  .legend-item {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 5px;
+    padding: 4px 6px;
+    background: rgba(255,255,255,.03);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
   }
   
-  .chart-bar-value {
-    font-weight: 700;
-    font-size: 16px;
+  .legend-item:hover {
+    background: rgba(255,255,255,.08);
+    transform: translateY(-1px);
+  }
+  
+  .legend-color {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    flex-shrink: 0;
   }
   
   .stat-grid {
@@ -494,6 +515,85 @@
   .stat-value {
     font-size: 20px;
     font-weight: 700;
+  }
+  
+  /* Insights Section */
+  .insights-section {
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .insights-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .insights-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .insight-stat {
+    background: rgba(255,255,255,.03);
+    padding: 15px;
+    border-radius: 12px;
+    border-left: 4px solid;
+  }
+  
+  .insight-stat.green { border-left-color: #22c55e; }
+  .insight-stat.blue { border-left-color: #3b82f6; }
+  .insight-stat.orange { border-left-color: #f59e0b; }
+  .insight-stat.purple { border-left-color: #a855f7; }
+  
+  .insight-label {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .insight-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  
+  .insight-subtext {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 5px;
+  }
+  
+  .date-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255,255,255,.03);
+    padding: 8px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,.08);
+  }
+  
+  .date-selector label {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  
+  .date-selector input {
+    background: rgba(0,0,0,.2);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 8px;
+    padding: 6px 10px;
+    color: var(--text);
+    font-family: var(--sans);
   }
   
   /* Patient Summary Card */
@@ -556,7 +656,7 @@
   .toast .t{font-weight:800}
   .toast .m{color:var(--muted); font-size:13px; margin-top:4px}
   
-  /* Assistant - Improved */
+  /* Assistant */
   .assistant{
     position:fixed; right:16px; bottom:16px;
     width:min(420px, 92vw);
@@ -704,6 +804,19 @@
     .stat-grid {
       grid-template-columns: 1fr;
     }
+    .insights-stats {
+      grid-template-columns: 1fr;
+    }
+    .insights-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .chart-card {
+      min-height: 320px;
+    }
+    .chart-canvas {
+      height: 200px !important;
+    }
   }
 </style>
 </head>
@@ -714,7 +827,7 @@
         <div class="dot glowing-dot"></div>
         <div>
           <div class="title">Command Center</div>
-          <div class="subtitle">Medical Department • Enhanced</div>
+          <div class="subtitle">Medical Department • Enhanced with Charts</div>
         </div>
       </div>
 
@@ -787,6 +900,7 @@
   const ICON_EMAIL = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4-8 5L4 8V6l8 5 8-5v2z"/></svg>`;
   const ICON_SAVE = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7l-4-4zM12 19a3 3 0 1 1 0-6 3 3 0 0 1 0 6zM6 8V5h10v3H6z"/></svg>`;
   const ICON_CHART = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>`;
+  const ICON_INSIGHTS = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>`;
 
   // -----------------------------
   // Options (Dropdowns)
@@ -803,7 +917,108 @@
   // -----------------------------
   // State
   // -----------------------------
-  const STORAGE_KEY = "command_center_v7";
+  const STORAGE_KEY = "command_center_v10_real_patients";
+  
+  // Datos de pacientes REALES de la segunda imagen
+  const getInitialPatients = () => [
+    {
+      matter: "107761",
+      patient: "Lexus Winemiller",
+      state: "OH",
+      type: "Other",
+      provider: "IRX",
+      providerEmail: "",
+      requestedDate: "2025-12-29",
+      sender: "Email",
+      status: "Sent to clinic",
+      waitingOn: "You",
+      notes: "1st pain",
+      createdAt: new Date("2025-12-29").toISOString()
+    },
+    {
+      matter: "107623",
+      patient: "Breah Rhodes",
+      state: "GA",
+      type: "Ortho",
+      provider: "GIC",
+      providerEmail: "",
+      requestedDate: "2025-12-29",
+      sender: "Email",
+      status: "Sent to clinic",
+      waitingOn: "You",
+      notes: "GIC",
+      createdAt: new Date("2025-12-29").toISOString()
+    },
+    {
+      matter: "105539",
+      patient: "Bobby Thompson",
+      state: "GA",
+      type: "MRI",
+      provider: "NSM",
+      providerEmail: "",
+      requestedDate: "2025-12-29",
+      sender: "Email",
+      status: "Sent to clinic",
+      waitingOn: "You",
+      notes: "Check if he was sent for an MRI or if I need to redirect him.",
+      createdAt: new Date("2025-12-29").toISOString()
+    },
+    {
+      matter: "105682",
+      patient: "Maria Aguilar Ponce",
+      state: "IL",
+      type: "Other",
+      provider: "IRX",
+      providerEmail: "",
+      requestedDate: "2025-12-29",
+      sender: "Email",
+      status: "Sent to clinic",
+      waitingOn: "You",
+      notes: "1st Pain Verify if the process was done",
+      createdAt: new Date("2025-12-29").toISOString()
+    },
+    {
+      matter: "106279",
+      patient: "Raven Joan White",
+      state: "NC",
+      type: "MRI",
+      provider: "MoveDocs",
+      providerEmail: "",
+      requestedDate: "2025-12-29",
+      sender: "Web Page",
+      status: "Sent to clinic",
+      waitingOn: "You",
+      notes: "Cardinal Points Imaging of the Carolinas - Midtown (OIA)",
+      createdAt: new Date("2025-12-29").toISOString()
+    },
+    {
+      matter: "107853",
+      patient: "Peter Simerin",
+      state: "OH",
+      type: "Chiro",
+      provider: "MoveDocs",
+      providerEmail: "",
+      requestedDate: "2025-12-29",
+      sender: "Web Page",
+      status: "Sent to clinic",
+      waitingOn: "You",
+      notes: "Athletics PT - Wright State Client speaks haitian creole",
+      createdAt: new Date("2025-12-29").toISOString()
+    }
+  ];
+
+  const getInitialTasks = () => [
+    {
+      id: "task1",
+      matter: "105539",
+      taskType: "Follow-up clinic",
+      priority: "High",
+      progress: "Open",
+      description: "Follow up with NSM about MRI scheduling for Bobby Thompson",
+      createdAt: new Date(Date.now() - 2*24*60*60*1000).toISOString()
+    }
+  ];
+
   const defaultState = () => ({
     ui: { 
       tab:"Home", 
@@ -812,12 +1027,14 @@
       patientWaiting:"all", 
       taskSearch:"", 
       reportEditingId:null,
-      chartSearch: ""  // NEW: Search for charts section
+      chartSearch: "",
+      insightDate: new Date().toISOString().split('T')[0] // Fecha actual por defecto
     },
-    patients: [],
-    tasks: [],
+    patients: getInitialPatients(),
+    tasks: getInitialTasks(),
     reports: [],
-    assistant: { open:false, chat:[], lastMatter:null, pending:0 }
+    assistant: { open:false, chat:[], lastMatter:null, pending:0 },
+    charts: {} // Cache for chart instances
   });
 
   let state = loadState();
@@ -877,7 +1094,6 @@
     modalOnSave = onSave || null;
     backdrop.style.display="flex";
     
-    // FIX: Focus first input in modal
     setTimeout(() => {
       const firstInput = modalBody.querySelector('input, select, textarea');
       if (firstInput) firstInput.focus();
@@ -911,7 +1127,11 @@
     if(state.ui.tab==="Home") page.innerHTML = renderHome();
     if(state.ui.tab==="Patients") page.innerHTML = renderPatients();
     if(state.ui.tab==="Tasks") page.innerHTML = renderTasks();
-    if(state.ui.tab==="Charts") page.innerHTML = renderCharts();
+    if(state.ui.tab==="Charts") {
+      page.innerHTML = renderCharts();
+      // Render charts after DOM is ready
+      setTimeout(renderChartVisualizations, 100);
+    }
     if(state.ui.tab==="Reports") page.innerHTML = renderReports();
     wirePage();
     saveState();
@@ -1037,7 +1257,6 @@
   }
 
   function renderPatients(){
-    // FIX: This function was missing - reimplementing it
     return `
       <div class="pageTitle">Patients</div>
       <p class="pageHint">Your operational list</p>
@@ -1152,19 +1371,16 @@
     });
   }
 
-  // FIXED: Charts Section with working data display and click functionality
-  function renderCharts(){
-    // Calculate chart data
+  // Función para calcular datos de los gráficos
+  function calculateChartData() {
     const statusCounts = {};
     const waitingCounts = {};
     const typeCounts = {};
-    const priorityCounts = {};
     
     // Initialize counts
     OPTIONS.patientStatus.forEach(s => statusCounts[s] = 0);
     OPTIONS.waitingOn.forEach(w => waitingCounts[w] = 0);
     OPTIONS.patientTypes.forEach(t => typeCounts[t] = 0);
-    OPTIONS.taskPriority.forEach(p => priorityCounts[p] = 0);
     
     // Count actual data
     state.patients.forEach(p => {
@@ -1173,51 +1389,150 @@
       if(p.type) typeCounts[p.type] = (typeCounts[p.type] || 0) + 1;
     });
     
-    state.tasks.forEach(t => {
-      if(t.priority) priorityCounts[t.priority] = (priorityCounts[t.priority] || 0) + 1;
+    // Filter out zero values for charts
+    const filteredStatusCounts = Object.entries(statusCounts).filter(([_, count]) => count > 0);
+    const filteredWaitingCounts = Object.entries(waitingCounts).filter(([_, count]) => count > 0);
+    const filteredTypeCounts = Object.entries(typeCounts).filter(([_, count]) => count > 0);
+    
+    return {
+      statusData: {
+        labels: filteredStatusCounts.map(([label]) => label),
+        data: filteredStatusCounts.map(([_, count]) => count),
+        total: state.patients.length
+      },
+      waitingData: {
+        labels: filteredWaitingCounts.map(([label]) => label),
+        data: filteredWaitingCounts.map(([_, count]) => count),
+        total: state.patients.length
+      },
+      typeData: {
+        labels: filteredTypeCounts.map(([label]) => label),
+        data: filteredTypeCounts.map(([_, count]) => count),
+        total: state.patients.length
+      }
+    };
+  }
+
+  // Función para calcular insights
+  function calculateInsights(selectedDate) {
+    // Filtrar pacientes por fecha seleccionada (si aplica)
+    const dateFilteredPatients = selectedDate ? 
+      state.patients.filter(p => p.requestedDate === selectedDate) : 
+      state.patients;
+    
+    // Calcular estadísticas
+    const totalPatients = state.patients.length;
+    const totalTasks = state.tasks.length;
+    const totalReports = state.reports.length;
+    
+    // Encontrar el estado más común
+    const statusCounts = {};
+    state.patients.forEach(p => {
+      statusCounts[p.status] = (statusCounts[p.status] || 0) + 1;
     });
+    const mostCommonStatus = Object.entries(statusCounts)
+      .sort((a, b) => b[1] - a[1])[0] || ["None", 0];
     
-    // Sort and get top categories
-    const topStatuses = Object.entries(statusCounts)
-      .sort((a,b) => b[1] - a[1])
-      .slice(0, 6);
+    // Encontrar el tipo más común
+    const typeCounts = {};
+    state.patients.forEach(p => {
+      typeCounts[p.type] = (typeCounts[p.type] || 0) + 1;
+    });
+    const mostCommonType = Object.entries(typeCounts)
+      .sort((a, b) => b[1] - a[1])[0] || ["None", 0];
     
-    const topWaiting = Object.entries(waitingCounts)
-      .sort((a,b) => b[1] - a[1])
-      .slice(0, 6);
+    // Calcular pacientes por estado
+    const sentToClinic = state.patients.filter(p => p.status === "Sent to clinic").length;
+    const needsReply = state.patients.filter(p => p.status === "Needs reply").length;
+    const newPatients = state.patients.filter(p => p.status === "New").length;
     
-    const topTypes = Object.entries(typeCounts)
-      .sort((a,b) => b[1] - a[1])
-      .slice(0, 6);
+    // Calcular tareas pendientes
+    const openTasks = state.tasks.filter(t => t.progress === "Open").length;
+    const highPriorityTasks = state.tasks.filter(t => t.priority === "High" && t.progress === "Open").length;
     
-    // Color palette
-    const colors = ["#d10f2f", "#7dd3fc", "#22c55e", "#f59e0b", "#a855f7", "#ef4444", "#3b82f6"];
+    return {
+      totalPatients,
+      totalTasks,
+      totalReports,
+      mostCommonStatus: {
+        name: mostCommonStatus[0],
+        count: mostCommonStatus[1],
+        percentage: Math.round((mostCommonStatus[1] / totalPatients) * 100)
+      },
+      mostCommonType: {
+        name: mostCommonType[0],
+        count: mostCommonType[1],
+        percentage: Math.round((mostCommonType[1] / totalPatients) * 100)
+      },
+      sentToClinic,
+      needsReply,
+      newPatients,
+      openTasks,
+      highPriorityTasks,
+      dateFilteredCount: dateFilteredPatients.length
+    };
+  }
+
+  // Renderizar la sección de gráficos
+  function renderCharts(){
+    const chartData = calculateChartData();
+    const insights = calculateInsights(state.ui.insightDate);
+    const colors = ["#d10f2f", "#7dd3fc", "#22c55e", "#f59e0b", "#a855f7", "#3b82f6", "#ef4444", "#8b5cf6"];
     
     // Filter patients based on chart search
     const filteredPatientsList = filterPatientsForCharts();
     
     return `
       <div class="pageTitle">Charts & Analytics</div>
-      <p class="pageHint">Visual overview of your data. Click on any chart item to filter patients.</p>
+      <p class="pageHint">Visual overview of your data. Click on any chart legend to filter patients.</p>
       
-      <div class="card">
-        <h3>📊 Summary Statistics</h3>
-        <div class="stat-grid">
-          <div class="stat-item" style="border-left-color: #d10f2f" data-action="chart_filter" data-filter="type:all">
-            <div class="stat-label">Total Patients</div>
-            <div class="stat-value">${state.patients.length}</div>
+      <!-- Data Trends & Insights Section -->
+      <div class="card insights-section">
+        <div class="insights-header">
+          <h3>${ICON_INSIGHTS} Data Trends & Insights</h3>
+          <div class="date-selector">
+            <label for="insightDate">View insights for:</label>
+            <input type="date" id="insightDate" value="${state.ui.insightDate}" />
+            <button class="ghostBtn" id="resetInsightDate">Today</button>
           </div>
-          <div class="stat-item" style="border-left-color: #7dd3fc" data-action="chart_filter" data-filter="progress:Open">
-            <div class="stat-label">Open Tasks</div>
-            <div class="stat-value">${state.tasks.filter(t => t.progress === 'Open').length}</div>
+        </div>
+        <p>This section provides visual insights into your patient and task data. Click on any chart item to filter the patient list below.</p>
+        
+        <div class="insights-stats">
+          <div class="insight-stat green">
+            <div class="insight-label">
+              <span class="miniDot" style="background: #22c55e"></span>
+              Total Records
+            </div>
+            <div class="insight-value">${insights.totalPatients} patients, ${insights.totalTasks} tasks, ${insights.totalReports} reports</div>
+            <div class="insight-subtext">Data Last Updated: ${new Date().toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' })} • ${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</div>
           </div>
-          <div class="stat-item" style="border-left-color: #22c55e" data-action="chart_filter" data-filter="created:today">
-            <div class="stat-label">Patients Today</div>
-            <div class="stat-value">${state.patients.filter(p => new Date(p.createdAt).toDateString() === new Date().toDateString()).length}</div>
+          
+          <div class="insight-stat blue">
+            <div class="insight-label">
+              <span class="miniDot" style="background: #3b82f6"></span>
+              Most Common Status
+            </div>
+            <div class="insight-value">${insights.mostCommonStatus.name} (${insights.mostCommonStatus.count} patients)</div>
+            <div class="insight-subtext">${insights.mostCommonStatus.percentage}% of all patients • ${insights.sentToClinic} sent to clinic, ${insights.needsReply} need reply</div>
           </div>
-          <div class="stat-item" style="border-left-color: #f59e0b" data-action="chart_filter" data-filter="status:Needs reply">
-            <div class="stat-label">Needs Reply</div>
-            <div class="stat-value">${state.patients.filter(p => p.status === 'Needs reply').length}</div>
+          
+          <div class="insight-stat orange">
+            <div class="insight-label">
+              <span class="miniDot" style="background: #f59e0b"></span>
+              Most Common Type
+            </div>
+            <div class="insight-value">${insights.mostCommonType.name} (${insights.mostCommonType.count} patients)</div>
+            <div class="insight-subtext">${insights.mostCommonType.percentage}% of all patients • ${insights.newPatients} new patients today</div>
+          </div>
+          
+          <div class="insight-stat purple">
+            <div class="insight-label">
+              <span class="miniDot" style="background: #a855f7"></span>
+              Task Overview
+            </div>
+            <div class="insight-value">${insights.openTasks} open tasks</div>
+            <div class="insight-subtext">${insights.highPriorityTasks} high priority • ${insights.totalTasks - insights.openTasks} completed</div>
           </div>
         </div>
       </div>
@@ -1225,69 +1540,72 @@
       <div class="charts-container">
         <div class="chart-card">
           <h3>${ICON_CHART} Patient Status Distribution</h3>
-          <div class="chart-bar-container">
-            ${topStatuses.map(([status, count], i) => `
-              <div class="chart-bar" style="border-left-color: ${colors[i % colors.length]}" data-action="chart_filter" data-filter="status:${escapeHtml(status)}">
-                <div class="chart-bar-label">
-                  <span style="width:10px;height:10px;border-radius:50%;background:${colors[i % colors.length]};display:inline-block"></span>
-                  ${escapeHtml(status)}
-                </div>
-                <div class="chart-bar-value">${count}</div>
-              </div>
-            `).join('')}
-            ${topStatuses.length === 0 ? `
-              <div class="chart-placeholder">
-                <div>No patient status data available</div>
-                <div class="mini">Add patients to see status distribution</div>
-              </div>
-            ` : ''}
+          <div class="chart-canvas-container">
+            <canvas id="chartStatus" class="chart-canvas"></canvas>
           </div>
+          ${chartData.statusData.labels.length > 0 ? `
+            <div class="chart-legend" id="statusLegend">
+              ${chartData.statusData.labels.map((label, i) => `
+                <div class="legend-item" data-action="chart_filter" data-filter="status:${escapeHtml(label)}">
+                  <div class="legend-color" style="background: ${colors[i % colors.length]}"></div>
+                  <span>${escapeHtml(label)} (${chartData.statusData.data[i]})</span>
+                </div>
+              `).join('')}
+            </div>
+          ` : `
+            <div class="chart-placeholder">
+              <div>No patient status data available</div>
+              <div class="mini">Add patients to see status distribution</div>
+            </div>
+          `}
         </div>
         
         <div class="chart-card">
           <h3>${ICON_CHART} Waiting On Distribution</h3>
-          <div class="chart-bar-container">
-            ${topWaiting.map(([waiting, count], i) => `
-              <div class="chart-bar" style="border-left-color: ${colors[(i+2) % colors.length]}" data-action="chart_filter" data-filter="waiting:${escapeHtml(waiting)}">
-                <div class="chart-bar-label">
-                  <span style="width:10px;height:10px;border-radius:50%;background:${colors[(i+2) % colors.length]};display:inline-block"></span>
-                  ${escapeHtml(waiting)}
-                </div>
-                <div class="chart-bar-value">${count}</div>
-              </div>
-            `).join('')}
-            ${topWaiting.length === 0 ? `
-              <div class="chart-placeholder">
-                <div>No waiting on data available</div>
-                <div class="mini">Add patients to see waiting on distribution</div>
-              </div>
-            ` : ''}
+          <div class="chart-canvas-container">
+            <canvas id="chartWaiting" class="chart-canvas"></canvas>
           </div>
+          ${chartData.waitingData.labels.length > 0 ? `
+            <div class="chart-legend" id="waitingLegend">
+              ${chartData.waitingData.labels.map((label, i) => `
+                <div class="legend-item" data-action="chart_filter" data-filter="waiting:${escapeHtml(label)}">
+                  <div class="legend-color" style="background: ${colors[(i+2) % colors.length]}"></div>
+                  <span>${escapeHtml(label)} (${chartData.waitingData.data[i]})</span>
+                </div>
+              `).join('')}
+            </div>
+          ` : `
+            <div class="chart-placeholder">
+              <div>No waiting on data available</div>
+              <div class="mini">Add patients to see waiting on distribution</div>
+            </div>
+          `}
         </div>
         
         <div class="chart-card">
           <h3>${ICON_CHART} Patient Types</h3>
-          <div class="chart-bar-container">
-            ${topTypes.map(([type, count], i) => `
-              <div class="chart-bar" style="border-left-color: ${colors[(i+4) % colors.length]}" data-action="chart_filter" data-filter="type:${escapeHtml(type)}">
-                <div class="chart-bar-label">
-                  <span style="width:10px;height:10px;border-radius:50%;background:${colors[(i+4) % colors.length]};display:inline-block"></span>
-                  ${escapeHtml(type)}
-                </div>
-                <div class="chart-bar-value">${count}</div>
-              </div>
-            `).join('')}
-            ${topTypes.length === 0 ? `
-              <div class="chart-placeholder">
-                <div>No patient type data available</div>
-                <div class="mini">Add patients to see type distribution</div>
-              </div>
-            ` : ''}
+          <div class="chart-canvas-container">
+            <canvas id="chartTypes" class="chart-canvas"></canvas>
           </div>
+          ${chartData.typeData.labels.length > 0 ? `
+            <div class="chart-legend" id="typeLegend">
+              ${chartData.typeData.labels.map((label, i) => `
+                <div class="legend-item" data-action="chart_filter" data-filter="type:${escapeHtml(label)}">
+                  <div class="legend-color" style="background: ${colors[(i+4) % colors.length]}"></div>
+                  <span>${escapeHtml(label)} (${chartData.typeData.data[i]})</span>
+                </div>
+              `).join('')}
+            </div>
+          ` : `
+            <div class="chart-placeholder">
+              <div>No patient type data available</div>
+              <div class="mini">Add patients to see type distribution</div>
+            </div>
+          `}
         </div>
       </div>
       
-      <!-- NEW: Patient Summary Card with Search -->
+      <!-- Patient Summary Card with Search -->
       <div class="card patient-summary-card">
         <h3>📋 Patient Summary</h3>
         <p class="pageHint">All patients data collected from all sections. Search by name or matter number.</p>
@@ -1311,18 +1629,153 @@
           ${state.ui.chartSearch ? ` • Filtered by: "${escapeHtml(state.ui.chartSearch)}"` : ''}
         </div>
       </div>
-      
-      <div class="card" style="margin-top: 20px;">
-        <h3>📈 Data Trends & Insights</h3>
-        <div class="mini">
-          <p>This section provides visual insights into your patient and task data. Click on any chart item to filter the patient list below.</p>
-          <p><strong>Total Records:</strong> ${state.patients.length} patients, ${state.tasks.length} tasks, ${state.reports.length} saved reports</p>
-          <p><strong>Data Last Updated:</strong> ${new Date().toLocaleString()}</p>
-          <p><strong>Most Common Status:</strong> ${topStatuses.length > 0 ? topStatuses[0][0] + ' (' + topStatuses[0][1] + ' patients)' : 'No data'}</p>
-          <p><strong>Most Common Type:</strong> ${topTypes.length > 0 ? topTypes[0][0] + ' (' + topTypes[0][1] + ' patients)' : 'No data'}</p>
-        </div>
-      </div>
     `;
+  }
+
+  // Función para renderizar los gráficos con Chart.js
+  function renderChartVisualizations() {
+    const chartData = calculateChartData();
+    const colors = ["#d10f2f", "#7dd3fc", "#22c55e", "#f59e0b", "#a855f7", "#3b82f6", "#ef4444", "#8b5cf6"];
+    
+    // Destroy existing charts
+    if (state.charts.statusChart) state.charts.statusChart.destroy();
+    if (state.charts.waitingChart) state.charts.waitingChart.destroy();
+    if (state.charts.typeChart) state.charts.typeChart.destroy();
+    
+    // Configuración común para todos los gráficos
+    const commonOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          backgroundColor: 'rgba(20, 26, 34, 0.95)',
+          titleColor: '#e7e9ee',
+          bodyColor: '#aab0bd',
+          borderColor: 'rgba(255,255,255,0.1)',
+          borderWidth: 1,
+          callbacks: {
+            label: function(context) {
+              const label = context.label || '';
+              const value = context.raw || 0;
+              const total = context.dataset.data.reduce((a, b) => a + b, 0);
+              const percentage = Math.round((value / total) * 100);
+              return `${label}: ${value} patients (${percentage}%)`;
+            }
+          }
+        }
+      }
+    };
+    
+    // Render Status Chart (Doughnut)
+    if (chartData.statusData.labels.length > 0) {
+      const statusCtx = document.getElementById('chartStatus')?.getContext('2d');
+      if (statusCtx) {
+        state.charts.statusChart = new Chart(statusCtx, {
+          type: 'doughnut',
+          data: {
+            labels: chartData.statusData.labels,
+            datasets: [{
+              data: chartData.statusData.data,
+              backgroundColor: chartData.statusData.labels.map((_, i) => colors[i % colors.length]),
+              borderColor: 'rgba(255,255,255,0.15)',
+              borderWidth: 1,
+              hoverOffset: 10
+            }]
+          },
+          options: {
+            ...commonOptions,
+            cutout: '65%',
+            animation: {
+              animateScale: true,
+              animateRotate: true
+            }
+          }
+        });
+      }
+    }
+    
+    // Render Waiting Chart (Bar)
+    if (chartData.waitingData.labels.length > 0) {
+      const waitingCtx = document.getElementById('chartWaiting')?.getContext('2d');
+      if (waitingCtx) {
+        state.charts.waitingChart = new Chart(waitingCtx, {
+          type: 'bar',
+          data: {
+            labels: chartData.waitingData.labels,
+            datasets: [{
+              label: 'Patients',
+              data: chartData.waitingData.data,
+              backgroundColor: chartData.waitingData.labels.map((_, i) => colors[(i+2) % colors.length]),
+              borderColor: 'rgba(255,255,255,0.2)',
+              borderWidth: 1,
+              borderRadius: 4
+            }]
+          },
+          options: {
+            ...commonOptions,
+            scales: {
+              y: {
+                beginAtZero: true,
+                grid: {
+                  color: 'rgba(255,255,255,0.05)'
+                },
+                ticks: {
+                  color: 'rgba(255,255,255,0.6)',
+                  font: {
+                    size: 11
+                  }
+                }
+              },
+              x: {
+                grid: {
+                  color: 'rgba(255,255,255,0.05)'
+                },
+                ticks: {
+                  color: 'rgba(255,255,255,0.6)',
+                  font: {
+                    size: 11
+                  }
+                }
+              }
+            },
+            animation: {
+              duration: 1000,
+              easing: 'easeOutQuart'
+            }
+          }
+        });
+      }
+    }
+    
+    // Render Type Chart (Pie)
+    if (chartData.typeData.labels.length > 0) {
+      const typeCtx = document.getElementById('chartTypes')?.getContext('2d');
+      if (typeCtx) {
+        state.charts.typeChart = new Chart(typeCtx, {
+          type: 'pie',
+          data: {
+            labels: chartData.typeData.labels,
+            datasets: [{
+              data: chartData.typeData.data,
+              backgroundColor: chartData.typeData.labels.map((_, i) => colors[(i+4) % colors.length]),
+              borderColor: 'rgba(255,255,255,0.15)',
+              borderWidth: 1,
+              hoverOffset: 12
+            }]
+          },
+          options: {
+            ...commonOptions,
+            animation: {
+              animateScale: true,
+              animateRotate: true
+            }
+          }
+        });
+      }
+    }
   }
 
   function filterPatientsForCharts() {
@@ -1392,7 +1845,7 @@
   }
 
   // -----------------------------
-  // Page wiring (events) - COMPLETELY REWRITTEN
+  // Page wiring (events)
   // -----------------------------
   function wirePage(){
     // Tabs
@@ -1428,17 +1881,14 @@
       render();
     }));
 
-    // FIXED: Patients tools with working search
+    // Patients tools
     const ps = $("#patientSearch");
     if(ps){
-      // Working input handler
       ps.addEventListener("input", (e) => {
         state.ui.patientSearch = e.target.value;
         saveState();
-        // No auto-render here - we'll use a debounced approach
       });
       
-      // Add debounced search
       let searchTimeout;
       ps.addEventListener("keyup", (e) => {
         clearTimeout(searchTimeout);
@@ -1447,14 +1897,12 @@
         }, 300);
       });
       
-      // Enter key to search immediately
       ps.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
           render();
         }
       });
       
-      // Other filters
       $("#patientStatusFilter")?.addEventListener("change", (e) => { 
         state.ui.patientStatus = e.target.value; 
         render(); 
@@ -1475,17 +1923,14 @@
       $("#btnQuickPatient")?.addEventListener("click", openQuickPatient);
     }
 
-    // FIXED: Tasks tools with working search
+    // Tasks tools
     const ts = $("#taskSearch");
     if(ts){
-      // Working input handler
       ts.addEventListener("input", (e) => {
         state.ui.taskSearch = e.target.value;
         saveState();
-        // No auto-render here - we'll use a debounced approach
       });
       
-      // Add debounced search
       let taskSearchTimeout;
       ts.addEventListener("keyup", (e) => {
         clearTimeout(taskSearchTimeout);
@@ -1494,7 +1939,6 @@
         }, 300);
       });
       
-      // Enter key to search immediately
       ts.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
           render();
@@ -1509,7 +1953,7 @@
       $("#btnQuickTask")?.addEventListener("click", openQuickTask);
     }
 
-    // NEW: Charts section search
+    // Charts section search
     const cs = $("#chartSearch");
     if(cs){
       cs.addEventListener("input", (e) => {
@@ -1517,7 +1961,6 @@
         saveState();
       });
       
-      // Add debounced search for charts
       let chartSearchTimeout;
       cs.addEventListener("keyup", (e) => {
         clearTimeout(chartSearchTimeout);
@@ -1529,6 +1972,20 @@
       $("#chartSearchClear")?.addEventListener("click", () => { 
         state.ui.chartSearch = ""; 
         render(); 
+      });
+    }
+
+    // Insights date selector
+    const insightDate = $("#insightDate");
+    if(insightDate){
+      insightDate.addEventListener("change", (e) => {
+        state.ui.insightDate = e.target.value;
+        render();
+      });
+      
+      $("#resetInsightDate")?.addEventListener("click", () => {
+        state.ui.insightDate = new Date().toISOString().split('T')[0];
+        render();
       });
     }
 
@@ -2189,6 +2646,9 @@
   if(state.assistant.chat.length === 0) {
     addAssistant("sys", "Hello! I'm your medical command center assistant. I can help you manage patients, tasks, generate reports, and more. Try typing 'help' to see what I can do.");
   }
+
+  // Initialize charts cache
+  state.charts = state.charts || {};
 
   // Error handling
   window.addEventListener("error", (e)=>{
