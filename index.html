@@ -517,7 +517,7 @@
     font-weight: 700;
   }
   
-  /* Insights Section */
+  /* Insights Section - REVISADO: eliminado el fondo negro */
   .insights-section {
     margin-top: 20px;
     margin-bottom: 20px;
@@ -596,13 +596,148 @@
     font-family: var(--sans);
   }
   
-  /* Patient Summary Card */
+  /* Patient Summary Card - MEJORADO para mostrar resumen en lugar de tabla */
   .patient-summary-card {
     margin-top: 20px;
   }
   
   .patient-summary-card .tools {
     margin-bottom: 16px;
+  }
+  
+  /* Patient Summary Cards */
+  .patient-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+  }
+  
+  .patient-card {
+    background: rgba(255,255,255,.03);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: var(--r2);
+    padding: 16px;
+    transition: var(--transition);
+    animation: fadeIn 0.5s ease-out;
+  }
+  
+  .patient-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    border-color: rgba(125,211,252,.15);
+  }
+  
+  .patient-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+  }
+  
+  .patient-id {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--link);
+    letter-spacing: 0.5px;
+  }
+  
+  .patient-name {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  
+  .patient-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  
+  .patient-state {
+    background: rgba(209,15,47,.1);
+    color: #d10f2f;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 600;
+  }
+  
+  .patient-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 12px;
+  }
+  
+  .patient-detail {
+    flex: 1;
+    min-width: 120px;
+  }
+  
+  .detail-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+  
+  .detail-value {
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 500;
+  }
+  
+  .patient-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+  
+  .status-sent { background: rgba(34,197,94,.2); color: #22c55e; }
+  .status-sent .status-dot { background: #22c55e; }
+  
+  .status-new { background: rgba(59,130,246,.2); color: #3b82f6; }
+  .status-new .status-dot { background: #3b82f6; }
+  
+  .status-needs-reply { background: rgba(245,158,11,.2); color: #f59e0b; }
+  .status-needs-reply .status-dot { background: #f59e0b; }
+  
+  .waiting-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: rgba(125,211,252,.1);
+    color: #7dd3fc;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  
+  .patient-notes {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255,255,255,.05);
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
   }
   
   /* Modal */
@@ -817,6 +952,9 @@
     .chart-canvas {
       height: 200px !important;
     }
+    .patient-summary-grid {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
 </head>
@@ -915,9 +1053,9 @@
   };
 
   // -----------------------------
-  // State
+  // State - CORREGIDO el problema de guardado
   // -----------------------------
-  const STORAGE_KEY = "command_center_v10_real_patients";
+  const STORAGE_KEY = "medical_command_center_data";
   
   // Datos de pacientes REALES de la segunda imagen
   const getInitialPatients = () => [
@@ -1062,7 +1200,18 @@
   }
 
   function saveState(){
-    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){ console.warn(e); }
+    try { 
+      // Guardar TODO el estado correctamente
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        ui: state.ui,
+        patients: state.patients,
+        tasks: state.tasks,
+        reports: state.reports,
+        assistant: state.assistant
+      })); 
+    } catch(e) { 
+      console.warn("Error saving state:", e); 
+    }
     $("#pendingCount").textContent = String(state.assistant.pending||0);
   }
   
@@ -1072,14 +1221,28 @@
       if(!raw) return defaultState();
       const parsed = JSON.parse(raw);
       // merge for forward compatibility
-      return {...defaultState(), ...parsed, ui:{...defaultState().ui, ...(parsed.ui||{})}, assistant:{...defaultState().assistant, ...(parsed.assistant||{})}};
-    }catch(e){
+      const loadedState = {
+        ...defaultState(),
+        ...parsed,
+        ui: { ...defaultState().ui, ...(parsed.ui || {}) },
+        patients: parsed.patients || defaultState().patients,
+        tasks: parsed.tasks || defaultState().tasks,
+        reports: parsed.reports || defaultState().reports,
+        assistant: { ...defaultState().assistant, ...(parsed.assistant || {}) }
+      };
+      
+      // Asegurar que los gráficos existan
+      loadedState.charts = {};
+      
+      return loadedState;
+    } catch(e){
+      console.warn("Error loading state, using default:", e);
       return defaultState();
     }
   }
 
   // -----------------------------
-  // Modal
+  // Modal - CORREGIDO el problema de alertas pegadas
   // -----------------------------
   const backdrop = $("#backdrop");
   const modalTitle = $("#modalTitle");
@@ -1108,7 +1271,10 @@
   
   $("#modalClose").addEventListener("click", closeModal);
   $("#modalCancel").addEventListener("click", closeModal);
-  $("#modalSave").addEventListener("click", () => { if(modalOnSave) modalOnSave(); });
+  $("#modalSave").addEventListener("click", () => { 
+    if(modalOnSave) modalOnSave(); 
+    closeModal();
+  });
 
   // -----------------------------
   // Rendering
@@ -1134,7 +1300,7 @@
     }
     if(state.ui.tab==="Reports") page.innerHTML = renderReports();
     wirePage();
-    saveState();
+    saveState(); // Guardar estado después de cada renderizado
   }
 
   function kpi(label, value, dotColor, pillText, pillAction){
@@ -1413,13 +1579,8 @@
     };
   }
 
-  // Función para calcular insights
+  // Función para calcular insights - REVISADO: eliminado fondo negro
   function calculateInsights(selectedDate) {
-    // Filtrar pacientes por fecha seleccionada (si aplica)
-    const dateFilteredPatients = selectedDate ? 
-      state.patients.filter(p => p.requestedDate === selectedDate) : 
-      state.patients;
-    
     // Calcular estadísticas
     const totalPatients = state.patients.length;
     const totalTasks = state.tasks.length;
@@ -1468,12 +1629,79 @@
       needsReply,
       newPatients,
       openTasks,
-      highPriorityTasks,
-      dateFilteredCount: dateFilteredPatients.length
+      highPriorityTasks
     };
   }
 
-  // Renderizar la sección de gráficos
+  // Función para renderizar resumen de pacientes (cards en lugar de tabla)
+  function renderPatientSummaryCards(patients) {
+    if (patients.length === 0) {
+      return `
+        <div class="chart-placeholder" style="min-height: 150px;">
+          <div>No patients found</div>
+          <div class="mini">Try adding patients or adjusting your search</div>
+        </div>
+      `;
+    }
+    
+    return `
+      <div class="patient-summary-grid">
+        ${patients.map(p => {
+          // Determinar clase de estado
+          let statusClass = "status-sent";
+          if (p.status === "New") statusClass = "status-new";
+          if (p.status === "Needs reply") statusClass = "status-needs-reply";
+          
+          return `
+            <div class="patient-card">
+              <div class="patient-card-header">
+                <div>
+                  <div class="patient-id">Matter: ${escapeHtml(p.matter)}</div>
+                  <div class="patient-name">${escapeHtml(p.patient)}</div>
+                  <div class="patient-meta">
+                    <span class="patient-state">${escapeHtml(p.state)}</span>
+                    <span>• ${escapeHtml(p.type)}</span>
+                  </div>
+                </div>
+                <div class="patient-status ${statusClass}">
+                  <span class="status-dot"></span>
+                  ${escapeHtml(p.status)}
+                </div>
+              </div>
+              
+              <div class="patient-details">
+                <div class="patient-detail">
+                  <div class="detail-label">Provider</div>
+                  <div class="detail-value">${escapeHtml(p.provider)}</div>
+                </div>
+                <div class="patient-detail">
+                  <div class="detail-label">Requested</div>
+                  <div class="detail-value">${escapeHtml(p.requestedDate)}</div>
+                </div>
+                <div class="patient-detail">
+                  <div class="detail-label">Sender</div>
+                  <div class="detail-value">${escapeHtml(p.sender)}</div>
+                </div>
+              </div>
+              
+              <div style="margin-top: 10px;">
+                <div class="detail-label">Waiting On</div>
+                <div class="waiting-badge">${escapeHtml(p.waitingOn)}</div>
+              </div>
+              
+              ${p.notes ? `
+                <div class="patient-notes">
+                  <strong>Notes:</strong> ${escapeHtml(p.notes)}
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  }
+
+  // Renderizar la sección de gráficos - REVISADO: eliminado cuadros negros
   function renderCharts(){
     const chartData = calculateChartData();
     const insights = calculateInsights(state.ui.insightDate);
@@ -1486,7 +1714,7 @@
       <div class="pageTitle">Charts & Analytics</div>
       <p class="pageHint">Visual overview of your data. Click on any chart legend to filter patients.</p>
       
-      <!-- Data Trends & Insights Section -->
+      <!-- Data Trends & Insights Section - REVISADO: sin fondo negro -->
       <div class="card insights-section">
         <div class="insights-header">
           <h3>${ICON_INSIGHTS} Data Trends & Insights</h3>
@@ -1496,7 +1724,6 @@
             <button class="ghostBtn" id="resetInsightDate">Today</button>
           </div>
         </div>
-        <p>This section provides visual insights into your patient and task data. Click on any chart item to filter the patient list below.</p>
         
         <div class="insights-stats">
           <div class="insight-stat green">
@@ -1504,8 +1731,8 @@
               <span class="miniDot" style="background: #22c55e"></span>
               Total Records
             </div>
-            <div class="insight-value">${insights.totalPatients} patients, ${insights.totalTasks} tasks, ${insights.totalReports} reports</div>
-            <div class="insight-subtext">Data Last Updated: ${new Date().toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' })} • ${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</div>
+            <div class="insight-value">${insights.totalPatients} patients, ${insights.totalTasks} tasks</div>
+            <div class="insight-subtext">Data updated: ${new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</div>
           </div>
           
           <div class="insight-stat blue">
@@ -1513,8 +1740,8 @@
               <span class="miniDot" style="background: #3b82f6"></span>
               Most Common Status
             </div>
-            <div class="insight-value">${insights.mostCommonStatus.name} (${insights.mostCommonStatus.count} patients)</div>
-            <div class="insight-subtext">${insights.mostCommonStatus.percentage}% of all patients • ${insights.sentToClinic} sent to clinic, ${insights.needsReply} need reply</div>
+            <div class="insight-value">${insights.mostCommonStatus.name}</div>
+            <div class="insight-subtext">${insights.mostCommonStatus.count} patients (${insights.mostCommonStatus.percentage}%)</div>
           </div>
           
           <div class="insight-stat orange">
@@ -1522,8 +1749,8 @@
               <span class="miniDot" style="background: #f59e0b"></span>
               Most Common Type
             </div>
-            <div class="insight-value">${insights.mostCommonType.name} (${insights.mostCommonType.count} patients)</div>
-            <div class="insight-subtext">${insights.mostCommonType.percentage}% of all patients • ${insights.newPatients} new patients today</div>
+            <div class="insight-value">${insights.mostCommonType.name}</div>
+            <div class="insight-subtext">${insights.mostCommonType.count} patients (${insights.mostCommonType.percentage}%)</div>
           </div>
           
           <div class="insight-stat purple">
@@ -1532,7 +1759,7 @@
               Task Overview
             </div>
             <div class="insight-value">${insights.openTasks} open tasks</div>
-            <div class="insight-subtext">${insights.highPriorityTasks} high priority • ${insights.totalTasks - insights.openTasks} completed</div>
+            <div class="insight-subtext">${insights.highPriorityTasks} high priority</div>
           </div>
         </div>
       </div>
@@ -1605,7 +1832,7 @@
         </div>
       </div>
       
-      <!-- Patient Summary Card with Search -->
+      <!-- Patient Summary Card - REVISADO: ahora muestra cards en lugar de tabla -->
       <div class="card patient-summary-card">
         <h3>📋 Patient Summary</h3>
         <p class="pageHint">All patients data collected from all sections. Search by name or matter number.</p>
@@ -1615,14 +1842,7 @@
           <button class="btn" id="chartSearchClear">Clear Search</button>
         </div>
         
-        <div style="overflow: auto; max-height: 400px;">
-          ${filteredPatientsList.length > 0 ? tablePatients(filteredPatientsList, {compact: true, showActions: false}) : `
-            <div class="chart-placeholder" style="min-height: 150px;">
-              <div>No patients found</div>
-              <div class="mini">Try adding patients or adjusting your search</div>
-            </div>
-          `}
-        </div>
+        ${renderPatientSummaryCards(filteredPatientsList)}
         
         <div class="mini" style="margin-top: 8px;">
           Showing ${filteredPatientsList.length} of ${state.patients.length} patients
@@ -2047,7 +2267,7 @@
       });
     }
 
-    // Delegated actions for the entire page
+    // Delegated actions for the entire page - CORREGIDO: eliminado el problema de alertas pegadas
     $("#page").addEventListener("click", (e)=>{
       const actEl = e.target.closest("[data-action]");
       if(!actEl) return;
@@ -2063,11 +2283,27 @@
         return;
       }
       if(action==="edit_patient"){ editPatient(actEl.dataset.matter); return; }
-      if(action==="del_patient"){ deletePatient(actEl.dataset.matter); return; }
+      if(action==="del_patient"){ 
+        // Usar confirm directo en lugar de función problemática
+        if(confirm(`Delete patient ${actEl.dataset.matter}?`)) {
+          deletePatient(actEl.dataset.matter); 
+        }
+        return; 
+      }
       if(action==="edit_task"){ editTask(actEl.dataset.id); return; }
-      if(action==="del_task"){ deleteTask(actEl.dataset.id); return; }
+      if(action==="del_task"){ 
+        if(confirm("Delete this task?")) {
+          deleteTask(actEl.dataset.id); 
+        }
+        return; 
+      }
       if(action==="edit_report"){ state.ui.tab="Reports"; state.ui.reportEditingId = actEl.dataset.id; render(); return; }
-      if(action==="del_report"){ deleteReport(actEl.dataset.id); return; }
+      if(action==="del_report"){ 
+        if(confirm("Delete this saved report?")) {
+          deleteReport(actEl.dataset.id); 
+        }
+        return; 
+      }
     });
 
     $("#page").addEventListener("change", (e)=>{
@@ -2128,7 +2364,6 @@
       else state.patients.unshift(p);
       state.assistant.lastMatter = p.matter;
       addAssistantSystem(`Added/updated patient ${p.matter} (${p.patient}).`);
-      closeModal();
       render();
     });
     
@@ -2169,13 +2404,11 @@
         notes: norm($("#ep_notes").value)
       });
       addAssistantSystem(`Updated patient ${matter}.`);
-      closeModal();
       render();
     });
   }
 
   function deletePatient(matter){
-    if(!confirm(`Delete patient ${matter}?`)) return;
     state.patients = state.patients.filter(p => p.matter!==matter);
     addAssistantSystem(`Deleted patient ${matter}.`);
     render();
@@ -2217,7 +2450,6 @@
       state.tasks.unshift(t);
       state.assistant.lastMatter = t.matter;
       addAssistantSystem(`Added task for matter ${t.matter}.`);
-      closeModal();
       render();
     });
     
@@ -2248,13 +2480,11 @@
         description: norm($("#et_desc").value)
       });
       addAssistantSystem(`Updated a task for ${t.matter}.`);
-      closeModal();
       render();
     });
   }
 
   function deleteTask(id){
-    if(!confirm("Delete this task?")) return;
     state.tasks = state.tasks.filter(t => t.id!==id);
     addAssistantSystem("Deleted a task.");
     render();
@@ -2334,7 +2564,6 @@
   }
 
   function deleteReport(id){
-    if(!confirm("Delete this saved report?")) return;
     state.reports = state.reports.filter(r => r.id!==id);
     if(state.ui.reportEditingId===id) state.ui.reportEditingId=null;
     toast("Deleted","Saved report removed.");
