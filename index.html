@@ -767,6 +767,9 @@
   .modalBody{padding:14px 16px}
   
   .modalGrid{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+  .formSectionTitle{grid-column:1/-1; font-weight:800; margin-top:6px; color:var(--ink); letter-spacing:.2px}
+  .formHelp{grid-column:1/-1; font-size:12px; color:var(--muted); margin-top:-4px}
+
   
   .modalFoot{
     display:flex; justify-content:space-between; gap:10px; 
@@ -1102,6 +1105,7 @@
       provider: "IRX",
       providerEmail: "",
       requestedDate: "2025-12-29",
+      dueDate: "",
       sender: "Email",
       status: "Sent to clinic",
       waitingOn: "You",
@@ -1116,6 +1120,7 @@
       provider: "GIC",
       providerEmail: "",
       requestedDate: "2025-12-29",
+      dueDate: "",
       sender: "Email",
       status: "Sent to clinic",
       waitingOn: "You",
@@ -1130,6 +1135,7 @@
       provider: "NSM",
       providerEmail: "",
       requestedDate: "2025-12-29",
+      dueDate: "",
       sender: "Email",
       status: "Sent to clinic",
       waitingOn: "You",
@@ -1144,6 +1150,7 @@
       provider: "IRX",
       providerEmail: "",
       requestedDate: "2025-12-29",
+      dueDate: "",
       sender: "Email",
       status: "Sent to clinic",
       waitingOn: "You",
@@ -1158,6 +1165,7 @@
       provider: "MoveDocs",
       providerEmail: "",
       requestedDate: "2025-12-29",
+      dueDate: "",
       sender: "Web Page",
       status: "Sent to clinic",
       waitingOn: "You",
@@ -1172,6 +1180,7 @@
       provider: "MoveDocs",
       providerEmail: "",
       requestedDate: "2025-12-29",
+      dueDate: "",
       sender: "Web Page",
       status: "Sent to clinic",
       waitingOn: "You",
@@ -1187,6 +1196,7 @@
       taskType: "Follow-up clinic",
       priority: "High",
       progress: "Open",
+      dueDate: "",
       description: "Follow up with NSM about MRI scheduling for Bobby Thompson",
       createdAt: new Date(Date.now() - 2*24*60*60*1000).toISOString()
     }
@@ -1198,6 +1208,8 @@
       patientSearch:"", 
       patientStatus:"all", 
       patientWaiting:"all", 
+      
+      patientOverdueOnly:false,
       taskSearch:"", 
       reportEditingId:null,
       chartSearch: "",
@@ -1386,11 +1398,18 @@
 
   function computeHome(){
     const today = new Date().toISOString().slice(0,10);
-    const overdue = state.tasks.filter(t => lower(t.progress)==="open" && t.dueDate && t.dueDate < today).length;
+
+    // "Overdue today" counts PATIENTS only: due on/before today AND not Done
+    const overdue = state.patients.filter(p =>
+      p.dueDate && p.dueDate <= today && lower(p.status)!=="done"
+    ).length;
+
     const needsReply = state.patients.filter(p => lower(p.status)==="needs reply").length
                     + state.tasks.filter(t => lower(t.taskType).includes("reply") && lower(t.progress)==="open").length;
+
     const newToday = state.patients.filter(p => (p.createdAt||"").slice(0,10)===today).length;
     const waitingClinic = state.patients.filter(p => lower(p.waitingOn)==="clinic" && lower(p.status)!=="done").length;
+
     return { overdue, needsReply, newToday, waitingClinic };
   }
 
@@ -1451,6 +1470,7 @@
           ${compact ? "" : `<td>${typeSel}</td>`}
           <td>${escapeHtml(p.provider||"")}</td>
           ${compact ? "" : `<td class="nowrap">${escapeHtml(p.requestedDate||"")}</td>`}
+          ${compact ? "" : `<td><input type="date" class="cellSelect" data-action="p_update" data-field="dueDate" data-matter="${matter}" value="${escapeHtml(p.dueDate||"")}"/></td>`}
           ${compact ? "" : `<td>${escapeHtml(p.sender||"")}</td>`}
           <td>${statusSel}</td>
           <td>${waitSel}</td>
@@ -1468,7 +1488,7 @@
         <th>Matter</th><th>Patient</th><th>State</th>
         ${compact ? "" : "<th>Type</th>"}
         <th>Provider</th>
-        ${compact ? "" : "<th>Requested</th><th>Sender</th>"}
+        ${compact ? "" : "<th>Requested</th><th>Due</th><th>Sender</th>"}
         <th>Status</th><th>Waiting On</th>
         ${compact ? "" : "<th>Notes</th>"}
         ${showActions ? "<th></th>" : ""}
@@ -1513,13 +1533,20 @@
     const q = lower(state.ui.patientSearch);
     const status = state.ui.patientStatus;
     const waiting = state.ui.patientWaiting;
+    const overdueOnly = !!state.ui.patientOverdueOnly;
+    const today = new Date().toISOString().slice(0,10);
 
     return state.patients
       .filter(p => {
-        const hay = lower([p.matter,p.patient,p.state,p.type,p.provider,p.requestedDate,p.sender,p.status,p.waitingOn,p.notes].join(" "));
+        const hay = lower([p.matter,p.patient,p.state,p.type,p.provider,p.providerEmail,p.requestedDate,p.dueDate,p.sender,p.status,p.waitingOn,p.notes].join(" "));
         if(q && !hay.includes(q)) return false;
         if(status && status!=="all" && norm(p.status)!==status) return false;
         if(waiting && waiting!=="all" && norm(p.waitingOn)!==waiting) return false;
+        if(overdueOnly){
+          if(!p.dueDate) return false;
+          if(p.dueDate > today) return false;
+          if(lower(p.status)==="done") return false;
+        }
         return true;
       });
   }
@@ -1547,6 +1574,7 @@
           ${compact ? "" : `<td>${typeSel}</td>`}
           <td>${prSel}</td>
           <td>${progSel}</td>
+          ${compact ? "" : `<td><input type="date" class="cellSelect" data-action="t_update" data-field="dueDate" data-id="${id}" value="${escapeHtml(t.dueDate||"")}"/></td>`}
           <td style="max-width:360px">${escapeHtml(t.description||"")}</td>
           <td class="rowActions">
             <button class="iconBtn" data-action="edit_task" data-id="${id}" title="Edit">${ICON_EDIT}</button>
@@ -1560,7 +1588,7 @@
       <tr>
         <th>Matter</th>
         ${compact ? "" : "<th>Type</th>"}
-        <th>Priority</th><th>Progress</th><th>Description</th><th></th>
+        <th>Priority</th><th>Progress</th>${compact ? "" : "<th>Due</th>"}<th>Description</th><th></th>
       </tr>
     `;
 
@@ -2134,6 +2162,7 @@
     // Tabs
     $$(".tab").forEach(t => t.addEventListener("click", () => { 
       state.ui.tab = t.dataset.tab; 
+      if(state.ui.tab==="Patients") state.ui.patientOverdueOnly=false;
       render(); 
     }));
 
@@ -2144,22 +2173,28 @@
         state.ui.patientStatus="Needs reply"; 
         state.ui.patientWaiting="all"; 
         state.ui.patientSearch=""; 
+        state.ui.patientOverdueOnly=false;
       }
       if(el.dataset.action==="home_waiting_clinic"){ 
         state.ui.tab="Patients"; 
         state.ui.patientWaiting="Clinic"; 
         state.ui.patientStatus="all"; 
         state.ui.patientSearch=""; 
+        state.ui.patientOverdueOnly=false;
       }
       if(el.dataset.action==="home_new_today"){ 
         state.ui.tab="Patients"; 
         state.ui.patientStatus="all"; 
         state.ui.patientWaiting="all"; 
         state.ui.patientSearch=""; 
+        state.ui.patientOverdueOnly=false;
       }
       if(el.dataset.action==="home_overdue"){ 
-        state.ui.tab="Tasks"; 
-        state.ui.taskSearch=""; 
+        state.ui.tab="Patients"; 
+        state.ui.patientStatus="all"; 
+        state.ui.patientWaiting="all"; 
+        state.ui.patientSearch=""; 
+        state.ui.patientOverdueOnly=true;
       }
       render();
     }));
@@ -2418,14 +2453,23 @@
   function openQuickPatient(){
     openModal("Quick Log — Patient", `
       <div class="modalGrid">
-        <input class="input" id="ql_matter" placeholder="Matter (ex: 107853)"/>
-        <input class="input" id="ql_patient" placeholder="Patient name"/>
-        <input class="input" id="ql_state" placeholder="State (ex: OH)"/>
+        <div class="formSectionTitle">Patient info / Información del paciente</div>
+        <input class="input" id="ql_matter" placeholder="Matter (ex: 107853) / Caso"/>
+        <input class="input" id="ql_patient" placeholder="Patient name / Nombre del paciente"/>
+        <input class="input" id="ql_state" placeholder="State (ex: OH) / Estado"/>
         <select class="input" id="ql_type">${buildOptions(OPTIONS.patientTypes, "MRI")}</select>
-        <input class="input" id="ql_provider" placeholder="Provider name"/>
-        <input class="input" id="ql_providerEmail" placeholder="Provider email (optional)"/>
-        <input class="input" id="ql_req" placeholder="Requested date (YYYY-MM-DD)"/>
-        <input class="input" id="ql_sender" placeholder="Sender (Email/Web page/etc)"/>
+
+        <div class="formSectionTitle">Provider / Clínica</div>
+        <input class="input" id="ql_provider" placeholder="Provider name / Nombre de la clínica"/>
+        <input class="input" id="ql_providerEmail" placeholder="Provider email (optional) / Email (opcional)"/>
+
+        <div class="formSectionTitle">Dates / Fechas</div>
+        <input class="input" id="ql_req" placeholder="Requested date (YYYY-MM-DD) / Fecha solicitada"/>
+        <input class="input" id="ql_due" type="date" placeholder="Due date / Fecha de vencimiento" title="Due date (drives 'Overdue today' from Patients)"/>
+        <div class="formHelp">Tip: “Overdue today” se calcula SOLO desde Patients usando “Due date”.</div>
+
+        <div class="formSectionTitle">Status / Estado</div>
+        <input class="input" id="ql_sender" placeholder="Sender (Email/Web page/etc) / Origen"/>
         <select class="input" id="ql_status">${buildOptions(OPTIONS.patientStatus, "New")}</select>
         <select class="input" id="ql_waiting">${buildOptions(OPTIONS.waitingOn, "Clinic")}</select>
       </div>
@@ -2441,6 +2485,7 @@
         provider: norm($("#ql_provider").value),
         providerEmail: norm($("#ql_providerEmail").value),
         requestedDate: norm($("#ql_req").value),
+        dueDate: norm($("#ql_due").value),
         sender: norm($("#ql_sender").value),
         status: norm($("#ql_status").value),
         waitingOn: norm($("#ql_waiting").value),
@@ -2475,6 +2520,7 @@
         <input class="input" id="ep_provider" placeholder="Provider name" value="${escapeHtml(p.provider||"")}"/>
         <input class="input" id="ep_providerEmail" placeholder="Provider email" value="${escapeHtml(p.providerEmail||"")}"/>
         <input class="input" id="ep_req" placeholder="Requested date" value="${escapeHtml(p.requestedDate||"")}"/>
+        <input class="input" id="ep_due" type="date" placeholder="Due date" value="${escapeHtml(p.dueDate||"")}"/>
         <input class="input" id="ep_sender" placeholder="Sender" value="${escapeHtml(p.sender||"")}"/>
         <select class="input" id="ep_status">${buildOptions(OPTIONS.patientStatus, p.status||"New")}</select>
         <select class="input" id="ep_waiting">${buildOptions(OPTIONS.waitingOn, p.waitingOn||"Clinic")}</select>
@@ -2490,6 +2536,7 @@
         provider: norm($("#ep_provider").value),
         providerEmail: norm($("#ep_providerEmail").value),
         requestedDate: norm($("#ep_req").value),
+        dueDate: norm($("#ep_due").value),
         sender: norm($("#ep_sender").value),
         status: norm($("#ep_status").value),
         waitingOn: norm($("#ep_waiting").value),
@@ -2524,6 +2571,7 @@
         <select class="input" id="qt_priority">${buildOptions(OPTIONS.taskPriority, "Medium")}</select>
         <select class="input" id="qt_type">${buildOptions(OPTIONS.taskType, "Follow-up clinic")}</select>
         <select class="input" id="qt_progress">${buildOptions(OPTIONS.taskProgress, "Open")}</select>
+        <input class="input" id="qt_due" type="date" placeholder="Due date"/>
       </div>
       <div style="margin-top:10px">
         <textarea class="input" id="qt_desc" placeholder="Description" style="min-height:130px"></textarea>
@@ -2535,6 +2583,7 @@
         priority: norm($("#qt_priority").value),
         taskType: norm($("#qt_type").value),
         progress: norm($("#qt_progress").value),
+        dueDate: norm($("#qt_due").value),
         description: norm($("#qt_desc").value),
         createdAt: new Date().toISOString()
       };
@@ -2562,6 +2611,7 @@
         <select class="input" id="et_priority">${buildOptions(OPTIONS.taskPriority, t.priority||"Medium")}</select>
         <select class="input" id="et_type">${buildOptions(OPTIONS.taskType, t.taskType||"Follow-up clinic")}</select>
         <select class="input" id="et_progress">${buildOptions(OPTIONS.taskProgress, t.progress||"Open")}</select>
+        <input class="input" id="et_due" type="date" placeholder="Due date" value="${escapeHtml(t.dueDate||"")}"/>
       </div>
       <div style="margin-top:10px">
         <textarea class="input" id="et_desc" style="min-height:140px">${escapeHtml(t.description||"")}</textarea>
@@ -2572,6 +2622,7 @@
         priority: norm($("#et_priority").value),
         taskType: norm($("#et_type").value),
         progress: norm($("#et_progress").value),
+        dueDate: norm($("#et_due").value),
         description: norm($("#et_desc").value)
       });
       addAssistantSystem(`Updated a task for ${t.matter}.`);
@@ -2680,15 +2731,19 @@
     const chat = state.assistant.chat || [];
     
     const suggestions = [
+      {cmd: "help", desc: "Show all commands"},
+      {cmd: "show overdue", desc: "List overdue (due on/before today)"},
       {cmd: "show needs reply", desc: "Show patients needing reply"},
+      {cmd: "show patients status New", desc: "Show patients with status New"},
+      {cmd: "show patients status Needs reply", desc: "Show patients with status Needs reply"},
+      {cmd: "show patients waiting on Clinic", desc: "Show patients waiting on Clinic"},
       {cmd: "open 107853", desc: "Open specific patient"},
-      {cmd: "update patient 107853 waitingOn=Clinic", desc: "Update patient info"},
-      {cmd: "export data", desc: "Download all data as Excel"},
+      {cmd: "update patient 107853 dueDate=2026-01-13 status=Needs reply", desc: "Update patient info"},
+      {cmd: "add patient", desc: "Add new patient"},
+      {cmd: "add task", desc: "Add new task"},
+      {cmd: "export data", desc: "Download all data as CSV"},
       {cmd: "generate report", desc: "Generate 4pm report"},
-      {cmd: "show charts", desc: "View analytics"},
-      {cmd: "what's pending", desc: "Show pending items"},
-      {cmd: "clear search", desc: "Clear all filters"},
-      {cmd: "add patient", desc: "Add new patient"}
+      {cmd: "what's pending", desc: "Show pending items"}
     ];
     
     const suggestionsHtml = `
@@ -2733,27 +2788,154 @@
   }
 
   function assistantRespond(input){
-    const msg = lower(input);
+    const raw = norm(input);
+    const msg = lower(raw);
 
-    if(msg.includes("help") || msg === "?") {
-      addAssistant("sys", "I can help you with: • show needs reply • open [matter] • update patient [matter] [field=value] • export data • generate report • show charts • what's pending • clear search • add patient • add task");
+    const today = new Date().toISOString().slice(0,10);
+
+    const STATUS = OPTIONS.patientStatus;
+    const WAITING = OPTIONS.waitingOn;
+    const TASK_TYPES = OPTIONS.taskType;
+    const PRIORITIES = OPTIONS.taskPriority;
+    const PROGRESS = OPTIONS.taskProgress;
+
+    const simplify = (s)=> lower((s||"").replace(/[_\-]+/g," ").replace(/[^\w\s]/g," ").replace(/\s+/g," ").trim());
+    const msgS = simplify(raw);
+
+    const bestMatch = (candidates, text) => {
+      const t = simplify(text);
+      // exact / includes
+      for(const c of candidates){
+        const cs = simplify(c);
+        if(t === cs) return c;
+        if(t.includes(cs)) return c;
+      }
+      // partial token match
+      const toks = t.split(" ").filter(Boolean);
+      for(const c of candidates){
+        const cs = simplify(c);
+        const ctoks = cs.split(" ");
+        if(ctoks.every(x => toks.includes(x))) return c;
+      }
+      // common aliases
+      const alias = {
+        "needsreply":"Needs reply",
+        "needs reply":"Needs reply",
+        "sent":"Sent to clinic",
+        "sent to clinic":"Sent to clinic",
+        "new":"New",
+        "done":"Done",
+        "stuck":"Stuck"
+      };
+      for(const [a,val] of Object.entries(alias)){
+        if(t.includes(a)) return val;
+      }
+      return null;
+    };
+
+    const extractAfter = (re) => {
+      const m = raw.match(re);
+      return m ? m[1].trim() : "";
+    };
+
+    const listOverdue = () => {
+      const overduePatients = state.patients
+        .filter(p => p.dueDate && p.dueDate <= today && lower(p.status)!=="done")
+        .sort((a,b)=> (a.dueDate||"").localeCompare(b.dueDate||""));
+      const overdueTasks = state.tasks
+        .filter(t => lower(t.progress)==="open" && t.dueDate && t.dueDate <= today)
+        .sort((a,b)=> (a.dueDate||"").localeCompare(b.dueDate||""));
+
+      const lines = [];
+      lines.push(`Overdue (due on/before ${today}):`);
+      lines.push(`• Patients: ${overduePatients.length}`);
+      for(const p of overduePatients.slice(0,12)){
+        lines.push(`  - ${p.matter}: ${p.patient} • due ${p.dueDate} • status ${p.status} • waiting ${p.waitingOn}`);
+      }
+      if(overduePatients.length>12) lines.push(`  … +${overduePatients.length-12} more`);
+      lines.push(`• Tasks: ${overdueTasks.length}`);
+      for(const t of overdueTasks.slice(0,12)){
+        lines.push(`  - ${t.matter}: [${t.priority}] ${t.taskType} • due ${t.dueDate} • ${t.description}`);
+      }
+      if(overdueTasks.length>12) lines.push(`  … +${overdueTasks.length-12} more`);
+      return lines.join("\n");
+    };
+
+    // HELP (EN/ES)
+    if(msgS === "help" || msgS === "ayuda" || msgS === "?"){
+      addAssistant("sys",
+`I can do (English / Español):
+• show overdue / mostrar vencidos
+• show needs reply / mostrar needs reply
+• show patients status <status> / mostrar pacientes estado <estado>
+• show patients waiting on <who> / mostrar pacientes esperando <quién>
+• open <matter> / abrir <matter>
+• update patient <matter> status=... waitingOn=... dueDate=YYYY-MM-DD (también en español: estado=..., esperando=..., vencimiento=...)
+• add patient / agregar paciente
+• add task / agregar tarea
+• export data / exportar
+• generate report / generar reporte
+• what's pending / qué tengo pendiente`
+      );
       return;
     }
 
-    if(msg.includes("show needs reply") || msg==="needs reply"){
+    // SHOW OVERDUE
+    if(msgS.includes("overdue") || msgS.includes("vencid") || msgS.includes("atrasad")){
+      addAssistant("sys", listOverdue());
+      return;
+    }
+
+    // SHOW NEEDS REPLY
+    if(msgS.includes("show needs reply") || msgS === "needs reply" || msgS.includes("mostrar needs reply") || msgS.includes("necesita respuesta") ){
       state.ui.tab="Patients"; state.ui.patientStatus="Needs reply"; state.ui.patientWaiting="all"; state.ui.patientSearch="";
       addAssistant("sys","Showing patients/tasks that need reply.");
-      render(); return;
+      render(); 
+      return;
     }
 
-    if(msg.includes("show charts") || msg.includes("view analytics")) {
+    // SHOW CHARTS
+    if(msgS.includes("show charts") || msgS.includes("view analytics") || msgS.includes("mostrar graficos") || msgS.includes("analytics")){
       state.ui.tab = "Charts";
       addAssistant("sys", "Opening charts and analytics.");
-      render(); return;
+      render(); 
+      return;
     }
 
-    if(msg.startsWith("open ")){
-      const matter = parseMatterFromText(input) || state.assistant.lastMatter;
+    // SHOW PATIENTS BY STATUS (ex: "show patients with new status", "mostrar pacientes estado new")
+    if((msgS.includes("show patients") || msgS.includes("mostrar pacientes")) && (msgS.includes("status") || msgS.includes("estado"))){
+      let target = extractAfter(/(?:status|estado)\s*(?:is|=|:|to)?\s*([a-zA-Z\s]+)/i);
+      if(!target && msgS.includes("new status")) target = "New";
+      const status = bestMatch(STATUS, target || raw);
+      if(status){
+        state.ui.tab="Patients";
+        state.ui.patientStatus=status;
+        state.ui.patientWaiting="all";
+        state.ui.patientSearch="";
+        addAssistant("sys", `Showing patients with status: ${status}`);
+        render();
+        return;
+      }
+    }
+
+    // SHOW PATIENTS BY WAITING ON
+    if((msgS.includes("show patients") || msgS.includes("mostrar pacientes")) && (msgS.includes("waiting on") || msgS.includes("esperando") || msgS.includes("waiting"))){
+      let target = extractAfter(/(?:waiting on|esperando)\s*(?:is|=|:|a)?\s*([a-zA-Z\s]+)/i);
+      const waiting = bestMatch(WAITING, target || raw);
+      if(waiting){
+        state.ui.tab="Patients";
+        state.ui.patientWaiting=waiting;
+        state.ui.patientStatus="all";
+        state.ui.patientSearch="";
+        addAssistant("sys", `Showing patients waiting on: ${waiting}`);
+        render();
+        return;
+      }
+    }
+
+    // OPEN
+    if(msgS.startsWith("open ") || msgS.startsWith("abrir ")){
+      const matter = parseMatterFromText(raw) || state.assistant.lastMatter;
       if(matter){
         state.ui.tab="Patients";
         state.ui.patientSearch = matter;
@@ -2761,30 +2943,37 @@
         state.ui.patientWaiting="all";
         state.assistant.lastMatter = matter;
         addAssistant("sys",`Opening matter ${matter} in Patients.`);
-        render(); return;
+        render(); 
+        return;
       }
     }
 
-    if(msg.includes("give an update") || msg.includes("update about") || msg.includes("status of") || msg.includes("what about")){
-      const name = input.split(/about|of/i)[1]?.trim();
+    // PATIENT SUMMARY QUERY ("status of ...", "qué pasó con ...")
+    if(msgS.includes("give an update") || msgS.includes("update about") || msgS.includes("status of") || msgS.includes("what about")
+       || msgS.includes("dame una actualizacion") || msgS.includes("estado de") || msgS.includes("que paso con")){
+      const name = input.split(/about|of|de|con/i)[1]?.trim();
       const p = name ? state.patients.find(x => lower(x.patient).includes(lower(name)) || x.matter === name) : null;
       if(p){
         state.assistant.lastMatter = p.matter;
-        addAssistant("sys", `Patient: ${p.patient} • Matter: ${p.matter} • Type: ${p.type||""} • Provider: ${p.provider||""} • Status: ${p.status||""} • Waiting On: ${p.waitingOn||""} • Requested: ${p.requestedDate||""}\nNotes: ${p.notes||""}`);
+        addAssistant("sys", `Patient: ${p.patient} • Matter: ${p.matter} • Type: ${p.type||""} • Provider: ${p.provider||""} • Status: ${p.status||""} • Waiting On: ${p.waitingOn||""} • Requested: ${p.requestedDate||""} • Due: ${p.dueDate||"-"}\nNotes: ${p.notes||""}`);
       }else{
         addAssistant("sys", "I couldn't find that patient name in your list yet.");
       }
       return;
     }
 
-    if(msg.includes("what's pending") || msg.includes("what do i have") || msg.includes("pending items")) {
-      const overdueTasks = state.tasks.filter(t => t.progress === "Open").length;
+    // WHAT'S PENDING
+    if(msgS.includes("what's pending") || msgS.includes("what do i have") || msgS.includes("pending items")
+       || msgS.includes("que tengo pendiente") || msgS.includes("pendiente")){
+      const overduePatients = state.patients.filter(p => p.dueDate && p.dueDate <= today && lower(p.status)!=="done").length;
+      const overdueTasks = state.tasks.filter(t => t.progress === "Open" && t.dueDate && t.dueDate <= today).length;
       const needsReplyPatients = state.patients.filter(p => p.status === "Needs reply").length;
-      addAssistant("sys", `You have: • ${overdueTasks} open tasks • ${needsReplyPatients} patients needing reply • ${state.patients.filter(p => p.waitingOn === "Clinic").length} waiting on clinic`);
+      addAssistant("sys", `You have: • ${overduePatients+overdueTasks} overdue (patients+tasks) • ${needsReplyPatients} patients needing reply • ${state.patients.filter(p => p.waitingOn === "Clinic").length} waiting on clinic`);
       return;
     }
 
-    if(msg.includes("clear search") || msg.includes("clear filters")) {
+    // CLEAR FILTERS
+    if(msgS.includes("clear search") || msgS.includes("clear filters") || msgS.includes("limpiar filtros") || msgS.includes("limpiar busqueda")){
       state.ui.patientSearch = "";
       state.ui.patientStatus = "all";
       state.ui.patientWaiting = "all";
@@ -2795,35 +2984,39 @@
       return;
     }
 
-    if(msg.includes("export data") || msg.includes("download excel") || msg.includes("download data")) {
+    // EXPORT
+    if(msgS.includes("export data") || msgS.includes("download excel") || msgS.includes("download data") || msgS.includes("exportar")){
       downloadCSV();
-      addAssistant("sys", "Downloading all patient data as Excel file.");
+      addAssistant("sys", "Downloading all patient data as CSV file.");
       return;
     }
 
-    if(msg.includes("generate report") || msg.includes("create report")) {
+    // GENERATE REPORT
+    if(msgS.includes("generate report") || msgS.includes("create report") || msgS.includes("generar reporte") || msgS.includes("generar informe")){
       state.ui.tab = "Reports";
       generateDraftInto("#reportText");
       addAssistant("sys", "Generated 4pm report and opened Reports tab.");
       return;
     }
 
-    if(msg.includes("add patient") || msg.includes("new patient")) {
+    // ADD
+    if(msgS.includes("add patient") || msgS.includes("new patient") || msgS.includes("agregar paciente") || msgS.includes("nuevo paciente")){
       openQuickPatient();
       addAssistant("sys", "Opening Quick Log to add a new patient.");
       return;
     }
 
-    if(msg.includes("add task") || msg.includes("new task")) {
+    if(msgS.includes("add task") || msgS.includes("new task") || msgS.includes("agregar tarea") || msgS.includes("nueva tarea")){
       openQuickTask();
       addAssistant("sys", "Opening Quick Log to add a new task.");
       return;
     }
 
-    if(msg.includes("update patient") || msg.includes("update the patient") || msg.includes("update the patient file")){
-      const matter = parseMatterFromText(input) || state.assistant.lastMatter;
+    // UPDATE PATIENT (richer parsing, EN/ES)
+    if(msgS.includes("update patient") || msgS.includes("actualizar paciente") || msgS.includes("update the patient")){
+      const matter = parseMatterFromText(raw) || state.assistant.lastMatter;
       if(!matter){
-        addAssistant("sys","Tell me the matter number (ex: update patient 107853 waitingOn=Clinic).");
+        addAssistant("sys","Tell me the matter number (ex: update patient 107853 status=Needs reply) / Dime el matter (ej: actualizar paciente 107853 estado=Needs reply).");
         return;
       }
       const p = state.patients.find(x => x.matter===matter);
@@ -2832,57 +3025,74 @@
         return;
       }
 
-      if(msg.includes("waiting on clinic") || msg.includes("waiting-on clinic")){
-        p.waitingOn = "Clinic";
-        if(!p.status) p.status = "Sent to clinic";
-        state.assistant.lastMatter = matter;
-        addAssistant("sys", `Updated patient ${matter}: waitingOn → Clinic.`);
-        render();
+      // key=value pairs (EN/ES keys)
+      const pairs = Array.from(raw.matchAll(/\b(status|estado|waitingOn|esperando|type|tipo|provider|proveedor|state|estadoUS|patient|paciente|sender|remitente|requestedDate|requested|solicitado|dueDate|due|vencimiento)\s*=\s*([^,\n]+)/gi));
+      if(pairs.length===0){
+        addAssistant("sys","Tell me what to change. Example: update patient 107853 status=Needs reply waitingOn=You dueDate=2026-01-13");
         return;
       }
 
-      const pairs = Array.from(input.matchAll(/\b(status|waitingOn|type|provider|state|patient|sender|requestedDate)\s*=\s*([^,\n]+)/gi));
-      if(pairs.length===0){
-        addAssistant("sys","Tell me what to change. Example: update patient 107853 status=Needs reply waitingOn=You");
-        return;
-      }
       for(const [,k,v] of pairs){
-        const key = k.trim();
-        p[key] = norm(v);
+        const keyRaw = lower(k.trim());
+        const val = norm(v);
+
+        if(keyRaw==="status" || keyRaw==="estado"){
+          const st = bestMatch(STATUS, val);
+          if(st) p.status = st; else p.status = val;
+          continue;
+        }
+        if(keyRaw==="waitingon" || keyRaw==="esperando"){
+          const w = bestMatch(WAITING, val);
+          if(w) p.waitingOn = w; else p.waitingOn = val;
+          continue;
+        }
+        if(keyRaw==="type" || keyRaw==="tipo"){
+          const t = bestMatch(OPTIONS.patientTypes, val);
+          if(t) p.type = t; else p.type = val;
+          continue;
+        }
+        if(keyRaw==="provider" || keyRaw==="proveedor"){ p.provider = val; continue; }
+        if(keyRaw==="state" || keyRaw==="estadous"){ p.state = val; continue; }
+        if(keyRaw==="patient" || keyRaw==="paciente"){ p.patient = val; continue; }
+        if(keyRaw==="sender" || keyRaw==="remitente"){ p.sender = val; continue; }
+        if(keyRaw==="requesteddate" || keyRaw==="requested" || keyRaw==="solicitado"){ p.requestedDate = val; continue; }
+        if(keyRaw==="duedate" || keyRaw==="due" || keyRaw==="vencimiento"){ p.dueDate = val; continue; }
       }
+
       state.assistant.lastMatter = matter;
       addAssistant("sys", `Updated patient ${matter}.`);
       render();
       return;
     }
 
-    const m = parseMatterFromText(input);
+    // If user typed a matter number, show quick summary
+    const m = parseMatterFromText(raw);
     if(m){
       const p = state.patients.find(x => x.matter===m);
       if(p){
         state.assistant.lastMatter = p.matter;
-        addAssistant("sys", `Patient: ${p.patient} • Matter: ${p.matter} • Status: ${p.status||""} • Waiting On: ${p.waitingOn||""} • Provider: ${p.provider||""}\nNotes: ${p.notes||""}`);
+        addAssistant("sys", `Patient: ${p.patient} • Matter: ${p.matter} • Status: ${p.status||""} • Waiting On: ${p.waitingOn||""} • Due: ${p.dueDate||"-"} • Provider: ${p.provider||""}\nNotes: ${p.notes||""}`);
       }else{
         addAssistant("sys", `I don't have matter ${m} saved yet. Add it via Quick Log → Patient.`);
       }
       return;
     }
 
-    addAssistant("sys","Try: • help - show all commands • show needs reply • open 107853 • update patient 107853 • export data • generate report • what's pending");
+    addAssistant("sys","Try: • help/ayuda • show overdue • show patients status New • show patients waiting on Clinic • open 107853 • update patient 107853 status=Needs reply dueDate=2026-01-13 • export data • generate report • what's pending");
   }
 
   // -----------------------------
   // CSV download
   // -----------------------------
   function downloadCSV(){
-    const patientHeaders = ["Matter","Patient","State","Type","Provider","Provider Email","Requested Date","Sender","Status","Waiting On","Notes", "Created At"];
+    const patientHeaders = ["Matter","Patient","State","Type","Provider","Provider Email","Requested Date","Due Date","Sender","Status","Waiting On","Notes", "Created At"];
     const patientRows = state.patients.map(p => [
-      p.matter, p.patient, p.state, p.type, p.provider, p.providerEmail, p.requestedDate, p.sender, p.status, p.waitingOn, p.notes, p.createdAt
+      p.matter, p.patient, p.state, p.type, p.provider, p.providerEmail, p.requestedDate, p.dueDate, p.sender, p.status, p.waitingOn, p.notes, p.createdAt
     ]);
     
-    const taskHeaders = ["ID","Matter","Task Type","Priority","Progress","Description","Created At"];
+    const taskHeaders = ["ID","Matter","Task Type","Priority","Progress","Due Date","Description","Created At"];
     const taskRows = state.tasks.map(t => [
-      t.id, t.matter, t.taskType, t.priority, t.progress, t.description, t.createdAt
+      t.id, t.matter, t.taskType, t.priority, t.progress, t.dueDate, t.description, t.createdAt
     ]);
     
     const reportHeaders = ["ID","Date/Time","Report Text"];
