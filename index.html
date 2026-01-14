@@ -158,6 +158,44 @@
   }
   
   .actionsBar{display:flex; gap:10px; align-items:center}
+
+  /* Dropdown menu (MedHub-style) */
+  .menuWrap{position:relative; display:inline-flex; align-items:center;}
+  .menuBtn{display:inline-flex; align-items:center; gap:8px;}
+  .menuPanel{
+    position:absolute; top:calc(100% + 10px); right:0;
+    min-width: 200px;
+    background: rgba(15,19,24,.98);
+    border:1px solid rgba(255,255,255,.12);
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.55);
+    padding: 8px;
+    display:none;
+    z-index: 30;
+  }
+  .menuPanel.open{display:block;}
+  .menuItem{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:10px;
+    padding:10px 12px;
+    border-radius: 12px;
+    cursor:pointer;
+    color: var(--text);
+    border:1px solid transparent;
+    transition: var(--transition);
+    font-weight: 700;
+  }
+  .menuItem:hover{
+    background: rgba(255,255,255,.05);
+    border-color: rgba(255,255,255,.10);
+    transform: translateY(-1px);
+  }
+  .menuItem.active{
+    background: rgba(125,211,252,.10);
+    border-color: rgba(125,211,252,.25);
+  }
+  .menuKicker{color:var(--muted); font-size:12px; font-weight:700; padding:8px 10px 4px;}
+
   
   .btn{
     display:inline-flex; align-items:center; gap:10px;
@@ -400,7 +438,16 @@
     min-height: 340px;
   }
   
-  .chart-card:hover {
+  .chart-card::before{
+    content:"";
+    position:absolute;
+    left:0; right:0; top:0;
+    height:4px;
+    background: var(--accent);
+    opacity:.75;
+  }
+
+.chart-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 20px 40px rgba(0,0,0,0.5);
   }
@@ -614,6 +661,7 @@
   }
   
   .patient-card {
+    position: relative;
     background: rgba(255,255,255,.03);
     border: 1px solid rgba(255,255,255,.08);
     border-radius: var(--r2);
@@ -622,7 +670,20 @@
     animation: fadeIn 0.5s ease-out;
   }
   
-  .patient-card:hover {
+  .patient-card::before{
+    content:"";
+    position:absolute;
+    left:0; top:0; bottom:0;
+    width:5px;
+    background: var(--accent);
+    opacity:.9;
+  }
+
+  .patient-card:hover::before{
+    filter: brightness(1.05);
+  }
+
+.patient-card:hover {
     transform: translateY(-3px);
     box-shadow: 0 10px 25px rgba(0,0,0,0.3);
     border-color: rgba(125,211,252,.15);
@@ -749,6 +810,9 @@
   
   .modal{
     width:min(920px, 95vw);
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
     background: rgba(15,19,24,.92);
     border:1px solid rgba(255,255,255,.10);
     border-radius: 22px;
@@ -764,7 +828,7 @@
   
   .modalHead h2{margin:0; font-size:18px}
   
-  .modalBody{padding:14px 16px}
+  .modalBody{padding:14px 16px; overflow:auto; max-height: calc(90vh - 120px);}
   
   .modalGrid{display:grid; grid-template-columns:1fr 1fr; gap:10px}
   .formSectionTitle{grid-column:1/-1; font-weight:800; margin-top:6px; color:var(--ink); letter-spacing:.2px}
@@ -979,6 +1043,106 @@
     }
   }
 </style>
+
+<style>
+/* Collapsible top menu */
+.top-nav.collapsed .nav-items {
+  display: none;
+}
+.top-nav .menu-toggle {
+  cursor: pointer;
+}
+
+/* Collapsible primary navigation (tabs) */
+.btn.navToggle{
+  padding:10px 12px;
+  border-radius: 14px;
+  background: rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.10);
+}
+.btn.navToggle svg{width:18px;height:18px}
+body.navCollapsed .tabs{
+  flex:0 !important;
+  width:0 !important;
+  max-width:0 !important;
+  opacity:0 !important;
+  pointer-events:none !important;
+  margin:0 !important;
+  padding:0 !important;
+}
+.tabs{
+  transition: max-width .22s ease, opacity .22s ease, transform .22s ease;
+  overflow:hidden;
+  max-width: 900px;
+}
+body.navCollapsed .tabs{transform: translateX(-8px);}
+body.navCollapsed .btn.navToggle .navToggleIcon{transform: rotate(180deg);}
+
+/* Patient cards grid: force two columns on desktop */
+@media (min-width: 980px){
+  .patient-summary-grid{
+    grid-template-columns: repeat(2, minmax(320px, 1fr));
+  }
+}
+
+/* Status progress bar for patient cards (Charts) */
+.statusProgress{
+  margin-top: 12px;
+}
+.statusProgress .labelRow{
+  display:flex;
+  align-items:center;
+  justify-content: center;
+  font-style: italic;
+  letter-spacing: .08em;
+  font-weight: 800;
+  color: #7dd3fc;
+  margin-bottom: 8px;
+}
+.statusProgress .bar{
+  height: 18px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.10);
+  overflow: hidden;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+}
+.statusProgress .fill{
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #000000 0%, #5a0f1a 55%, #d10f2f 100%);
+  transition: width 420ms ease;
+}
+
+</style>
+
+
+<style>
+.status-progress {
+  margin-top: 12px;
+}
+.status-label {
+  color: #4cc9f0;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.progress-track {
+  background: rgba(255,255,255,0.1);
+  border-radius: 10px;
+  height: 14px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 10px;
+}
+.progress-fill.treating {
+  width: 60%;
+  background: linear-gradient(90deg, #000000 0%, #5a0f1a 55%, #d10f2f 100%);
+}
+</style>
+
 </head>
 <body>
   <div class="topbar">
@@ -990,11 +1154,10 @@
           <div class="subtitle">Medical Department • Enhanced with Charts</div>
         </div>
       </div>
-
-      <div class="tabs" id="tabs"></div>
+<div class="tabs" id="tabs"></div>
 
       <div class="actionsBar">
-        <button class="btn floating" id="btnToggleAssistant" title="Toggle assistant">
+<button class="btn floating" id="btnToggleAssistant" title="Toggle assistant">
           <svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7v4a3 3 0 0 0 3 3h1v3l3-3h3a3 3 0 0 0 3-3V9a7 7 0 0 0-7-7zm-2 9h4v2h-4v-2zm0-4h4v2h-4V7z"/></svg>
           Assistant
         </button>
@@ -1232,6 +1395,20 @@
   const norm = (s)=> (s??"").toString().trim();
   const lower = (s)=> norm(s).toLowerCase();
   const escapeHtml = (s)=> norm(s).replace(/[&<>"']/g, c=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+
+function getStatusProgress(status){
+  const s = (status || "").toString().trim().toLowerCase();
+  // Map common pipeline statuses to a completion percentage
+  if(["new","intake","received"].includes(s)) return 20;
+  if(["sent","submitted","queued"].includes(s)) return 30;
+  if(["needs reply","needs response","pending","awaiting reply"].includes(s)) return 45;
+  if(["scheduled","schedule","appt scheduled"].includes(s)) return 55;
+  if(["treating","in treatment","treatment"].includes(s)) return 65;
+  if(["active"].includes(s)) return 70;
+  if(["completed","done","discharged","closed","finished"].includes(s)) return 100;
+  return 50;
+}
+
   const buildOptions = (list, selected) => list.map(v => `<option value="${escapeHtml(v)}" ${v===selected?"selected":""}>${escapeHtml(v)}</option>`).join("");
   const nowStamp = () => new Date().toLocaleString();
   const cryptoId = () => (crypto?.randomUUID?.() || ("id_"+Math.random().toString(16).slice(2)+Date.now()));
@@ -1760,6 +1937,18 @@
                 </div>
               </div>
               
+              
+              ${(() => {
+                const sp = getStatusProgress(p.status);
+                const label = (p.status || "Status").toString().toUpperCase();
+                return `
+                  <div class="statusProgress">
+                    <div class="labelRow">${escapeHtml(label)}</div>
+                    <div class="bar"><div class="fill" style="width:${sp}%"></div></div>
+                  </div>
+                `;
+              })()}
+
               <div class="patient-details">
                 <div class="patient-detail">
                   <div class="detail-label">Provider</div>
@@ -2166,6 +2355,7 @@
       render(); 
     }));
 
+
     // Home KPI pills
     $$("[data-action^='home_']").forEach(el => el.addEventListener("click", () => {
       if(el.dataset.action==="home_needs_reply"){ 
@@ -2453,23 +2643,23 @@
   function openQuickPatient(){
     openModal("Quick Log — Patient", `
       <div class="modalGrid">
-        <div class="formSectionTitle">Patient info / Información del paciente</div>
-        <input class="input" id="ql_matter" placeholder="Matter (ex: 107853) / Caso"/>
-        <input class="input" id="ql_patient" placeholder="Patient name / Nombre del paciente"/>
-        <input class="input" id="ql_state" placeholder="State (ex: OH) / Estado"/>
+        <div class="formSectionTitle">Patient info</div>
+        <input class="input" id="ql_matter" placeholder="Matter (e.g., 107853)"/>
+        <input class="input" id="ql_patient" placeholder="Patient name"/>
+        <input class="input" id="ql_state" placeholder="State (e.g., OH)"/>
         <select class="input" id="ql_type">${buildOptions(OPTIONS.patientTypes, "MRI")}</select>
 
-        <div class="formSectionTitle">Provider / Clínica</div>
-        <input class="input" id="ql_provider" placeholder="Provider name / Nombre de la clínica"/>
-        <input class="input" id="ql_providerEmail" placeholder="Provider email (optional) / Email (opcional)"/>
+        <div class="formSectionTitle">Provider</div>
+        <input class="input" id="ql_provider" placeholder="Provider name"/>
+        <input class="input" id="ql_providerEmail" placeholder="Provider email (optional)"/>
 
-        <div class="formSectionTitle">Dates / Fechas</div>
-        <input class="input" id="ql_req" placeholder="Requested date (YYYY-MM-DD) / Fecha solicitada"/>
+        <div class="formSectionTitle">Dates</div>
+        <input class="input" id="ql_req" placeholder="Requested date (YYYY-MM-DD)"/>
         <input class="input" id="ql_due" type="date" placeholder="Due date / Fecha de vencimiento" title="Due date (drives 'Overdue today' from Patients)"/>
-        <div class="formHelp">Tip: “Overdue today” se calcula SOLO desde Patients usando “Due date”.</div>
+        <div class="formHelp">Tip: "Overdue today" is calculated from Patients using "Due date".</div>
 
-        <div class="formSectionTitle">Status / Estado</div>
-        <input class="input" id="ql_sender" placeholder="Sender (Email/Web page/etc) / Origen"/>
+        <div class="formSectionTitle">Status</div>
+        <input class="input" id="ql_sender" placeholder="Sender (Email / Web page / etc.)"/>
         <select class="input" id="ql_status">${buildOptions(OPTIONS.patientStatus, "New")}</select>
         <select class="input" id="ql_waiting">${buildOptions(OPTIONS.waitingOn, "Clinic")}</select>
       </div>
@@ -2864,18 +3054,18 @@
     // HELP (EN/ES)
     if(msgS === "help" || msgS === "ayuda" || msgS === "?"){
       addAssistant("sys",
-`I can do (English / Español):
-• show overdue / mostrar vencidos
-• show needs reply / mostrar needs reply
-• show patients status <status> / mostrar pacientes estado <estado>
-• show patients waiting on <who> / mostrar pacientes esperando <quién>
-• open <matter> / abrir <matter>
-• update patient <matter> status=... waitingOn=... dueDate=YYYY-MM-DD (también en español: estado=..., esperando=..., vencimiento=...)
-• add patient / agregar paciente
-• add task / agregar tarea
-• export data / exportar
-• generate report / generar reporte
-• what's pending / qué tengo pendiente`
+`I can do:
+• show overdue
+• show needs reply
+• show patients status <status>
+• show patients waiting on <who>
+• open <matter>
+• update patient <matter> status=... waitingOn=... dueDate=YYYY-MM-DD
+• add patient
+• add task
+• export data
+• generate report
+• what's pending`
       );
       return;
     }
@@ -3181,7 +3371,7 @@
 
   // Initialize assistant
   if(state.assistant.chat.length === 0) {
-    addAssistant("sys", "Hello! I'm your medical command center assistant. I can help you manage patients, tasks, generate reports, and more. Try typing 'help' to see what I can do.");
+    addAssistant("sys", "Hello! I'm your medical command center assistant. I can help you manage patients, tasks, generate reports, and more. Type 'help' to see commands.");
   }
 
   // Initialize charts cache
@@ -3197,5 +3387,8 @@
   render();
 })();
 </script>
+
+
+
 </body>
 </html>
