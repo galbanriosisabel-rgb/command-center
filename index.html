@@ -1470,35 +1470,67 @@ body.navCollapsed .btn.navToggle .navToggleIcon{transform: rotate(180deg);}
   // -----------------------------
   const STORAGE_KEY = "medical_command_center_data";
   
-  // Helper function to format date as MM/DD/YYYY
+  // Date helpers (robust for MM/DD/YYYY, M/D/YYYY, DD/MM/YYYY, and YYYY-MM-DD)
+  function normalizeDateToISO(dateStr){
+    if(!dateStr) return '';
+    const s = String(dateStr).trim();
+    if(!s) return '';
+
+    // Already ISO (YYYY-MM-DD)
+    if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+
+    // Accept YYYY/MM/DD (rare)
+    if(/^\d{4}\/\d{1,2}\/\d{1,2}$/.test(s)){
+      const [y,m,d] = s.split('/').map(n=>String(n).padStart(2,'0'));
+      return `${y}-${m}-${d}`;
+    }
+
+    // Slash dates: MM/DD/YYYY OR DD/MM/YYYY
+    const parts = s.split('/').map(x=>x.trim());
+    if(parts.length===3){
+      const p0 = parseInt(parts[0],10);
+      const p1 = parseInt(parts[1],10);
+      const p2 = parseInt(parts[2],10);
+      if(Number.isFinite(p0) && Number.isFinite(p1) && Number.isFinite(p2)){
+        // Heuristic: if first part > 12 => DD/MM/YYYY
+        const isDMY = p0 > 12;
+        const mm = String(isDMY ? p1 : p0).padStart(2,'0');
+        const dd = String(isDMY ? p0 : p1).padStart(2,'0');
+        const yyyy = String(p2).padStart(4,'0');
+        return `${yyyy}-${mm}-${dd}`;
+      }
+    }
+
+    // Fallback: try Date parsing
+    const dt = new Date(s);
+    if(!isNaN(dt.getTime())) return dt.toISOString().slice(0,10);
+    return '';
+  }
+
+  // Helper function to format date inputs (YYYY-MM-DD) as MM/DD/YYYY
   function formatDate(dateStr) {
     if (!dateStr) return '';
-    try {
-      const parts = dateStr.split('-');
-      if (parts.length === 3) {
-        // If it's in YYYY-MM-DD format
-        return `${parts[1]}/${parts[2]}/${parts[0]}`;
-      }
-      // If it's already in MM/DD/YYYY format or other
-      return dateStr;
-    } catch (e) {
-      return dateStr;
+    const s = String(dateStr).trim();
+    if(!s) return '';
+
+    // If it's an input date (YYYY-MM-DD)
+    if(/^\d{4}-\d{2}-\d{2}$/.test(s)){
+      const [y,m,d] = s.split('-');
+      return `${m}/${d}/${y}`;
     }
+
+    // If it's already slash format, keep as-is
+    return s;
   }
-  
-  // Helper function to parse date from MM/DD/YYYY to YYYY-MM-DD for input fields
+
+  // Helper function to parse any stored date into YYYY-MM-DD for <input type="date">
   function parseDateForInput(dateStr) {
-    if (!dateStr) return '';
-    try {
-      const parts = dateStr.split('/');
-      if (parts.length === 3) {
-        // If it's in MM/DD/YYYY format
-        return `${parts[2]}-${parts[0].padStart(2, '0')}-${parts[1].padStart(2, '0')}`;
-      }
-      return dateStr;
-    } catch (e) {
-      return dateStr;
-    }
+    return normalizeDateToISO(dateStr);
+  }
+
+  function sameDayByRequestedDate(dateStr, isoToday){
+    const iso = normalizeDateToISO(dateStr);
+    return !!iso && iso === isoToday;
   }
 
   // Datos de pacientes REALES de la segunda imagen
@@ -1976,7 +2008,7 @@ function getStatusProgress(status){
   }
 
   function computeHome(){
-    const today = new Date().toISOString().slice(0,10);
+    const todayISO = new Date().toISOString().slice(0,10);
 
     const overdue = state.patients.filter(p =>
       p.dueDate && p.dueDate <= today && lower(p.status)!=="done"
@@ -1993,7 +2025,7 @@ function getStatusProgress(status){
 
     function renderHome(){
     const { overdue, needsReply, newToday, waitingClinic } = computeHome();
-    const today = new Date().toISOString().slice(0,10);
+    const todayISO = new Date().toISOString().slice(0,10);
     const homeFilter = state.ui.homeFilter || "all";
 
     const priorityPatients = state.patients
@@ -2450,7 +2482,7 @@ function filteredPatients(){
     const status = state.ui.patientStatus;
     const waiting = state.ui.patientWaiting;
     const overdueOnly = !!state.ui.patientOverdueOnly;
-    const today = new Date().toISOString().slice(0,10);
+    const todayISO = new Date().toISOString().slice(0,10);
 
     let filtered = state.patients
       .filter(p => {
@@ -2460,7 +2492,7 @@ function filteredPatients(){
         if(waiting && waiting!=="all" && norm(p.waitingOn)!==waiting) return false;
         if(overdueOnly){
           if(!p.dueDate) return false;
-          if(p.dueDate > today) return false;
+          if(normalizeDateToISO(p.dueDate) > todayISO) return false;
           if(lower(p.status)==="done") return false;
         }
         return true;
@@ -2468,14 +2500,14 @@ function filteredPatients(){
 
     if (state.ui.patientSort === "requested") {
       filtered.sort((a, b) => {
-        const aDate = a.requestedDate ? new Date(parseDateForInput(a.requestedDate)) : new Date(0);
-        const bDate = b.requestedDate ? new Date(parseDateForInput(b.requestedDate)) : new Date(0);
+        const aDate = a.requestedDate ? new Date(normalizeDateToISO(a.requestedDate) || 0) : new Date(0);
+        const bDate = b.requestedDate ? new Date(normalizeDateToISO(b.requestedDate) || 0) : new Date(0);
         return bDate - aDate;
       });
     } else if (state.ui.patientSort === "due") {
       filtered.sort((a, b) => {
-        const aDate = a.dueDate ? new Date(parseDateForInput(a.dueDate)) : new Date(9999, 11, 31);
-        const bDate = b.dueDate ? new Date(parseDateForInput(b.dueDate)) : new Date(9999, 11, 31);
+        const aDate = a.dueDate ? new Date(normalizeDateToISO(a.dueDate) || '9999-12-31') : new Date('9999-12-31');
+        const bDate = b.dueDate ? new Date(normalizeDateToISO(b.dueDate) || '9999-12-31') : new Date('9999-12-31');
         return aDate - bDate;
       });
     } else if (state.ui.patientSort === "patient") {
@@ -2598,8 +2630,8 @@ function filteredPatients(){
 
     if(state.ui.tasksSort==="due"){
       list = list.slice().sort((a,b)=> {
-        const aDate = a.dueDate ? new Date(parseDateForInput(a.dueDate)) : new Date(9999, 11, 31);
-        const bDate = b.dueDate ? new Date(parseDateForInput(b.dueDate)) : new Date(9999, 11, 31);
+        const aDate = a.dueDate ? new Date(normalizeDateToISO(a.dueDate) || '9999-12-31') : new Date('9999-12-31');
+        const bDate = b.dueDate ? new Date(normalizeDateToISO(b.dueDate) || '9999-12-31') : new Date('9999-12-31');
         return aDate - bDate;
       });
     } else if(state.ui.tasksSort==="priority"){
@@ -2963,7 +2995,43 @@ function filteredPatients(){
     `;
   }
 
-  function renderChartVisualizations() {
+  
+  function applyChartPatientFilter(field, value){
+    if(!value) return;
+
+    // Route user to Patients and apply filters
+    state.ui.tab = "Patients";
+    state.ui.patientView = "All";
+    state.ui.patientOverdueOnly = false;
+
+    if(field === 'status'){
+      state.ui.patientStatus = value;
+      state.ui.patientWaiting = 'all';
+      state.ui.patientSearch = '';
+      toast('Filter applied', `Patients filtered by Status: ${value}`);
+    } else if(field === 'waiting'){
+      state.ui.patientWaiting = value;
+      state.ui.patientStatus = 'all';
+      state.ui.patientSearch = '';
+      toast('Filter applied', `Patients filtered by Waiting: ${value}`);
+    } else {
+      // type/provider/channel
+      state.ui.patientSearch = value;
+      state.ui.patientStatus = 'all';
+      state.ui.patientWaiting = 'all';
+      toast('Filter applied', `Patients filtered by: ${value}`);
+    }
+
+    render();
+  }
+
+  function chartLabelFromClick(chart, evt){
+    const points = chart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
+    if(!points || !points.length) return null;
+    const idx = points[0].index;
+    return chart.data?.labels?.[idx] ?? null;
+  }
+function renderChartVisualizations() {
     const chartData = calculateChartData();
     const colors = ["#d10f2f", "#7dd3fc", "#22c55e", "#f59e0b", "#a855f7", "#3b82f6", "#ef4444", "#8b5cf6"];
     
@@ -3016,6 +3084,7 @@ function filteredPatients(){
           },
           options: {
             ...commonOptions,
+            onClick: (evt, els, chart) => { const label = chartLabelFromClick(chart, evt); if(label) applyChartPatientFilter('status', label); },
             cutout: '65%',
             animation: {
               animateScale: true,
@@ -3044,6 +3113,7 @@ function filteredPatients(){
           },
           options: {
             ...commonOptions,
+            onClick: (evt, els, chart) => { const label = chartLabelFromClick(chart, evt); if(label) applyChartPatientFilter('waiting', label); },
             scales: {
               y: {
                 beginAtZero: true,
@@ -3095,6 +3165,7 @@ function filteredPatients(){
           },
           options: {
             ...commonOptions,
+            onClick: (evt, els, chart) => { const label = chartLabelFromClick(chart, evt); if(label) applyChartPatientFilter('type', label); },
             animation: {
               animateScale: true,
               animateRotate: true
@@ -3122,6 +3193,7 @@ function filteredPatients(){
           },
           options: {
             ...commonOptions,
+            onClick: (evt, els, chart) => { const label = chartLabelFromClick(chart, evt); if(label) applyChartPatientFilter('provider', label); },
             indexAxis: 'y',
             scales: {
               x: {
@@ -3174,6 +3246,7 @@ function filteredPatients(){
           },
           options: {
             ...commonOptions,
+            onClick: (evt, els, chart) => { const label = chartLabelFromClick(chart, evt); if(label) applyChartPatientFilter('channel', label); },
             cutout: '60%',
             animation: {
               animateScale: true,
@@ -3708,7 +3781,7 @@ function filteredPatients(){
       }
       if(action==="home_action"){
         const kind = actEl.dataset.kind || "";
-        const today = new Date().toISOString().slice(0,10);
+        const todayISO = new Date().toISOString().slice(0,10);
 
         if(kind==="send_reply"){
           const targets = state.patients
@@ -4136,9 +4209,8 @@ function filteredPatients(){
       day: '2-digit' 
     }).replace(/(\d+)\/(\d+)\/(\d+)/, '$1/$2/$3');
     
-    const newPatientsToday = state.patients.filter(p => 
-      p.requestedDate === todayFormatted
-    ).length;
+    const isoToday = new Date().toISOString().slice(0,10);
+    const newPatientsToday = state.patients.filter(p => sameDayByRequestedDate(p.requestedDate, isoToday)).length;
 
     const lines = [];
     lines.push(`4pm Report — ${nowStamp()}`);
@@ -4296,7 +4368,7 @@ function filteredPatients(){
     const raw = norm(input);
     const msg = lower(raw);
 
-    const today = new Date().toISOString().slice(0,10);
+    const todayISO = new Date().toISOString().slice(0,10);
 
     const STATUS = OPTIONS.patientStatus;
     const WAITING = OPTIONS.waitingOn;
