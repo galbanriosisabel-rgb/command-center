@@ -417,11 +417,11 @@
   
   .badge strong{color:var(--text)}
   
-  /* Chart Section Styles - MODIFICADO: gráficos más pequeños */
+  /* Chart Section Styles */
   .charts-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Reducido de 350px */
-    gap: 15px; /* Reducido de 20px */
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 20px;
     margin-top: 20px;
   }
   
@@ -429,13 +429,13 @@
     background: var(--chart-bg);
     border: 1px solid rgba(255,255,255,.08);
     border-radius: var(--r);
-    padding: 15px; /* Reducido de 18px */
+    padding: 18px;
     box-shadow: var(--shadow);
     transition: var(--transition);
     display: flex;
     flex-direction: column;
     height: 100%;
-    min-height: 280px; /* Reducido de 340px */
+    min-height: 340px;
   }
   
   .chart-card::before{
@@ -453,13 +453,13 @@
   }
   
   .chart-card h3 {
-    display: block;
+    display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 12px; /* Reducido de 16px */
+    margin-bottom: 16px;
     color: var(--text);
-    min-height: 35px; /* Reducido de 40px */
-    font-size: 15px; /* Reducido de 16px */
+    min-height: 40px;
+    font-size: 16px;
     padding-bottom: 8px;
     border-bottom: 1px solid rgba(255,255,255,.05);
   }
@@ -472,11 +472,11 @@
     flex-grow: 1;
     color: var(--muted);
     text-align: center;
-    padding: 20px 15px; /* Reducido */
+    padding: 30px 20px;
     border-radius: 12px;
     background: rgba(0,0,0,.08);
     border: 1px dashed rgba(255,255,255,.08);
-    margin-top: 8px; /* Reducido de 10px */
+    margin-top: 10px;
   }
   
   /* Contenedor del gráfico */
@@ -488,11 +488,11 @@
     background: transparent !important;
   }
   
-  /* Canvas del gráfico - MODIFICADO: más pequeño */
+  /* Canvas del gráfico */
   .chart-canvas {
     width: 100% !important;
-    height: 160px !important; /* Reducido de 220px */
-    max-height: 160px !important; /* Reducido de 220px */
+    height: 220px !important;
+    max-height: 220px !important;
     background: transparent !important;
   }
   
@@ -500,12 +500,12 @@
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
-    margin-top: 10px; /* Reducido de 12px */
-    padding: 6px; /* Reducido de 8px */
+    margin-top: 12px;
+    padding: 8px;
     background: rgba(0,0,0,.1);
     border-radius: 8px;
-    font-size: 10px; /* Reducido de 11px */
-    max-height: 70px; /* Reducido de 80px */
+    font-size: 11px;
+    max-height: 80px;
     overflow-y: auto;
   }
   
@@ -513,7 +513,7 @@
     display: flex;
     align-items: center;
     gap: 5px;
-    padding: 3px 5px; /* Reducido */
+    padding: 4px 6px;
     background: rgba(255,255,255,.03);
     border-radius: 6px;
     cursor: pointer;
@@ -527,8 +527,8 @@
   }
   
   .legend-color {
-    width: 8px; /* Reducido de 10px */
-    height: 8px; /* Reducido de 10px */
+    width: 10px;
+    height: 10px;
     border-radius: 2px;
     flex-shrink: 0;
   }
@@ -564,7 +564,7 @@
     font-weight: 700;
   }
   
-  /* Insights Section */
+  /* Insights Section - REVISADO: eliminado el fondo negro */
   .insights-section {
     margin-top: 20px;
     margin-bottom: 20px;
@@ -643,7 +643,7 @@
     font-family: var(--sans);
   }
   
-  /* Patient Summary Card */
+  /* Patient Summary Card - MEJORADO para mostrar resumen en lugar de tabla */
   .patient-summary-card {
     margin-top: 20px;
   }
@@ -831,7 +831,7 @@
   .modalBody{padding:14px 16px; overflow:auto; max-height: calc(90vh - 120px);}
   
   .modalGrid{display:grid; grid-template-columns:1fr 1fr; gap:10px}
-  .formSectionTitle{grid-column:1/-1; font-weight:800; margin-top:6px; color:var(--text); letter-spacing:.2px}
+  .formSectionTitle{grid-column:1/-1; font-weight:800; margin-top:6px; color:var(--ink); letter-spacing:.2px}
   .formHelp{grid-column:1/-1; font-size:12px; color:var(--muted); margin-top:-4px}
 
   
@@ -877,7 +877,7 @@
   .toast .t{font-weight:800}
   .toast .m{color:var(--muted); font-size:13px; margin-top:4px}
   
-  /* Assistant - MODIFICADO: botón para minimizar */
+  /* Assistant */
   .assistant{
     position:fixed; right:16px; bottom:16px;
     width:min(420px, 92vw);
@@ -892,38 +892,15 @@
     animation: slideIn 0.5s ease-out;
   }
   
-  .assistant.minimized {
-    height: auto;
-    max-height: 54px;
-    width: min(280px, 92vw);
-  }
-
-  /* When minimized: show only title, keep it readable */
-  .assistant.minimized .assistantBody,
-  .assistant.minimized .assistantFoot {
-    display: none;
-  }
-
-  .assistant.minimized .pending { display: none; }
-
   .assistantHead{
     display:flex; align-items:center; justify-content:space-between; 
     padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.08);
     background: rgba(20,26,34,0.8);
-  
-    gap: 10px;
-}
+  }
   
   .assistantHead .name{
     display:flex; align-items:center; gap:10px; font-weight:900;
-    cursor: pointer;
-  
-    flex: 1;
-    min-width: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
+  }
   
   .assistantHead .pending{
     color:var(--muted); font-size:13px;
@@ -1037,126 +1014,6 @@
     animation: float 3s ease-in-out infinite;
   }
   
-  /* Home Section Improvements */
-  .home-table-container {
-    margin-top: 20px;
-    margin-bottom: 20px;
-  }
-  
-  .resizable-table-container {
-    border: 1px solid rgba(255,255,255,.08);
-    border-radius: var(--r2);
-    overflow: hidden;
-    background: rgba(255,255,255,.03);
-    margin-bottom: 20px;
-  }
-  
-  .resizable-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 16px;
-    background: rgba(20,26,34,0.8);
-    border-bottom: 1px solid rgba(255,255,255,.08);
-    cursor: move;
-  }
-  
-  .resizable-header:hover {
-    background: rgba(20,26,34,0.9);
-  }
-  
-  .resizable-content {
-    max-height: 400px;
-    overflow-y: auto;
-    transition: max-height 0.3s ease;
-  }
-  
-  .resizable-content.collapsed {
-    max-height: 0;
-    overflow: hidden;
-  }
-  
-  .resize-toggle {
-    background: transparent;
-    border: none;
-    color: var(--muted);
-    cursor: pointer;
-    padding: 4px 8px;
-    border-radius: 6px;
-    transition: var(--transition);
-  }
-  
-  .resize-toggle:hover {
-    background: rgba(255,255,255,.05);
-    color: var(--text);
-  }
-  
-  /* Patients table improvements */
-  .patients-table-container {
-    overflow-x: auto;
-    margin-top: 20px;
-  }
-  
-  .patients-table {
-    min-width: 1200px;
-  }
-  
-  .patients-table th {
-    background: rgba(20,26,34,0.8);
-    position: sticky;
-    top: 0;
-    z-index: 10;
-  }
-  
-  .patients-table td {
-    padding: 12px 10px;
-  }
-
-  /* Patients table column widths */
-  /* With bulk checkbox enabled, Status is the 10th column */
-  .patients-table th:nth-child(10),
-  .patients-table td:nth-child(10){
-    min-width: 170px;
-  }
-  .patients-table td:nth-child(10) .cellSelect{
-    min-width: 160px;
-  }
-
-  
-  /* Tasks table improvements */
-  .tasks-table-container {
-    overflow-x: auto;
-    margin-top: 20px;
-  }
-  
-  .tasks-table {
-    min-width: 800px;
-  }
-  
-  .tasks-table th {
-    background: rgba(20,26,34,0.8);
-    position: sticky;
-    top: 0;
-    z-index: 10;
-  }
-  
-  .tasks-table td {
-    padding: 12px 10px;
-  }
-  
-  /* Home search boxes */
-  .home-search-container {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
-    flex-wrap: wrap;
-  }
-  
-  .home-search-box {
-    flex: 1;
-    min-width: 300px;
-  }
-  
   @media (max-width: 980px){
     .grid2{grid-template-columns: 1fr}
     .kpis{grid-template-columns: repeat(2, minmax(0,1fr))}
@@ -1176,19 +1033,13 @@
       align-items: flex-start;
     }
     .chart-card {
-      min-height: 280px;
+      min-height: 320px;
     }
     .chart-canvas {
-      height: 160px !important;
+      height: 200px !important;
     }
     .patient-summary-grid {
       grid-template-columns: 1fr;
-    }
-    .home-search-box {
-      min-width: 100%;
-    }
-    .patients-table, .tasks-table {
-      min-width: 100%;
     }
   }
 </style>
@@ -1300,6 +1151,26 @@ body.navCollapsed .btn.navToggle .navToggleIcon{transform: rotate(180deg);}
 }
 
 
+/* Scrollable table containers (Home + lists) */
+.tableScroll{
+  max-height: 340px;
+  overflow-y: auto;
+  overflow-x: auto;
+  border-radius: 14px;
+}
+.homeSearchRow{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+  margin: 10px 0 12px;
+}
+.homeSearchRow .input{ min-width: 280px; }
+
+/* Roomier data tables */
+.tableRoomy th, .tableRoomy td{ padding: 12px 12px; }
+
+
 /* ===================== HOME PRIORITY + FOCUS (v17) ===================== */
 .home-stack{ display:flex; flex-direction:column; gap:14px; }
 .actionPills{ display:flex; flex-wrap:wrap; gap:10px; margin: 10px 0 14px; align-items:center; }
@@ -1372,7 +1243,7 @@ body.navCollapsed .btn.navToggle .navToggleIcon{transform: rotate(180deg);}
           Assistant
         </button>
         <button class="btn" id="btnDownload" title="Download CSV">
-          <svg viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zM12 2v12l4-4 1.4 1.4L12 18l5.4-5.6L16 10l-4 4V2h0z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zM12 2v12l4-4 1.4 1.4L12 18l-5.4-5.6L8 10l4 4V2h0z"/></svg>
           Export Data
         </button>
         <button class="btn primary" id="btnGenerate" title="Generate 4pm draft">
@@ -1421,12 +1292,11 @@ body.navCollapsed .btn.navToggle .navToggleIcon{transform: rotate(180deg);}
     </div>
   </div>
 
-  <!-- Assistant - MODIFICADO: con botón para minimizar -->
+  <!-- Assistant -->
   <div class="assistant" id="assistant">
     <div class="assistantHead">
       <div class="name"><span class="dot" style="width:10px;height:10px;box-shadow:none"></span> Isabel's Assistant</div>
       <div class="pending"><span id="pendingCount">0</span> pending</div>
-      <button class="ghostBtn" id="btnMinimizeAssistant" style="padding: 4px 8px; font-size: 12px;">−</button>
     </div>
     <div class="assistantBody" id="assistantBody">
       <!-- Command suggestions will be inserted here -->
@@ -1453,16 +1323,16 @@ body.navCollapsed .btn.navToggle .navToggleIcon{transform: rotate(180deg);}
   const ICON_INSIGHTS = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>`;
 
   // -----------------------------
-  // Options (Dropdowns) - MODIFICADO: nombres corregidos
+  // Options (Dropdowns)
   // -----------------------------
   const OPTIONS = {
     patientTypes: ["MRI","PT","Chiro/PT","Chiro","Ortho","Neuro","Pain Mgmt","Other"],
-    patientStatus: ["New","Sent to clinic","Stuck","Needs reply","Done"], // ESTO ES EL STATUS (CORREGIDO)
-    patientChannel: ["Email","Web Page","Phone","Referral","Other"], // ESTO ES EL CHANNEL (CORREGIDO)
-    waitingOn: ["Clinic","You","Attorney","Client","Records","Scheduling","Transportation","Other"], // ESTO ES EL WAITING ON (CORREGIDO)
+    patientStatus: ["New","Sent to clinic","Stuck","Needs reply","Done"],
+    waitingOn: ["Clinic","You","Attorney","Client","Records","Scheduling","Transportation","Other"],
     taskType: ["Follow-up clinic","Reply email","Update Clio","Send referral","Other"],
     taskPriority: ["High","Medium","Low"],
-    taskProgress: ["Open","Done","Updated"]
+    taskProgress: ["Open","Done","Updated"],
+    channel: ["Email","Web Page","Phone","Text","Other"]
   };
 
   // -----------------------------
@@ -1470,69 +1340,6 @@ body.navCollapsed .btn.navToggle .navToggleIcon{transform: rotate(180deg);}
   // -----------------------------
   const STORAGE_KEY = "medical_command_center_data";
   
-  // Date helpers (robust for MM/DD/YYYY, M/D/YYYY, DD/MM/YYYY, and YYYY-MM-DD)
-  function normalizeDateToISO(dateStr){
-    if(!dateStr) return '';
-    const s = String(dateStr).trim();
-    if(!s) return '';
-
-    // Already ISO (YYYY-MM-DD)
-    if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
-
-    // Accept YYYY/MM/DD (rare)
-    if(/^\d{4}\/\d{1,2}\/\d{1,2}$/.test(s)){
-      const [y,m,d] = s.split('/').map(n=>String(n).padStart(2,'0'));
-      return `${y}-${m}-${d}`;
-    }
-
-    // Slash dates: MM/DD/YYYY OR DD/MM/YYYY
-    const parts = s.split('/').map(x=>x.trim());
-    if(parts.length===3){
-      const p0 = parseInt(parts[0],10);
-      const p1 = parseInt(parts[1],10);
-      const p2 = parseInt(parts[2],10);
-      if(Number.isFinite(p0) && Number.isFinite(p1) && Number.isFinite(p2)){
-        // Heuristic: if first part > 12 => DD/MM/YYYY
-        const isDMY = p0 > 12;
-        const mm = String(isDMY ? p1 : p0).padStart(2,'0');
-        const dd = String(isDMY ? p0 : p1).padStart(2,'0');
-        const yyyy = String(p2).padStart(4,'0');
-        return `${yyyy}-${mm}-${dd}`;
-      }
-    }
-
-    // Fallback: try Date parsing
-    const dt = new Date(s);
-    if(!isNaN(dt.getTime())) return dt.toISOString().slice(0,10);
-    return '';
-  }
-
-  // Helper function to format date inputs (YYYY-MM-DD) as MM/DD/YYYY
-  function formatDate(dateStr) {
-    if (!dateStr) return '';
-    const s = String(dateStr).trim();
-    if(!s) return '';
-
-    // If it's an input date (YYYY-MM-DD)
-    if(/^\d{4}-\d{2}-\d{2}$/.test(s)){
-      const [y,m,d] = s.split('-');
-      return `${m}/${d}/${y}`;
-    }
-
-    // If it's already slash format, keep as-is
-    return s;
-  }
-
-  // Helper function to parse any stored date into YYYY-MM-DD for <input type="date">
-  function parseDateForInput(dateStr) {
-    return normalizeDateToISO(dateStr);
-  }
-
-  function sameDayByRequestedDate(dateStr, isoToday){
-    const iso = normalizeDateToISO(dateStr);
-    return !!iso && iso === isoToday;
-  }
-
   // Datos de pacientes REALES de la segunda imagen
   const getInitialPatients = () => [
     {
@@ -1542,11 +1349,11 @@ body.navCollapsed .btn.navToggle .navToggleIcon{transform: rotate(180deg);}
       type: "Other",
       provider: "IRX",
       providerEmail: "",
-      requestedDate: "12/29/2025",
+      requestedDate: "2025-12-29",
       dueDate: "",
-      channel: "Email", // CORREGIDO: Esto es el CHANNEL
-      status: "Sent to clinic", // CORREGIDO: Esto es el STATUS
-      waitingOn: "You", // CORREGIDO: Esto es el WAITING ON
+      sender: "Email",
+      status: "Sent to clinic",
+      waitingOn: "You",
       notes: "1st pain",
       createdAt: new Date("2025-12-29").toISOString()
     },
@@ -1557,11 +1364,11 @@ body.navCollapsed .btn.navToggle .navToggleIcon{transform: rotate(180deg);}
       type: "Ortho",
       provider: "GIC",
       providerEmail: "",
-      requestedDate: "12/29/2025",
+      requestedDate: "2025-12-29",
       dueDate: "",
-      channel: "Email", // CORREGIDO: Esto es el CHANNEL
-      status: "Sent to clinic", // CORREGIDO: Esto es el STATUS
-      waitingOn: "You", // CORREGIDO: Esto es el WAITING ON
+      sender: "Email",
+      status: "Sent to clinic",
+      waitingOn: "You",
       notes: "GIC",
       createdAt: new Date("2025-12-29").toISOString()
     },
@@ -1572,11 +1379,11 @@ body.navCollapsed .btn.navToggle .navToggleIcon{transform: rotate(180deg);}
       type: "MRI",
       provider: "NSM",
       providerEmail: "",
-      requestedDate: "12/29/2025",
+      requestedDate: "2025-12-29",
       dueDate: "",
-      channel: "Email", // CORREGIDO: Esto es el CHANNEL
-      status: "Sent to clinic", // CORREGIDO: Esto es el STATUS
-      waitingOn: "You", // CORREGIDO: Esto es el WAITING ON
+      sender: "Email",
+      status: "Sent to clinic",
+      waitingOn: "You",
       notes: "Check if he was sent for an MRI or if I need to redirect him.",
       createdAt: new Date("2025-12-29").toISOString()
     },
@@ -1587,11 +1394,11 @@ body.navCollapsed .btn.navToggle .navToggleIcon{transform: rotate(180deg);}
       type: "Other",
       provider: "IRX",
       providerEmail: "",
-      requestedDate: "12/29/2025",
+      requestedDate: "2025-12-29",
       dueDate: "",
-      channel: "Email", // CORREGIDO: Esto es el CHANNEL
-      status: "Sent to clinic", // CORREGIDO: Esto es el STATUS
-      waitingOn: "You", // CORREGIDO: Esto es el WAITING ON
+      sender: "Email",
+      status: "Sent to clinic",
+      waitingOn: "You",
       notes: "1st Pain Verify if the process was done",
       createdAt: new Date("2025-12-29").toISOString()
     },
@@ -1602,11 +1409,11 @@ body.navCollapsed .btn.navToggle .navToggleIcon{transform: rotate(180deg);}
       type: "MRI",
       provider: "MoveDocs",
       providerEmail: "",
-      requestedDate: "12/29/2025",
+      requestedDate: "2025-12-29",
       dueDate: "",
-      channel: "Web Page", // CORREGIDO: Esto es el CHANNEL
-      status: "Sent to clinic", // CORREGIDO: Esto es el STATUS
-      waitingOn: "You", // CORREGIDO: Esto es el WAITING ON
+      sender: "Web Page",
+      status: "Sent to clinic",
+      waitingOn: "You",
       notes: "Cardinal Points Imaging of the Carolinas - Midtown (OIA)",
       createdAt: new Date("2025-12-29").toISOString()
     },
@@ -1617,11 +1424,11 @@ body.navCollapsed .btn.navToggle .navToggleIcon{transform: rotate(180deg);}
       type: "Chiro",
       provider: "MoveDocs",
       providerEmail: "",
-      requestedDate: "12/29/2025",
+      requestedDate: "2025-12-29",
       dueDate: "",
-      channel: "Web Page", // CORREGIDO: Esto es el CHANNEL
-      status: "Sent to clinic", // CORREGIDO: Esto es el STATUS
-      waitingOn: "You", // CORREGIDO: Esto es el WAITING ON
+      sender: "Web Page",
+      status: "Sent to clinic",
+      waitingOn: "You",
       notes: "Athletics PT - Wright State Client speaks haitian creole",
       createdAt: new Date("2025-12-29").toISOString()
     }
@@ -1636,35 +1443,37 @@ body.navCollapsed .btn.navToggle .navToggleIcon{transform: rotate(180deg);}
       progress: "Open",
       dueDate: "",
       description: "Follow up with NSM about MRI scheduling for Bobby Thompson",
-      createdAt: new Date(Date.now() - 2*24*60*60*1000).toISOString()
+      createdAt: new Date(Date.now() - 2*24*60*60*1000).toISOString(),
+      requestedDate: new Date().toISOString().slice(0,10)
     }
   ];
 
   const defaultState = () => ({
     ui: { 
       tab:"Home",
-      homeFilter:"all", 
+      homeFilter:"all",
+      homeSearch:"", 
       patientSearch:"", 
       patientStatus:"all", 
       patientWaiting:"all",
       patientView:"My Queue",
       patientOverdueOnly:false,
-      patientSort:"requested",
+      patientSort:"requested_desc",
       selectedPatients:[],
       selectedTasks:[],
       taskSearch:"", 
       tasksShowDone:false,
       tasksSort:"created",
+      tasksRequestedSort:"requested_desc",
       reportEditingId:null,
       chartSearch: "",
-      insightDate: new Date().toISOString().split('T')[0]
+      insightDate: new Date().toISOString().split('T')[0] // Fecha actual por defecto
     },
     patients: getInitialPatients(),
     tasks: getInitialTasks(),
     reports: [],
-    assistant: { open:false, minimized: false, chat:[], lastMatter:null, pending:0 }, // MODIFICADO: añadido minimized
-    charts: {},
-    draggableTables: {}
+    assistant: { open:false, chat:[], lastMatter:null, pending:0 },
+    charts: {} // Cache for chart instances
   });
 
   let state = loadState();
@@ -1678,6 +1487,32 @@ body.navCollapsed .btn.navToggle .navToggleIcon{transform: rotate(180deg);}
   const lower = (s)=> norm(s).toLowerCase();
   const escapeHtml = (s)=> norm(s).replace(/[&<>"']/g, c=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
 
+  // Dates: store as ISO (YYYY-MM-DD) but DISPLAY as MM/DD/YYYY (site-wide)
+  const formatDateMDY = (iso) => {
+    const v = (iso || "").toString().trim();
+    if(!v) return "";
+    // Accept YYYY-MM-DD or any Date-parsable string
+    let d;
+    if(/^\d{4}-\d{2}-\d{2}$/.test(v)){
+      d = new Date(v + "T00:00:00");
+    } else {
+      d = new Date(v);
+    }
+    if(Number.isNaN(d.getTime())) return v;
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const dd = String(d.getDate()).padStart(2,'0');
+    const yyyy = String(d.getFullYear());
+    return `${mm}/${dd}/${yyyy}`;
+  };
+
+  const formatDateTimeMDY = (iso) => {
+    const d = iso ? new Date(iso) : new Date();
+    if(Number.isNaN(d.getTime())) return String(iso||"");
+    const date = formatDateMDY(d.toISOString().slice(0,10));
+    const time = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    return `${date} ${time}`;
+  };
+
 
   // -----------------------------
   // Home: priority + focus helpers
@@ -1686,7 +1521,7 @@ body.navCollapsed .btn.navToggle .navToggleIcon{transform: rotate(180deg);}
     if(!due) return "";
     if(due < today) return `<span class="homeDueChip overdue">Overdue</span>`;
     if(due === today) return `<span class="homeDueChip today">Due today</span>`;
-    return `<span class="homeDueChip upcoming">Due ${escapeHtml(due)}</span>`;
+    return `<span class="homeDueChip upcoming">Due ${escapeHtml(formatDateMDY(due))}</span>`;
   };
 
   const patientPriorityScore = (p, today) => {
@@ -1744,6 +1579,21 @@ body.navCollapsed .btn.navToggle .navToggleIcon{transform: rotate(180deg);}
     return true;
   };
 
+
+  const matchesHomeSearchPatient = (p) => {
+    const q = lower(state.ui.homeSearch || "");
+    if(!q) return true;
+    const hay = lower([p.matter, p.patient].join(" "));
+    return hay.includes(q);
+  };
+
+  const matchesHomeSearchTask = (t) => {
+    const q = lower(state.ui.homeSearch || "");
+    if(!q) return true;
+    const hay = lower([t.matter, t.description, t.taskType].join(" "));
+    return hay.includes(q);
+  };
+
   const matchesHomeFilterTask = (t, today, f) => {
     f = (f||"all").toLowerCase();
     const prog = lower(t.progress);
@@ -1758,6 +1608,7 @@ body.navCollapsed .btn.navToggle .navToggleIcon{transform: rotate(180deg);}
 
 function getStatusProgress(status){
   const s = (status || "").toString().trim().toLowerCase();
+  // Map common pipeline statuses to a completion percentage
   if(["new","intake","received"].includes(s)) return 20;
   if(["sent","submitted","queued"].includes(s)) return 30;
   if(["needs reply","needs response","pending","awaiting reply"].includes(s)) return 45;
@@ -1769,7 +1620,7 @@ function getStatusProgress(status){
 }
 
   const buildOptions = (list, selected) => list.map(v => `<option value="${escapeHtml(v)}" ${v===selected?"selected":""}>${escapeHtml(v)}</option>`).join("");
-  const nowStamp = () => new Date().toLocaleString();
+  const nowStamp = () => formatDateTimeMDY(new Date().toISOString());
   const cryptoId = () => (crypto?.randomUUID?.() || ("id_"+Math.random().toString(16).slice(2)+Date.now()));
   
   function toast(title, msg){
@@ -1784,13 +1635,13 @@ function getStatusProgress(status){
 
   function saveState(){
     try { 
+      // Guardar TODO el estado correctamente
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
         ui: state.ui,
         patients: state.patients,
         tasks: state.tasks,
         reports: state.reports,
-        assistant: state.assistant,
-        draggableTables: state.draggableTables
+        assistant: state.assistant
       })); 
     } catch(e) { 
       console.warn("Error saving state:", e); 
@@ -1803,6 +1654,7 @@ function getStatusProgress(status){
       const raw = localStorage.getItem(STORAGE_KEY);
       if(!raw) return defaultState();
       const parsed = JSON.parse(raw);
+      // merge for forward compatibility
       const loadedState = {
         ...defaultState(),
         ...parsed,
@@ -1810,11 +1662,12 @@ function getStatusProgress(status){
         patients: parsed.patients || defaultState().patients,
         tasks: parsed.tasks || defaultState().tasks,
         reports: parsed.reports || defaultState().reports,
-        assistant: { ...defaultState().assistant, ...(parsed.assistant || {}) },
-        draggableTables: parsed.draggableTables || {}
+        assistant: { ...defaultState().assistant, ...(parsed.assistant || {}) }
       };
       
+      // Asegurar que los gráficos existan
       loadedState.charts = {};
+      
       loadedState.ui.selectedPatients = loadedState.ui.selectedPatients || [];
       loadedState.ui.selectedTasks = loadedState.ui.selectedTasks || [];
       return loadedState;
@@ -1838,18 +1691,7 @@ function getStatusProgress(status){
     modalBody.innerHTML = html;
     modalHint.textContent = hint || "";
     modalOnSave = onSave || null;
-    // If there's no onSave handler, this is an info-only modal.
-    // Hide the Save button to avoid confusing the user.
-    const saveBtn = $("#modalSave");
-    if(saveBtn){
-      saveBtn.style.display = modalOnSave ? "inline-flex" : "none";
-    }
     backdrop.style.display="flex";
-    
-    // Minimizar el asistente si está abierto
-    if (state.assistant.open && !state.assistant.minimized) {
-      toggleAssistantMinimize();
-    }
     
     setTimeout(() => {
       const firstInput = modalBody.querySelector('input, select, textarea');
@@ -1871,72 +1713,7 @@ function getStatusProgress(status){
   });
 
   // -----------------------------
-  // Patient Peek ("hablador")
-  // -----------------------------
-  function openPatientPeek(matter){
-    const p = state.patients.find(x => (x.matter||"") === (matter||""));
-    if(!p){
-      toast("Not found", `No patient found for Matter ${matter||""}`);
-      return;
-    }
-
-    const status = escapeHtml(p.status||"-");
-    const waiting = escapeHtml(p.waitingOn||"-");
-    const channel = escapeHtml(p.channel||"-");
-    const provider = escapeHtml(p.provider||"-");
-    const providerEmail = escapeHtml(p.providerEmail||"-");
-    const requested = formatDate(p.requestedDate) || "-";
-    const due = p.dueDate ? formatDate(p.dueDate) : "-";
-    const patientName = escapeHtml(p.patient||"-");
-    const stateAbbr = escapeHtml(p.state||"-");
-    const type = escapeHtml(p.type||"-");
-    const notes = escapeHtml(p.notes||"");
-
-    const html = `
-      <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:flex-start; justify-content:space-between">
-        <div>
-          <div style="font-size:12px; opacity:.85">Matter</div>
-          <div style="font-size:18px; font-weight:800; letter-spacing:.02em">${escapeHtml(p.matter)}</div>
-          <div style="margin-top:6px; font-size:14px; opacity:.92">${patientName} • ${stateAbbr} • ${type}</div>
-        </div>
-        <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end">
-          <span class="badge" title="Status"><strong>Status:</strong> ${status}</span>
-          <span class="badge" title="Waiting On"><strong>Waiting:</strong> ${waiting}</span>
-          <span class="badge" title="Channel"><strong>Channel:</strong> ${channel}</span>
-        </div>
-      </div>
-
-      <div class="modalGrid" style="margin-top:14px">
-        <div>
-          <div class="mini" style="margin-bottom:6px; opacity:.85">Provider</div>
-          <div style="font-weight:650">${provider}</div>
-          <div class="mini" style="margin-top:6px; opacity:.85">Provider Email</div>
-          <div style="word-break:break-word">${providerEmail}</div>
-        </div>
-        <div>
-          <div class="mini" style="margin-bottom:6px; opacity:.85">Dates</div>
-          <div><strong>Requested:</strong> ${requested}</div>
-          <div style="margin-top:6px"><strong>Due:</strong> ${due}</div>
-        </div>
-      </div>
-
-      <div style="margin-top:14px">
-        <div class="mini" style="margin-bottom:6px; opacity:.85">Notes</div>
-        <div style="border:1px solid rgba(255,255,255,.10); background: rgba(0,0,0,.18); border-radius:14px; padding:12px; line-height:1.35; white-space:pre-wrap; max-height: 40vh; overflow:auto">
-          ${notes ? notes : '<span class="mini" style="opacity:.75">No notes</span>'}
-        </div>
-      </div>
-
-      <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:14px">
-        <button class="btn" data-action="edit_patient" data-matter="${escapeHtml(p.matter)}">Edit</button>
-      </div>
-    `;
-
-    openModal("Patient Details", html, "", null);
-  }
-
-  // -----------------------------
-  // Confirmation Modal System
+  // Confirmation Modal System (NEW)
   // -----------------------------
   const confirmBackdrop = $("#confirmBackdrop");
   const confirmTitle = $("#confirmTitle");
@@ -1982,6 +1759,7 @@ function getStatusProgress(status){
     if(state.ui.tab==="Tasks") page.innerHTML = renderTasks();
     if(state.ui.tab==="Charts") {
       page.innerHTML = renderCharts();
+      // Render charts after DOM is ready
       setTimeout(renderChartVisualizations, 100);
     }
     if(state.ui.tab==="Reports") page.innerHTML = renderReports();
@@ -2008,8 +1786,9 @@ function getStatusProgress(status){
   }
 
   function computeHome(){
-    const todayISO = new Date().toISOString().slice(0,10);
+    const today = new Date().toISOString().slice(0,10);
 
+    // "Overdue today" counts PATIENTS only: due on/before today AND not Done
     const overdue = state.patients.filter(p =>
       p.dueDate && p.dueDate <= today && lower(p.status)!=="done"
     ).length;
@@ -2025,12 +1804,13 @@ function getStatusProgress(status){
 
     function renderHome(){
     const { overdue, needsReply, newToday, waitingClinic } = computeHome();
-    const todayISO = new Date().toISOString().slice(0,10);
+    const today = new Date().toISOString().slice(0,10);
     const homeFilter = state.ui.homeFilter || "all";
 
+    // Priority list: real priority ordering + optional focus filter
     const priorityPatients = state.patients
       .slice()
-      .filter(p => matchesHomeFilterPatient(p, today, homeFilter))
+      .filter(p => matchesHomeFilterPatient(p, today, homeFilter) && matchesHomeSearchPatient(p))
       .sort((a,b)=>{
         const sa = patientPriorityScore(a, today);
         const sb = patientPriorityScore(b, today);
@@ -2044,7 +1824,7 @@ function getStatusProgress(status){
 
     const inbox = state.tasks
       .slice()
-      .filter(t => matchesHomeFilterTask(t, today, homeFilter))
+      .filter(t => matchesHomeFilterTask(t, today, homeFilter) && matchesHomeSearchTask(t))
       .sort((a,b)=>{
         const sa = taskPriorityScore(a, today);
         const sb = taskPriorityScore(b, today);
@@ -2055,6 +1835,7 @@ function getStatusProgress(status){
       })
       .slice(0,12);
 
+    // Summary counts
     const overduePatients = state.patients.filter(p => p.dueDate && p.dueDate <= today && lower(p.status)!=="done").length;
     const needsReplyPatients = state.patients.filter(p => lower(p.status)==="needs reply" && lower(p.status)!=="done").length;
     const waitingClinicPatients = state.patients.filter(p => lower(p.waitingOn)==="clinic" && lower(p.status)!=="done").length;
@@ -2091,7 +1872,6 @@ function getStatusProgress(status){
           (wo==="clinic" && !done) ? "row-waitingclinic" : ""
         ].filter(Boolean).join(" ");
 
-        // CORREGIDO: status se refiere a STATUS, waitingOn se refiere a WAITING ON
         const statusSel = `<select class="cellSelect" data-action="p_update" data-field="status" data-matter="${matter}">
           ${buildOptions(OPTIONS.patientStatus, p.status||"New")}
         </select>`;
@@ -2110,7 +1890,7 @@ function getStatusProgress(status){
             <td>${escapeHtml(p.patient||"")}</td>
             <td>${statusSel}</td>
             <td>${waitSel}</td>
-            <td class="nowrap2">${due ? escapeHtml(due) : "-"}</td>
+            <td class="nowrap2">${due ? escapeHtml(formatDateMDY(due)) : "-"}</td>
             <td class="rowActions">
               <button class="iconBtn" data-action="edit_patient" data-matter="${matter}" title="Edit">${ICON_EDIT}</button>
               <button class="iconBtn danger" data-action="del_patient" data-matter="${matter}" title="Delete">${ICON_TRASH}</button>
@@ -2120,7 +1900,7 @@ function getStatusProgress(status){
       }).join("");
 
       return `
-        <div style="overflow:auto">
+        <div class="tableScroll">
           <table class="tableCompact">
             <thead>
               <tr>
@@ -2160,7 +1940,7 @@ function getStatusProgress(status){
             </td>
             <td>${prSel}</td>
             <td>${progSel}</td>
-            <td class="nowrap2">${due ? escapeHtml(due) : "-"}</td>
+            <td class="nowrap2">${due ? escapeHtml(formatDateMDY(due)) : "-"}</td>
             <td><div class="descClamp" title="${escapeHtml(t.description||"")}">${escapeHtml(t.description||"")}</div></td>
             <td class="rowActions">
               <button class="iconBtn" data-action="edit_task" data-id="${id}" title="Edit">${ICON_EDIT}</button>
@@ -2171,7 +1951,7 @@ function getStatusProgress(status){
       }).join("");
 
       return `
-        <div style="overflow:auto">
+        <div class="tableScroll">
           <table class="tableCompact">
             <thead>
               <tr>
@@ -2203,7 +1983,7 @@ function getStatusProgress(status){
       </div>
 
       <div class="card focusCard" style="position:relative">
-        <h3>🎯 Today's Focus</h3>
+        <h3>🎯 Today’s Focus</h3>
         <div class="mini">Click an item to focus Home lists.</div>
         <div class="focusGrid">
           ${focusItem("var(--link)","Follow up", `${waitingClinicPatients} patients waiting on clinic`, "waiting_clinic")}
@@ -2212,83 +1992,76 @@ function getStatusProgress(status){
         </div>
       </div>
 
-      <div class="home-table-container">
-        <div class="resizable-table-container" id="priorityPatientsTable">
-          <div class="resizable-header">
-            <h3 style="margin:0">📌 Priority Patients (Today)</h3>
-            <button class="resize-toggle" data-table="priorityPatients">−</button>
+      <div class="home-stack">
+        <div class="card">
+          <h3>📌 Priority Patients (Today)</h3>
+
+          <div class="homeSearchRow">
+            <input class="input" id="homeSearch" placeholder="Search by matter or client name..." value="${escapeHtml(state.ui.homeSearch||"")}"/>
+            <button class="btn" id="homeSearchClear">Clear</button>
           </div>
-          <div class="resizable-content">
-            <div class="home-search-container">
-              <input class="input home-search-box" id="homePatientSearch" placeholder="Search by matter or patient name..." />
-              <button class="btn" id="clearHomePatientSearch">Clear</button>
+
+          <div class="homeSummaryLine">
+            <div class="mini">
+              ${overduePatients} overdue • ${needsReplyPatients} needs reply • ${waitingClinicPatients} waiting clinic${focusLabel}
             </div>
-            ${tablePatientsHome(filterHomePatients(priorityPatients))}
+            <div style="display:flex; gap:10px; flex-wrap:wrap">
+              <button class="btn" data-action="home_quick_patient">+ Quick Patient</button>
+            </div>
           </div>
+
+          ${tablePatientsHome(priorityPatients)}
         </div>
 
-        <div class="resizable-table-container" id="actionInboxTable">
-          <div class="resizable-header">
-            <h3 style="margin:0">📨 Action Inbox (Email → Tasks)</h3>
-            <button class="resize-toggle" data-table="actionInbox">−</button>
-          </div>
-          <div class="resizable-content">
-            <div class="home-search-container">
-              <input class="input home-search-box" id="homeTaskSearch" placeholder="Search by matter or description..." />
-              <button class="btn" id="clearHomeTaskSearch">Clear</button>
+        <div class="card">
+          <h3>📨 Action Inbox (Email → Tasks)</h3>
+
+          <div class="homeSummaryLine">
+            <div class="mini">
+              ${openTasks} open • ${highOpenTasks} high priority • ${overdueTasks} overdue${focusLabel}
             </div>
-            ${tableTasksHome(filterHomeTasks(inbox))}
+            <div style="display:flex; gap:10px; flex-wrap:wrap">
+              <button class="btn" data-action="home_quick_task">+ Quick Task</button>
+            </div>
           </div>
+
+          ${tableTasksHome(inbox)}
         </div>
       </div>
     `;
   }
 
-  function filterHomePatients(patients) {
-    const searchTerm = lower($("#homePatientSearch")?.value || "");
-    if (!searchTerm) return patients;
-    
-    return patients.filter(p => {
-      const hay = lower([p.matter, p.patient].join(" "));
-      return hay.includes(searchTerm);
-    });
-  }
-
-  function filterHomeTasks(tasks) {
-    const searchTerm = lower($("#homeTaskSearch")?.value || "");
-    if (!searchTerm) return tasks;
-    
-    return tasks.filter(t => {
-      const hay = lower([t.matter, t.description].join(" "));
-      return hay.includes(searchTerm);
-    });
-  }
 
   function tablePatients(list, {compact=false, showActions=true, bulk=false}={}){
     if(list.length===0){
       return `<div class="mini">No patients found.</div>`;
     }
-    
     const rows = list.map(p => {
       const matter = escapeHtml(p.matter);
-      // Keep inline editing for core workflow fields, but free up horizontal space
-      // by moving the important details (Status/Waiting/Channel/Notes/etc.) into a peek modal.
-      const typeSel = `<select class="cellSelect" data-action="p_update" data-field="type" data-matter="${matter}" style="min-width: 120px;">
+      const statusSel = `<select class="cellSelect" data-action="p_update" data-field="status" data-matter="${matter}">
+        ${buildOptions(OPTIONS.patientStatus, p.status||"New")}
+      </select>`;
+      const waitSel = `<select class="cellSelect" data-action="p_update" data-field="waitingOn" data-matter="${matter}">
+        ${buildOptions(OPTIONS.waitingOn, p.waitingOn||"Clinic")}
+      </select>`;
+      const typeSel = `<select class="cellSelect" data-action="p_update" data-field="type" data-matter="${matter}">
         ${buildOptions(OPTIONS.patientTypes, p.type||"MRI")}
       </select>`;
 
       return `
         <tr>
           <td class="nowrap">${bulk ? `<input type="checkbox" class="pSel" data-matter="${matter}" ${state.ui.selectedPatients?.includes(matter) ? "checked" : ""}/>` : ""}</td>
-          <td class="nowrap">
-            <a class="link" data-action="peek_patient" data-matter="${matter}" title="View full patient details">${matter}</a>
-          </td>
+          <td class="nowrap"><a class="link" data-action="open_patient" data-matter="${matter}">${matter}</a></td>
           <td>${escapeHtml(p.patient||"")}</td>
           <td class="nowrap">${escapeHtml(p.state||"")}</td>
-          <td>${typeSel}</td>
+          ${compact ? "" : `<td>${typeSel}</td>`}
           <td>${escapeHtml(p.provider||"")}</td>
-          <td class="nowrap">${formatDate(p.requestedDate)||""}</td>
-          <td><input type="date" class="cellSelect" data-action="p_update" data-field="dueDate" data-matter="${matter}" value="${parseDateForInput(p.dueDate||"")}"/></td>
+          ${compact ? "" : `<td class="nowrap">${escapeHtml(formatDateMDY(p.requestedDate||""))}</td>`}
+          ${compact ? "" : `<td><input type="date" class="cellSelect" data-action="p_update" data-field="dueDate" data-matter="${matter}" value="${escapeHtml(p.dueDate||"")}"/></td>`}
+          ${compact ? "" : `<td>${escapeHtml(p.sender||"")}</td>`}
+          <td>${statusSel}</td>
+          <td>${waitSel}</td>
+          ${compact ? "" : `<td style="max-width:320px">${escapeHtml(p.notes||"")}</td>`}
           ${showActions ? `<td class="rowActions">
             <button class="iconBtn" data-action="edit_patient" data-matter="${matter}" title="Edit">${ICON_EDIT}</button>
             <button class="iconBtn danger" data-action="del_patient" data-matter="${matter}" title="Delete">${ICON_TRASH}</button>
@@ -2299,21 +2072,20 @@ function getStatusProgress(status){
 
     const head = `
       <tr>
-        ${bulk ? '<th class="nowrap"><input type="checkbox" id="pSelectAll" /></th>' : ''}
-        <th class="nowrap">Matter</th>
-        <th>Patient</th>
-        <th class="nowrap">State</th>
-        <th>Type</th>
+        <th class="nowrap">${bulk ? `<input type="checkbox" id="pSelectAll" />` : ""}</th>
+        <th>Matter</th><th>Client</th><th>State</th>
+        ${compact ? "" : "<th>Type</th>"}
         <th>Provider</th>
-        <th class="nowrap">Requested</th>
-        <th class="nowrap">Due</th>
+        ${compact ? "" : "<th>Requested</th><th>Due</th><th>Channel</th>"}
+        <th>Status</th><th>Waiting On</th>
+        ${compact ? "" : "<th>Notes</th>"}
         ${showActions ? "<th></th>" : ""}
       </tr>
     `;
 
     return `
-      <div class="patients-table-container">
-        <table class="patients-table">
+      <div style="overflow:auto">
+        <table class="tableRoomy">
           <thead>${head}</thead>
           <tbody>${rows}</tbody>
         </table>
@@ -2322,8 +2094,6 @@ function getStatusProgress(status){
   }
 
   function renderPatients(){
-    const filtered = filteredPatients();
-    
     return `
       <div class="pageTitle">Patients</div>
       <p class="pageHint">Your operational list</p>
@@ -2338,27 +2108,31 @@ function getStatusProgress(status){
         </div>
 
         <div class="tools">
-          <input class="input" id="patientSearch" placeholder="Search by patient name, matter number, provider, notes..." value="${escapeHtml(state.ui.patientSearch||"")}"/>
+          <input class="input" id="patientSearch" placeholder="Search by client name or matter number..." value="${escapeHtml(state.ui.patientSearch||"")}"/>
           <select id="patientStatusFilter">
             ${["all", ...OPTIONS.patientStatus].map(v=>`<option value="${v}" ${state.ui.patientStatus===v?"selected":""}>Status (${v})</option>`).join("")}
           </select>
           <select id="patientWaitingFilter">
             ${["all", ...OPTIONS.waitingOn].map(v=>`<option value="${v}" ${state.ui.patientWaiting===v?"selected":""}>Waiting (${v})</option>`).join("")}
           </select>
-          <select id="patientSortFilter">
-            <option value="requested" ${state.ui.patientSort==="requested"?"selected":""}>Sort by Requested Date</option>
-            <option value="created" ${state.ui.patientSort==="created"?"selected":""}>Sort by Created Date</option>
-            <option value="due" ${state.ui.patientSort==="due"?"selected":""}>Sort by Due Date</option>
-            <option value="patient" ${state.ui.patientSort==="patient"?"selected":""}>Sort by Patient Name</option>
-            <option value="matter" ${state.ui.patientSort==="matter"?"selected":""}>Sort by Matter</option>
+          <select id="patientSort">
+            ${[
+              ["requested_desc","Sort: Requested (newest)"],
+              ["requested_asc","Sort: Requested (oldest)"],
+              ["due_desc","Sort: Due (latest)"],
+              ["due_asc","Sort: Due (earliest)"],
+              ["matter","Sort: Matter"],
+              ["client","Sort: Client"],
+              ["created_desc","Sort: Created (newest)"]
+            ].map(([v,l])=>`<option value="${v}" ${state.ui.patientSort===v?"selected":""}>${l}</option>`).join("")}
           </select>
           <button class="btn" id="patientClear">Clear</button>
         </div>
 
         ${renderPatientBulkBar()}
-        ${tablePatients(filtered, {compact:false, bulk:true})}
+        ${tablePatients(filteredPatients(), {compact:false, bulk:true})}
 
-        <div class="mini" style="margin-top:8px">Showing ${filtered.length} of ${state.patients.length} patients</div>
+        <div class="mini" style="margin-top:8px">Selections and bulk actions work only inside Patients (not the compact Home tables).</div>
       </div>
     `;
   }
@@ -2437,7 +2211,8 @@ function getStatusProgress(status){
       progress:"Open",
       dueDate:"",
       description,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      requestedDate: new Date().toISOString().slice(0,10)
     });
     return true;
   }
@@ -2482,43 +2257,39 @@ function filteredPatients(){
     const status = state.ui.patientStatus;
     const waiting = state.ui.patientWaiting;
     const overdueOnly = !!state.ui.patientOverdueOnly;
-    const todayISO = new Date().toISOString().slice(0,10);
+    const today = new Date().toISOString().slice(0,10);
 
-    let filtered = state.patients
+    let list = state.patients
       .filter(p => {
-        const hay = lower([p.matter,p.patient,p.state,p.type,p.provider,p.providerEmail,p.requestedDate,p.dueDate,p.channel,p.status,p.waitingOn,p.notes].join(" "));
+        const hay = lower([p.matter,p.patient,p.state,p.type,p.provider,p.providerEmail,p.requestedDate,p.dueDate,p.sender,p.status,p.waitingOn,p.notes].join(" "));
         if(q && !hay.includes(q)) return false;
         if(status && status!=="all" && norm(p.status)!==status) return false;
         if(waiting && waiting!=="all" && norm(p.waitingOn)!==waiting) return false;
         if(overdueOnly){
           if(!p.dueDate) return false;
-          if(normalizeDateToISO(p.dueDate) > todayISO) return false;
+          if(p.dueDate > today) return false;
           if(lower(p.status)==="done") return false;
         }
         return true;
       });
 
-    if (state.ui.patientSort === "requested") {
-      filtered.sort((a, b) => {
-        const aDate = a.requestedDate ? new Date(normalizeDateToISO(a.requestedDate) || 0) : new Date(0);
-        const bDate = b.requestedDate ? new Date(normalizeDateToISO(b.requestedDate) || 0) : new Date(0);
-        return bDate - aDate;
-      });
-    } else if (state.ui.patientSort === "due") {
-      filtered.sort((a, b) => {
-        const aDate = a.dueDate ? new Date(normalizeDateToISO(a.dueDate) || '9999-12-31') : new Date('9999-12-31');
-        const bDate = b.dueDate ? new Date(normalizeDateToISO(b.dueDate) || '9999-12-31') : new Date('9999-12-31');
-        return aDate - bDate;
-      });
-    } else if (state.ui.patientSort === "patient") {
-      filtered.sort((a, b) => (a.patient || "").localeCompare(b.patient || ""));
-    } else if (state.ui.patientSort === "matter") {
-      filtered.sort((a, b) => (a.matter || "").localeCompare(b.matter || ""));
+    const sort = state.ui.patientSort || "requested_desc";
+    if(sort==="requested_asc"){
+      list = list.slice().sort((a,b)=>(a.requestedDate||"9999-12-31").localeCompare(b.requestedDate||"9999-12-31"));
+    } else if(sort==="requested_desc"){
+      list = list.slice().sort((a,b)=>(b.requestedDate||"").localeCompare(a.requestedDate||""));
+    } else if(sort==="due_asc"){
+      list = list.slice().sort((a,b)=>(a.dueDate||"9999-12-31").localeCompare(b.dueDate||"9999-12-31"));
+    } else if(sort==="due_desc"){
+      list = list.slice().sort((a,b)=>(b.dueDate||"").localeCompare(a.dueDate||""));
+    } else if(sort==="matter"){
+      list = list.slice().sort((a,b)=>(a.matter||"").localeCompare(b.matter||""));
+    } else if(sort==="client"){
+      list = list.slice().sort((a,b)=>(a.patient||"").localeCompare(b.patient||""));
     } else {
-      filtered.sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
+      list = list.slice().sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||""));
     }
-
-    return filtered;
+    return list;
   }
 
   function tableTasks(list, {compact=false, bulk=false}={}){
@@ -2533,7 +2304,7 @@ function filteredPatients(){
       </select>`;
       const prSel = `<select class="cellSelect" data-action="t_update" data-field="priority" data-id="${id}">
         ${buildOptions(OPTIONS.taskPriority, t.priority||"Medium")}
-        </select>`;
+      </select>`;
       const progSel = `<select class="cellSelect" data-action="t_update" data-field="progress" data-id="${id}">
         ${buildOptions(OPTIONS.taskProgress, t.progress||"Open")}
       </select>`;
@@ -2542,10 +2313,10 @@ function filteredPatients(){
         <tr>
           <td class="nowrap">${bulk ? `<input type="checkbox" class="tSel" data-id="${id}" ${state.ui.selectedTasks?.includes(id) ? "checked" : ""}/>` : ""}</td>
           <td class="nowrap"><a class="link" data-action="open_patient" data-matter="${matter}">${matter||"-"}</a></td>
-          <td>${typeSel}</td>
+          ${compact ? "" : `<td>${typeSel}</td>`}
           <td>${prSel}</td>
           <td>${progSel}</td>
-          <td><input type="date" class="cellSelect" data-action="t_update" data-field="dueDate" data-id="${id}" value="${parseDateForInput(t.dueDate||"")}"/></td>
+          ${compact ? "" : `<td><input type="date" class="cellSelect" data-action="t_update" data-field="requestedDate" data-id="${id}" value="${escapeHtml(t.requestedDate||"")}"/></td><td><input type="date" class="cellSelect" data-action="t_update" data-field="dueDate" data-id="${id}" value="${escapeHtml(t.dueDate||"")}"/></td>`}
           <td style="max-width:360px">${escapeHtml(t.description||"")}</td>
           <td class="rowActions">
             <button class="iconBtn" data-action="edit_task" data-id="${id}" title="Edit">${ICON_EDIT}</button>
@@ -2557,20 +2328,16 @@ function filteredPatients(){
 
     const head = `
       <tr>
-        ${bulk ? '<th class="nowrap"><input type="checkbox" id="tSelectAll" /></th>' : ''}
-        <th class="nowrap">Matter</th>
-        <th>Task Type</th>
-        <th>Priority</th>
-        <th>Progress</th>
-        <th class="nowrap">Due Date</th>
-        <th>Description</th>
-        <th></th>
+        <th class="nowrap">${bulk ? `<input type="checkbox" id="tSelectAll" />` : ""}</th>
+        <th>Matter</th>
+        ${compact ? "" : "<th>Type</th>"}
+        <th>Priority</th><th>Progress</th>${compact ? "" : "<th>Requested</th><th>Due</th>"}<th>Description</th><th></th>
       </tr>
     `;
 
     return `
-      <div class="tasks-table-container">
-        <table class="tasks-table">
+      <div style="overflow:auto">
+        <table class="tableRoomy">
           <thead>${head}</thead>
           <tbody>${rows}</tbody>
         </table>
@@ -2601,6 +2368,7 @@ function filteredPatients(){
           <select id="taskSort">
             ${[
               ["created","Sort: Created"],
+              ["requested","Sort: Requested date"],
               ["due","Sort: Due date"],
               ["priority","Sort: Priority"]
             ].map(([v,l])=>`<option value="${v}" ${state.ui.tasksSort===v?"selected":""}>${l}</option>`).join("")}
@@ -2628,12 +2396,11 @@ function filteredPatients(){
       return true;
     });
 
-    if(state.ui.tasksSort==="due"){
-      list = list.slice().sort((a,b)=> {
-        const aDate = a.dueDate ? new Date(normalizeDateToISO(a.dueDate) || '9999-12-31') : new Date('9999-12-31');
-        const bDate = b.dueDate ? new Date(normalizeDateToISO(b.dueDate) || '9999-12-31') : new Date('9999-12-31');
-        return aDate - bDate;
-      });
+    if(state.ui.tasksSort==="requested"){
+      list = list.slice().sort((a,b)=> (a.requestedDate||"9999-12-31").localeCompare(b.requestedDate||"9999-12-31"));
+    } else if(state.ui.tasksSort==="due"){
+
+      list = list.slice().sort((a,b)=> (a.dueDate||"9999-12-31").localeCompare(b.dueDate||"9999-12-31"));
     } else if(state.ui.tasksSort==="priority"){
       const rank = {high:0, medium:1, low:2};
       list = list.slice().sort((a,b)=> (rank[lower(a.priority)]??9) - (rank[lower(b.priority)]??9));
@@ -2643,34 +2410,31 @@ function filteredPatients(){
     return list;
   }
 
+  // Función para calcular datos de los gráficos
   function calculateChartData() {
     const statusCounts = {};
     const waitingCounts = {};
     const typeCounts = {};
     const providerCounts = {};
-    const channelCounts = {};
     
+    // Initialize counts
     OPTIONS.patientStatus.forEach(s => statusCounts[s] = 0);
     OPTIONS.waitingOn.forEach(w => waitingCounts[w] = 0);
     OPTIONS.patientTypes.forEach(t => typeCounts[t] = 0);
-    OPTIONS.patientChannel.forEach(c => channelCounts[c] = 0);
     
-    state.patients.forEach(p => {
+    // Count actual data
+    patientsForDate.forEach(p => {
       if(p.status) statusCounts[p.status] = (statusCounts[p.status] || 0) + 1;
       if(p.waitingOn) waitingCounts[p.waitingOn] = (waitingCounts[p.waitingOn] || 0) + 1;
       if(p.type) typeCounts[p.type] = (typeCounts[p.type] || 0) + 1;
       if(p.provider) providerCounts[p.provider] = (providerCounts[p.provider] || 0) + 1;
-      if(p.channel) channelCounts[p.channel] = (channelCounts[p.channel] || 0) + 1;
     });
     
+    // Filter out zero values for charts
     const filteredStatusCounts = Object.entries(statusCounts).filter(([_, count]) => count > 0);
     const filteredWaitingCounts = Object.entries(waitingCounts).filter(([_, count]) => count > 0);
     const filteredTypeCounts = Object.entries(typeCounts).filter(([_, count]) => count > 0);
-    const filteredProviderCounts = Object.entries(providerCounts)
-      .filter(([_, count]) => count > 0)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 10);
-    const filteredChannelCounts = Object.entries(channelCounts).filter(([_, count]) => count > 0);
+    const filteredProviderCounts = Object.entries(providerCounts).filter(([_, count]) => count > 0).sort((a,b)=>b[1]-a[1]).slice(0,10);
     
     return {
       statusData: {
@@ -2683,68 +2447,54 @@ function filteredPatients(){
         data: filteredWaitingCounts.map(([_, count]) => count),
         total: state.patients.length
       },
-      typeData: {
-        labels: filteredTypeCounts.map(([label]) => label),
-        data: filteredTypeCounts.map(([_, count]) => count),
-        total: state.patients.length
-      },
       providerData: {
         labels: filteredProviderCounts.map(([label]) => label),
         data: filteredProviderCounts.map(([_, count]) => count),
         total: state.patients.length
       },
-      channelData: {
-        labels: filteredChannelCounts.map(([label]) => label),
-        data: filteredChannelCounts.map(([_, count]) => count),
+      typeData: {
+        labels: filteredTypeCounts.map(([label]) => label),
+        data: filteredTypeCounts.map(([_, count]) => count),
         total: state.patients.length
       }
     };
   }
 
+  // Función para calcular insights - REVISADO: eliminado fondo negro
   function calculateInsights(selectedDate) {
-    const insightDate = selectedDate ? new Date(selectedDate) : new Date();
-    
-    const totalPatients = state.patients.length;
-    const totalTasks = state.tasks.length;
+    const dateKey = (selectedDate || "").toString().slice(0,10);
+    const patientsForDate = dateKey ? state.patients.filter(p => (p.requestedDate||"").slice(0,10) === dateKey) : state.patients;
+    const tasksForDate = dateKey ? state.tasks.filter(t => (t.requestedDate||"").slice(0,10) === dateKey) : state.tasks;
+    // Calcular estadísticas
+    const totalPatients = patientsForDate.length;
+    const totalTasks = tasksForDate.length;
     const totalReports = state.reports.length;
     
-    const patientsByRequestedDate = {};
-    state.patients.forEach(p => {
-      if (p.requestedDate) {
-        patientsByRequestedDate[p.requestedDate] = (patientsByRequestedDate[p.requestedDate] || 0) + 1;
-      }
-    });
-    
+    // Encontrar el estado más común
     const statusCounts = {};
-    state.patients.forEach(p => {
+    patientsForDate.forEach(p => {
       statusCounts[p.status] = (statusCounts[p.status] || 0) + 1;
     });
     const mostCommonStatus = Object.entries(statusCounts)
       .sort((a, b) => b[1] - a[1])[0] || ["None", 0];
     
+    // Encontrar el tipo más común
     const typeCounts = {};
-    state.patients.forEach(p => {
+    const providerCounts = {};
+    patientsForDate.forEach(p => {
       typeCounts[p.type] = (typeCounts[p.type] || 0) + 1;
     });
     const mostCommonType = Object.entries(typeCounts)
       .sort((a, b) => b[1] - a[1])[0] || ["None", 0];
     
-    const sentToClinic = state.patients.filter(p => p.status === "Sent to clinic").length;
-    const needsReply = state.patients.filter(p => p.status === "Needs reply").length;
-    const newPatients = state.patients.filter(p => p.status === "New").length;
+    // Calcular pacientes por estado
+    const sentToClinic = patientsForDate.filter(p => p.status === "Sent to clinic").length;
+    const needsReply = patientsForDate.filter(p => p.status === "Needs reply").length;
+    const newPatients = patientsForDate.filter(p => p.status === "New").length;
     
-    const openTasks = state.tasks.filter(t => t.progress === "Open").length;
-    const highPriorityTasks = state.tasks.filter(t => t.priority === "High" && t.progress === "Open").length;
-    
-    const formattedSelectedDate = insightDate.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: '2-digit', 
-      day: '2-digit' 
-    }).replace(/(\d+)\/(\d+)\/(\d+)/, '$1/$2/$3');
-    
-    const patientsOnSelectedDate = state.patients.filter(p => 
-      p.requestedDate === formattedSelectedDate
-    ).length;
+    // Calcular tareas pendientes
+    const openTasks = tasksForDate.filter(t => t.progress === "Open").length;
+    const highPriorityTasks = tasksForDate.filter(t => t.priority === "High" && t.progress === "Open").length;
     
     return {
       totalPatients,
@@ -2764,13 +2514,11 @@ function filteredPatients(){
       needsReply,
       newPatients,
       openTasks,
-      highPriorityTasks,
-      patientsByRequestedDate,
-      patientsOnSelectedDate,
-      selectedDate: formattedSelectedDate
+      highPriorityTasks
     };
   }
 
+  // Función para renderizar resumen de pacientes (cards en lugar de tabla)
   function renderPatientSummaryCards(patients) {
     if (patients.length === 0) {
       return `
@@ -2784,6 +2532,7 @@ function filteredPatients(){
     return `
       <div class="patient-summary-grid">
         ${patients.map(p => {
+          // Determinar clase de estado
           let statusClass = "status-sent";
           if (p.status === "New") statusClass = "status-new";
           if (p.status === "Needs reply") statusClass = "status-needs-reply";
@@ -2824,11 +2573,11 @@ function filteredPatients(){
                 </div>
                 <div class="patient-detail">
                   <div class="detail-label">Requested</div>
-                  <div class="detail-value">${formatDate(p.requestedDate)}</div>
+                  <div class="detail-value">${escapeHtml(formatDateMDY(p.requestedDate))}</div>
                 </div>
                 <div class="patient-detail">
-                  <div class="detail-label">Channel</div>
-                  <div class="detail-value">${escapeHtml(p.channel)}</div>
+                  <div class="detail-label">Sender</div>
+                  <div class="detail-value">${escapeHtml(p.sender)}</div>
                 </div>
               </div>
               
@@ -2849,22 +2598,25 @@ function filteredPatients(){
     `;
   }
 
+  // Renderizar la sección de gráficos - REVISADO: eliminado cuadros negros
   function renderCharts(){
     const chartData = calculateChartData();
     const insights = calculateInsights(state.ui.insightDate);
     const colors = ["#d10f2f", "#7dd3fc", "#22c55e", "#f59e0b", "#a855f7", "#3b82f6", "#ef4444", "#8b5cf6"];
     
+    // Filter patients based on chart search
     const filteredPatientsList = filterPatientsForCharts();
     
     return `
       <div class="pageTitle">Charts & Analytics</div>
-      <p class="pageHint">Visual overview of your data.</p>
+      <p class="pageHint">Visual overview of your data. Click on any chart legend to filter patients.</p>
       
+      <!-- Data Trends & Insights Section - REVISADO: sin fondo negro -->
       <div class="card insights-section">
         <div class="insights-header">
           <h3>${ICON_INSIGHTS} Data Trends & Insights</h3>
           <div class="date-selector">
-            <label for="insightDate">View patients requested on:</label>
+            <label for="insightDate">View insights for:</label>
             <input type="date" id="insightDate" value="${state.ui.insightDate}" />
             <button class="ghostBtn" id="resetInsightDate">Today</button>
           </div>
@@ -2883,19 +2635,19 @@ function filteredPatients(){
           <div class="insight-stat blue">
             <div class="insight-label">
               <span class="miniDot" style="background: #3b82f6"></span>
-              Patients on ${insights.selectedDate}
+              Most Common Status
             </div>
-            <div class="insight-value">${insights.patientsOnSelectedDate}</div>
-            <div class="insight-subtext">Patients requested on this date</div>
+            <div class="insight-value">${insights.mostCommonStatus.name}</div>
+            <div class="insight-subtext">${insights.mostCommonStatus.count} patients (${insights.mostCommonStatus.percentage}%)</div>
           </div>
           
           <div class="insight-stat orange">
             <div class="insight-label">
               <span class="miniDot" style="background: #f59e0b"></span>
-              Most Common Status
+              Most Common Type
             </div>
-            <div class="insight-value">${insights.mostCommonStatus.name}</div>
-            <div class="insight-subtext">${insights.mostCommonStatus.count} patients (${insights.mostCommonStatus.percentage}%)</div>
+            <div class="insight-value">${insights.mostCommonType.name}</div>
+            <div class="insight-subtext">${insights.mostCommonType.count} patients (${insights.mostCommonType.percentage}%)</div>
           </div>
           
           <div class="insight-stat purple">
@@ -2911,11 +2663,20 @@ function filteredPatients(){
       
       <div class="charts-container">
         <div class="chart-card">
-          <h3>Patient Status Distribution</h3>
+          <h3>${ICON_CHART} Patient Status Distribution</h3>
           <div class="chart-canvas-container">
             <canvas id="chartStatus" class="chart-canvas"></canvas>
           </div>
-          ${chartData.statusData.labels.length > 0 ? '' : `
+          ${chartData.statusData.labels.length > 0 ? `
+            <div class="chart-legend" id="statusLegend">
+              ${chartData.statusData.labels.map((label, i) => `
+                <div class="legend-item" data-action="chart_filter" data-filter="status:${escapeHtml(label)}">
+                  <div class="legend-color" style="background: ${colors[i % colors.length]}"></div>
+                  <span>${escapeHtml(label)} (${chartData.statusData.data[i]})</span>
+                </div>
+              `).join('')}
+            </div>
+          ` : `
             <div class="chart-placeholder">
               <div>No patient status data available</div>
               <div class="mini">Add patients to see status distribution</div>
@@ -2924,11 +2685,20 @@ function filteredPatients(){
         </div>
         
         <div class="chart-card">
-          <h3>Waiting On Distribution</h3>
+          <h3>${ICON_CHART} Waiting On Distribution</h3>
           <div class="chart-canvas-container">
             <canvas id="chartWaiting" class="chart-canvas"></canvas>
           </div>
-          ${chartData.waitingData.labels.length > 0 ? '' : `
+          ${chartData.waitingData.labels.length > 0 ? `
+            <div class="chart-legend" id="waitingLegend">
+              ${chartData.waitingData.labels.map((label, i) => `
+                <div class="legend-item" data-action="chart_filter" data-filter="waiting:${escapeHtml(label)}">
+                  <div class="legend-color" style="background: ${colors[(i+2) % colors.length]}"></div>
+                  <span>${escapeHtml(label)} (${chartData.waitingData.data[i]})</span>
+                </div>
+              `).join('')}
+            </div>
+          ` : `
             <div class="chart-placeholder">
               <div>No waiting on data available</div>
               <div class="mini">Add patients to see waiting on distribution</div>
@@ -2937,45 +2707,51 @@ function filteredPatients(){
         </div>
         
         <div class="chart-card">
-          <h3>Patient Types</h3>
-          <div class="chart-canvas-container">
-            <canvas id="chartTypes" class="chart-canvas"></canvas>
-          </div>
-          ${chartData.typeData.labels.length > 0 ? '' : `
-            <div class="chart-placeholder">
-              <div>No patient type data available</div>
-              <div class="mini">Add patients to see type distribution</div>
-            </div>
-          `}
-        </div>
-        
-        <div class="chart-card">
-          <h3>Top Providers</h3>
+          <h3>${ICON_CHART} Provider Distribution (Top 10)</h3>
           <div class="chart-canvas-container">
             <canvas id="chartProviders" class="chart-canvas"></canvas>
           </div>
-          ${chartData.providerData.labels.length > 0 ? '' : `
+          ${chartData.providerData.labels.length > 0 ? `
+            <div class="chart-legend" id="providerLegend">
+              ${chartData.providerData.labels.map((label, i) => `
+                <div class="legend-item" data-action="chart_filter" data-filter="provider:${escapeHtml(label)}">
+                  <div class="legend-color" style="background: ${colors[(i+6) % colors.length]}"></div>
+                  <span>${escapeHtml(label)} (${chartData.providerData.data[i]})</span>
+                </div>
+              `).join('')}
+            </div>
+          ` : `
             <div class="chart-placeholder">
               <div>No provider data available</div>
               <div class="mini">Add patients to see provider distribution</div>
             </div>
           `}
         </div>
-        
+
         <div class="chart-card">
-          <h3>Channel Distribution</h3>
+          <h3>${ICON_CHART} Patient Types</h3>
           <div class="chart-canvas-container">
-            <canvas id="chartChannels" class="chart-canvas"></canvas>
+            <canvas id="chartTypes" class="chart-canvas"></canvas>
           </div>
-          ${chartData.channelData.labels.length > 0 ? '' : `
+          ${chartData.typeData.labels.length > 0 ? `
+            <div class="chart-legend" id="typeLegend">
+              ${chartData.typeData.labels.map((label, i) => `
+                <div class="legend-item" data-action="chart_filter" data-filter="type:${escapeHtml(label)}">
+                  <div class="legend-color" style="background: ${colors[(i+4) % colors.length]}"></div>
+                  <span>${escapeHtml(label)} (${chartData.typeData.data[i]})</span>
+                </div>
+              `).join('')}
+            </div>
+          ` : `
             <div class="chart-placeholder">
-              <div>No channel data available</div>
-              <div class="mini">Add patients to see channel distribution</div>
+              <div>No patient type data available</div>
+              <div class="mini">Add patients to see type distribution</div>
             </div>
           `}
         </div>
       </div>
       
+      <!-- Patient Summary Card - REVISADO: ahora muestra cards en lugar de tabla -->
       <div class="card patient-summary-card">
         <h3>📋 Patient Summary</h3>
         <p class="pageHint">All patients data collected from all sections. Search by name or matter number.</p>
@@ -2995,52 +2771,22 @@ function filteredPatients(){
     `;
   }
 
-  
-  function applyChartPatientFilter(field, value){
-    if(!value) return;
-
-    // Route user to Patients and apply filters
-    state.ui.tab = "Patients";
-    state.ui.patientView = "All";
-    state.ui.patientOverdueOnly = false;
-
-    if(field === 'status'){
-      state.ui.patientStatus = value;
-      state.ui.patientWaiting = 'all';
-      state.ui.patientSearch = '';
-      toast('Filter applied', `Patients filtered by Status: ${value}`);
-    } else if(field === 'waiting'){
-      state.ui.patientWaiting = value;
-      state.ui.patientStatus = 'all';
-      state.ui.patientSearch = '';
-      toast('Filter applied', `Patients filtered by Waiting: ${value}`);
-    } else {
-      // type/provider/channel
-      state.ui.patientSearch = value;
-      state.ui.patientStatus = 'all';
-      state.ui.patientWaiting = 'all';
-      toast('Filter applied', `Patients filtered by: ${value}`);
+  // Función para renderizar los gráficos con Chart.js
+  function renderChartVisualizations() {
+    if (typeof window.Chart === "undefined") {
+      console.warn("Chart.js failed to load. Charts disabled.");
+      return;
     }
-
-    render();
-  }
-
-  function chartLabelFromClick(chart, evt){
-    const points = chart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
-    if(!points || !points.length) return null;
-    const idx = points[0].index;
-    return chart.data?.labels?.[idx] ?? null;
-  }
-function renderChartVisualizations() {
     const chartData = calculateChartData();
     const colors = ["#d10f2f", "#7dd3fc", "#22c55e", "#f59e0b", "#a855f7", "#3b82f6", "#ef4444", "#8b5cf6"];
     
+    // Destroy existing charts
     if (state.charts.statusChart) state.charts.statusChart.destroy();
     if (state.charts.waitingChart) state.charts.waitingChart.destroy();
     if (state.charts.typeChart) state.charts.typeChart.destroy();
-    if (state.charts.providerChart) state.charts.providerChart.destroy();
-    if (state.charts.channelChart) state.charts.channelChart.destroy();
+    if (state.charts.providersChart) state.charts.providersChart.destroy();
     
+    // Configuración común para todos los gráficos
     const commonOptions = {
       responsive: true,
       maintainAspectRatio: false,
@@ -3067,6 +2813,7 @@ function renderChartVisualizations() {
       }
     };
     
+    // Render Status Chart (Doughnut)
     if (chartData.statusData.labels.length > 0) {
       const statusCtx = document.getElementById('chartStatus')?.getContext('2d');
       if (statusCtx) {
@@ -3084,7 +2831,6 @@ function renderChartVisualizations() {
           },
           options: {
             ...commonOptions,
-            onClick: (evt, els, chart) => { const label = chartLabelFromClick(chart, evt); if(label) applyChartPatientFilter('status', label); },
             cutout: '65%',
             animation: {
               animateScale: true,
@@ -3095,6 +2841,7 @@ function renderChartVisualizations() {
       }
     }
     
+    // Render Waiting Chart (Bar)
     if (chartData.waitingData.labels.length > 0) {
       const waitingCtx = document.getElementById('chartWaiting')?.getContext('2d');
       if (waitingCtx) {
@@ -3113,7 +2860,6 @@ function renderChartVisualizations() {
           },
           options: {
             ...commonOptions,
-            onClick: (evt, els, chart) => { const label = chartLabelFromClick(chart, evt); if(label) applyChartPatientFilter('waiting', label); },
             scales: {
               y: {
                 beginAtZero: true,
@@ -3148,6 +2894,43 @@ function renderChartVisualizations() {
       }
     }
     
+    // Render Provider Chart (Bar)
+    if (chartData.providerData.labels.length > 0) {
+      const provCtx = document.getElementById('chartProviders')?.getContext('2d');
+      if (provCtx) {
+        state.charts.providersChart = new Chart(provCtx, {
+          type: 'bar',
+          data: {
+            labels: chartData.providerData.labels,
+            datasets: [{
+              label: 'Patients',
+              data: chartData.providerData.data,
+              backgroundColor: chartData.providerData.labels.map((_, i) => colors[(i+6) % colors.length]),
+              borderColor: 'rgba(255,255,255,0.2)',
+              borderWidth: 1,
+              borderRadius: 4
+            }]
+          },
+          options: {
+            ...commonOptions,
+            scales: {
+              y: {
+                beginAtZero: true,
+                grid: { color: 'rgba(255,255,255,0.05)' },
+                ticks: { color: 'rgba(255,255,255,0.6)', font: { size: 11 } }
+              },
+              x: {
+                grid: { color: 'rgba(255,255,255,0.05)' },
+                ticks: { color: 'rgba(255,255,255,0.6)', font: { size: 10 } }
+              }
+            },
+            animation: { duration: 1000, easing: 'easeOutQuart' }
+          }
+        });
+      }
+    }
+
+    // Render Type Chart (Pie)
     if (chartData.typeData.labels.length > 0) {
       const typeCtx = document.getElementById('chartTypes')?.getContext('2d');
       if (typeCtx) {
@@ -3165,89 +2948,6 @@ function renderChartVisualizations() {
           },
           options: {
             ...commonOptions,
-            onClick: (evt, els, chart) => { const label = chartLabelFromClick(chart, evt); if(label) applyChartPatientFilter('type', label); },
-            animation: {
-              animateScale: true,
-              animateRotate: true
-            }
-          }
-        });
-      }
-    }
-    
-    if (chartData.providerData.labels.length > 0) {
-      const providerCtx = document.getElementById('chartProviders')?.getContext('2d');
-      if (providerCtx) {
-        state.charts.providerChart = new Chart(providerCtx, {
-          type: 'bar',
-          data: {
-            labels: chartData.providerData.labels,
-            datasets: [{
-              label: 'Patients',
-              data: chartData.providerData.data,
-              backgroundColor: chartData.providerData.labels.map((_, i) => colors[(i+6) % colors.length]),
-              borderColor: 'rgba(255,255,255,0.2)',
-              borderWidth: 1,
-              borderRadius: 4
-            }]
-          },
-          options: {
-            ...commonOptions,
-            onClick: (evt, els, chart) => { const label = chartLabelFromClick(chart, evt); if(label) applyChartPatientFilter('provider', label); },
-            indexAxis: 'y',
-            scales: {
-              x: {
-                beginAtZero: true,
-                grid: {
-                  color: 'rgba(255,255,255,0.05)'
-                },
-                ticks: {
-                  color: 'rgba(255,255,255,0.6)',
-                  font: {
-                    size: 11
-                  }
-                }
-              },
-              y: {
-                grid: {
-                  color: 'rgba(255,255,255,0.05)'
-                },
-                ticks: {
-                  color: 'rgba(255,255,255,0.6)',
-                  font: {
-                    size: 11
-                  }
-                }
-              }
-            },
-            animation: {
-              duration: 1000,
-              easing: 'easeOutQuart'
-            }
-          }
-        });
-      }
-    }
-    
-    if (chartData.channelData.labels.length > 0) {
-      const channelCtx = document.getElementById('chartChannels')?.getContext('2d');
-      if (channelCtx) {
-        state.charts.channelChart = new Chart(channelCtx, {
-          type: 'doughnut',
-          data: {
-            labels: chartData.channelData.labels,
-            datasets: [{
-              data: chartData.channelData.data,
-              backgroundColor: chartData.channelData.labels.map((_, i) => colors[(i+3) % colors.length]),
-              borderColor: 'rgba(255,255,255,0.15)',
-              borderWidth: 1,
-              hoverOffset: 10
-            }]
-          },
-          options: {
-            ...commonOptions,
-            onClick: (evt, els, chart) => { const label = chartLabelFromClick(chart, evt); if(label) applyChartPatientFilter('channel', label); },
-            cutout: '60%',
             animation: {
               animateScale: true,
               animateRotate: true
@@ -3292,9 +2992,35 @@ function renderChartVisualizations() {
         </div>
 
         <div style="margin-top:18px">
+          <h3 style="margin-bottom:8px">New Web Page Patients (per day)</h3>
+          ${renderWebPageDaily()}
+        </div>
+
+        <div style="margin-top:18px">
           <h3 style="margin-bottom:8px">Report Save Log</h3>
           ${renderReportLog()}
         </div>
+      </div>
+    `;
+  }
+
+  function renderWebPageDaily(){
+    const rows = {};
+    for(const p of (state.patients||[])){
+      if(lower(p.sender||"") !== "web page") continue;
+      const day = (p.createdAt||"").slice(0,10) || (p.requestedDate||"").slice(0,10);
+      if(!day) continue;
+      rows[day] = (rows[day]||0) + 1;
+    }
+    const entries = Object.entries(rows).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,14);
+    if(!entries.length) return `<div class="mini">No web page entries yet.</div>`;
+    const tr = entries.map(([d,c])=>`<tr><td class="nowrap">${escapeHtml(formatDateMDY(d))}</td><td>${c}</td></tr>`).join("");
+    return `
+      <div style="overflow:auto">
+        <table class="tableRoomy">
+          <thead><tr><th>Date</th><th>New Patients</th></tr></thead>
+          <tbody>${tr}</tbody>
+        </table>
       </div>
     `;
   }
@@ -3328,17 +3054,22 @@ function renderChartVisualizations() {
   // Page wiring (events)
   // -----------------------------
   function wirePage(){
+    // Tabs
     $$(".tab").forEach(t => t.addEventListener("click", () => { 
       state.ui.tab = t.dataset.tab; 
       if(state.ui.tab==="Patients") state.ui.patientOverdueOnly=false;
       render(); 
     }));
 
+
+    
+    // Home Quick Actions
     $("#qaCallClinic")?.addEventListener("click", ()=>{ runQuickAction("callClinic"); render(); });
     $("#qaSendReply")?.addEventListener("click", ()=>{ runQuickAction("sendReply"); render(); });
     $("#qaCloseTasks")?.addEventListener("click", ()=>{ runQuickAction("closeTasks"); render(); });
     $("#qaClearFocus")?.addEventListener("click", ()=>{ runQuickAction("clearFocus"); render(); });
 
+    // Patient saved views
     $$("[data-action='set_view']").forEach(el => el.addEventListener("click", ()=>{
       const view = el.dataset.view;
       state.ui.patientView = view;
@@ -3353,6 +3084,7 @@ function renderChartVisualizations() {
       render();
     }));
 
+    // Bulk selection: Patients
     $("#pSelectAll")?.addEventListener("change", (e)=>{
       const checked = e.target.checked;
       const list = filteredPatients().map(p=>p.matter);
@@ -3401,6 +3133,7 @@ function renderChartVisualizations() {
       });
     });
 
+    // Bulk selection: Tasks
     $("#tSelectAll")?.addEventListener("change", (e)=>{
       const checked = e.target.checked;
       const list = filteredTasks().map(t=>t.id);
@@ -3429,14 +3162,14 @@ function renderChartVisualizations() {
     });
     $("#bulkTSnooze")?.addEventListener("click", ()=>{
       const add1 = (d)=>{
-        const dt = d ? new Date(parseDateForInput(d)+"T00:00:00") : new Date();
+        const dt = d ? new Date(d+"T00:00:00") : new Date();
         dt.setDate(dt.getDate()+1);
         return dt.toISOString().slice(0,10);
       };
       for(const id of (state.ui.selectedTasks||[])){
         const t = state.tasks.find(x=>x.id===id);
         if(!t) continue;
-        t.dueDate = formatDate(add1(t.dueDate));
+        t.dueDate = add1(t.dueDate);
       }
       toast("Snoozed","+1 day applied.");
       render();
@@ -3452,9 +3185,11 @@ function renderChartVisualizations() {
       });
     });
 
+    // Task controls
     $("#taskSort")?.addEventListener("change", (e)=>{ state.ui.tasksSort = e.target.value; render(); });
     $("#tasksShowDone")?.addEventListener("change", (e)=>{ state.ui.tasksShowDone = !!e.target.checked; render(); });
 
+    // Task templates
     const tpl = (type, desc)=>()=>{
       const matter = state.assistant.lastMatter || "";
       openModal("New Task (Template)", `
@@ -3463,6 +3198,7 @@ function renderChartVisualizations() {
           <select class="input" id="tpl_priority">${buildOptions(OPTIONS.taskPriority, "High")}</select>
           <select class="input" id="tpl_type">${buildOptions(OPTIONS.taskType, type)}</select>
           <select class="input" id="tpl_progress">${buildOptions(OPTIONS.taskProgress, "Open")}</select>
+          <input class="input" id="tpl_req" type="date" placeholder="Requested date" value="${new Date().toISOString().slice(0,10)}"/>
           <input class="input" id="tpl_due" type="date" placeholder="Due date"/>
         </div>
         <div style="margin-top:10px">
@@ -3475,7 +3211,8 @@ function renderChartVisualizations() {
           priority: norm($("#tpl_priority").value),
           taskType: norm($("#tpl_type").value),
           progress: norm($("#tpl_progress").value),
-          dueDate: formatDate(norm($("#tpl_due").value)),
+          requestedDate: norm($("#tpl_req").value),
+          dueDate: norm($("#tpl_due").value),
           description: norm($("#tpl_desc").value),
           createdAt: new Date().toISOString()
         };
@@ -3492,6 +3229,8 @@ function renderChartVisualizations() {
     $("#tplRequestRecords")?.addEventListener("click", tpl("Other", "Request records from clinic"));
     $("#tplConfirmAppt")?.addEventListener("click", tpl("Other", "Confirm appointment details"));
 
+
+    // Home KPI pills
     $$("[data-action^='home_']").forEach(el => el.addEventListener("click", () => {
       const a = el.dataset.action;
       if(a==="home_needs_reply"){ state.ui.homeFilter="needs_reply"; state.ui.tab="Home"; }
@@ -3501,95 +3240,7 @@ function renderChartVisualizations() {
       render();
     }));
 
-    const homePatientSearch = $("#homePatientSearch");
-    if (homePatientSearch) {
-      homePatientSearch.addEventListener("input", (e) => {
-        const table = document.querySelector("#priorityPatientsTable .resizable-content table tbody");
-        if (table) {
-          const searchTerm = lower(e.target.value);
-          const allRows = Array.from(table.querySelectorAll("tr"));
-          allRows.forEach(row => {
-            const text = lower(row.textContent);
-            row.style.display = text.includes(searchTerm) ? "" : "none";
-          });
-        }
-      });
-      
-      $("#clearHomePatientSearch")?.addEventListener("click", () => {
-        if (homePatientSearch) {
-          homePatientSearch.value = "";
-          const table = document.querySelector("#priorityPatientsTable .resizable-content table tbody");
-          if (table) {
-            const allRows = table.querySelectorAll("tr");
-            allRows.forEach(row => row.style.display = "");
-          }
-        }
-      });
-    }
-
-    const homeTaskSearch = $("#homeTaskSearch");
-    if (homeTaskSearch) {
-      homeTaskSearch.addEventListener("input", (e) => {
-        const table = document.querySelector("#actionInboxTable .resizable-content table tbody");
-        if (table) {
-          const searchTerm = lower(e.target.value);
-          const allRows = Array.from(table.querySelectorAll("tr"));
-          allRows.forEach(row => {
-            const text = lower(row.textContent);
-            row.style.display = text.includes(searchTerm) ? "" : "none";
-          });
-        }
-      });
-      
-      $("#clearHomeTaskSearch")?.addEventListener("click", () => {
-        if (homeTaskSearch) {
-          homeTaskSearch.value = "";
-          const table = document.querySelector("#actionInboxTable .resizable-content table tbody");
-          if (table) {
-            const allRows = table.querySelectorAll("tr");
-            allRows.forEach(row => row.style.display = "");
-          }
-        }
-      });
-    }
-
-    $$(".resize-toggle").forEach(btn => {
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const tableId = btn.dataset.table;
-        const content = btn.closest(".resizable-table-container").querySelector(".resizable-content");
-        
-        if (content.classList.contains("collapsed")) {
-          content.classList.remove("collapsed");
-          btn.textContent = "−";
-        } else {
-          content.classList.add("collapsed");
-          btn.textContent = "+";
-        }
-        
-        state.draggableTables[tableId] = content.classList.contains("collapsed");
-        saveState();
-      });
-    });
-
-    if (state.draggableTables.priorityPatients) {
-      const content = document.querySelector("#priorityPatientsTable .resizable-content");
-      const btn = document.querySelector("#priorityPatientsTable .resize-toggle");
-      if (content && btn) {
-        content.classList.add("collapsed");
-        btn.textContent = "+";
-      }
-    }
-    
-    if (state.draggableTables.actionInbox) {
-      const content = document.querySelector("#actionInboxTable .resizable-content");
-      const btn = document.querySelector("#actionInboxTable .resize-toggle");
-      if (content && btn) {
-        content.classList.add("collapsed");
-        btn.textContent = "+";
-      }
-    }
-
+    // Patients tools
     const ps = $("#patientSearch");
     if(ps){
       ps.addEventListener("input", (e) => {
@@ -3620,23 +3271,20 @@ function renderChartVisualizations() {
         state.ui.patientWaiting = e.target.value; 
         render(); 
       });
-      
-      $("#patientSortFilter")?.addEventListener("change", (e) => { 
-        state.ui.patientSort = e.target.value; 
-        render(); 
-      });
+
+      $("#patientSort")?.addEventListener("change", (e)=>{ state.ui.patientSort = e.target.value; render(); });
       
       $("#patientClear")?.addEventListener("click", () => { 
         state.ui.patientSearch = ""; 
         state.ui.patientStatus = "all"; 
         state.ui.patientWaiting = "all"; 
-        state.ui.patientSort = "requested";
         render(); 
       });
       
       $("#btnQuickPatient")?.addEventListener("click", openQuickPatient);
     }
 
+    // Tasks tools
     const ts = $("#taskSearch");
     if(ts){
       ts.addEventListener("input", (e) => {
@@ -3666,6 +3314,7 @@ function renderChartVisualizations() {
       $("#btnQuickTask")?.addEventListener("click", openQuickTask);
     }
 
+    // Charts section search
     const cs = $("#chartSearch");
     if(cs){
       cs.addEventListener("input", (e) => {
@@ -3687,6 +3336,7 @@ function renderChartVisualizations() {
       });
     }
 
+    // Insights date selector
     const insightDate = $("#insightDate");
     if(insightDate){
       insightDate.addEventListener("change", (e) => {
@@ -3700,6 +3350,7 @@ function renderChartVisualizations() {
       });
     }
 
+    // Charts filter clicks
     $$("[data-action='chart_filter']").forEach(el => {
       el.addEventListener("click", (e) => {
         const filter = el.dataset.filter;
@@ -3717,24 +3368,18 @@ function renderChartVisualizations() {
             state.ui.patientStatus = "all";
             state.ui.patientSearch = "";
             toast("Filter Applied", `Showing patients waiting on: ${value}`);
+          } else if (type === "provider") {
+            state.ui.tab = "Patients";
+            state.ui.patientSearch = value;
+            state.ui.patientStatus = "all";
+            state.ui.patientWaiting = "all";
+            toast("Filter Applied", `Showing patients for provider: ${value}`);
           } else if (type === "type") {
             state.ui.tab = "Patients";
             state.ui.patientSearch = value;
             state.ui.patientStatus = "all";
             state.ui.patientWaiting = "all";
             toast("Filter Applied", `Showing patients of type: ${value}`);
-          } else if (type === "provider") {
-            state.ui.tab = "Patients";
-            state.ui.patientSearch = value;
-            state.ui.patientStatus = "all";
-            state.ui.patientWaiting = "all";
-            toast("Filter Applied", `Showing patients with provider: ${value}`);
-          } else if (type === "channel") {
-            state.ui.tab = "Patients";
-            state.ui.patientSearch = value;
-            state.ui.patientStatus = "all";
-            state.ui.patientWaiting = "all";
-            toast("Filter Applied", `Showing patients from channel: ${value}`);
           } else if (type === "progress") {
             state.ui.tab = "Tasks";
             state.ui.taskSearch = "";
@@ -3757,6 +3402,7 @@ function renderChartVisualizations() {
       });
     });
 
+    // Reports tools
     if($("#reportText")){
       $("#btnGenerateHere")?.addEventListener("click", () => { generateDraftInto("#reportText"); });
       $("#btnCopyReport")?.addEventListener("click", copyReport);
@@ -3768,6 +3414,7 @@ function renderChartVisualizations() {
       });
     }
 
+    // Delegated actions for the entire page
     $("#page").addEventListener("click", (e)=>{
       const actEl = e.target.closest("[data-action]");
       if(!actEl) return;
@@ -3781,9 +3428,10 @@ function renderChartVisualizations() {
       }
       if(action==="home_action"){
         const kind = actEl.dataset.kind || "";
-        const todayISO = new Date().toISOString().slice(0,10);
+        const today = new Date().toISOString().slice(0,10);
 
         if(kind==="send_reply"){
+          // Create "Reply email" tasks for needs-reply patients (top 8) if missing
           const targets = state.patients
             .filter(p => lower(p.status)==="needs reply" && lower(p.status)!=="done")
             .slice()
@@ -3810,7 +3458,7 @@ function renderChartVisualizations() {
           });
 
           state.ui.homeFilter = "needs_reply";
-          persist();
+          saveState();
           toast("Send Reply", made ? `Created ${made} task(s).` : "No new tasks needed.");
           render();
           return;
@@ -3848,13 +3496,13 @@ function renderChartVisualizations() {
         render();
         return;
       }
-      if(action==="peek_patient"){ openPatientPeek(actEl.dataset.matter); return; }
       if(action==="edit_patient"){ editPatient(actEl.dataset.matter); return; }
       if(action==="del_patient"){ 
         const matter = actEl.dataset.matter;
         const patient = state.patients.find(p => p.matter === matter);
         const patientName = patient ? patient.patient : matter;
         
+        // Use the new confirmation modal instead of native confirm
         openConfirm(
           "Delete Patient", 
           `Are you sure you want to delete patient ${patientName} (Matter: ${matter})?`,
@@ -3870,6 +3518,7 @@ function renderChartVisualizations() {
         const task = state.tasks.find(t => t.id === taskId);
         const matterInfo = task ? `for Matter ${task.matter}` : "";
         
+        // Use the new confirmation modal instead of native confirm
         openConfirm(
           "Delete Task", 
           `Are you sure you want to delete this task ${matterInfo}?`,
@@ -3885,6 +3534,7 @@ function renderChartVisualizations() {
         const report = state.reports.find(r => r.id === reportId);
         const reportDate = report ? report.when : "this report";
         
+        // Use the new confirmation modal instead of native confirm
         openConfirm(
           "Delete Report", 
           `Are you sure you want to delete the report saved on ${reportDate}?`,
@@ -3903,24 +3553,12 @@ function renderChartVisualizations() {
       if(sel.dataset.action==="p_update"){
         const matter = sel.dataset.matter;
         const field = sel.dataset.field;
-        let value = sel.value;
-        
-        if (field === "dueDate" || field === "requestedDate") {
-          value = formatDate(value);
-        }
-        
-        updatePatientField(matter, field, value);
+        updatePatientField(matter, field, sel.value);
       }
       if(sel.dataset.action==="t_update"){
         const id = sel.dataset.id;
         const field = sel.dataset.field;
-        let value = sel.value;
-        
-        if (field === "dueDate") {
-          value = formatDate(value);
-        }
-        
-        updateTaskField(id, field, value);
+        updateTaskField(id, field, sel.value);
       }
     });
   }
@@ -3942,12 +3580,12 @@ function renderChartVisualizations() {
         <input class="input" id="ql_providerEmail" placeholder="Provider email (optional)"/>
 
         <div class="formSectionTitle">Dates</div>
-        <input class="input" id="ql_req" placeholder="Requested Date (MM/DD/YYYY)"/>
-        <input class="input" id="ql_due" type="date" placeholder="Due Date" title="Due Date (drives 'Overdue today' from Patients)"/>
-        <div class="formHelp">Tip: "Overdue today" is calculated from Patients using "Due Date".</div>
+        <input class="input" id="ql_req" type="date" placeholder="Requested date"/>
+        <input class="input" id="ql_due" type="date" placeholder="Due date" title="Due date (drives Overdue/Today in Patients and Home)"/>
+        <div class="formHelp">Tip: Overdue/Today is calculated from the Due date.</div>
 
-        <div class="formSectionTitle">Status</div>
-        <select class="input" id="ql_channel">${buildOptions(OPTIONS.patientChannel, "Email")}</select>
+        <div class="formSectionTitle">Channel</div>
+        <select class="input" id="ql_sender">${buildOptions(OPTIONS.channel, "Email")}</select>
         <select class="input" id="ql_status">${buildOptions(OPTIONS.patientStatus, "New")}</select>
         <select class="input" id="ql_waiting">${buildOptions(OPTIONS.waitingOn, "Clinic")}</select>
       </div>
@@ -3963,8 +3601,8 @@ function renderChartVisualizations() {
         provider: norm($("#ql_provider").value),
         providerEmail: norm($("#ql_providerEmail").value),
         requestedDate: norm($("#ql_req").value),
-        dueDate: formatDate(norm($("#ql_due").value)),
-        channel: norm($("#ql_channel").value),
+        dueDate: norm($("#ql_due").value),
+        sender: norm($("#ql_sender").value),
         status: norm($("#ql_status").value),
         waitingOn: norm($("#ql_waiting").value),
         notes: norm($("#ql_notes").value),
@@ -3997,9 +3635,9 @@ function renderChartVisualizations() {
         <select class="input" id="ep_type">${buildOptions(OPTIONS.patientTypes, p.type||"MRI")}</select>
         <input class="input" id="ep_provider" placeholder="Provider name" value="${escapeHtml(p.provider||"")}"/>
         <input class="input" id="ep_providerEmail" placeholder="Provider email" value="${escapeHtml(p.providerEmail||"")}"/>
-        <input class="input" id="ep_req" placeholder="Requested Date (MM/DD/YYYY)" value="${escapeHtml(p.requestedDate||"")}"/>
-        <input class="input" id="ep_due" type="date" placeholder="Due Date" value="${parseDateForInput(p.dueDate||"")}"/>
-        <select class="input" id="ep_channel">${buildOptions(OPTIONS.patientChannel, p.channel||"Email")}</select>
+        <input class="input" id="ep_req" type="date" placeholder="Requested date" value="${escapeHtml(p.requestedDate||"")}"/>
+        <input class="input" id="ep_due" type="date" placeholder="Due date" value="${escapeHtml(p.dueDate||"")}"/>
+        <select class="input" id="ep_sender">${buildOptions(OPTIONS.channel, p.sender||"Email")}</select>
         <select class="input" id="ep_status">${buildOptions(OPTIONS.patientStatus, p.status||"New")}</select>
         <select class="input" id="ep_waiting">${buildOptions(OPTIONS.waitingOn, p.waitingOn||"Clinic")}</select>
       </div>
@@ -4014,8 +3652,8 @@ function renderChartVisualizations() {
         provider: norm($("#ep_provider").value),
         providerEmail: norm($("#ep_providerEmail").value),
         requestedDate: norm($("#ep_req").value),
-        dueDate: formatDate(norm($("#ep_due").value)),
-        channel: norm($("#ep_channel").value),
+        dueDate: norm($("#ep_due").value),
+        sender: norm($("#ep_sender").value),
         status: norm($("#ep_status").value),
         waitingOn: norm($("#ep_waiting").value),
         notes: norm($("#ep_notes").value)
@@ -4023,78 +3661,6 @@ function renderChartVisualizations() {
       addAssistantSystem(`Updated patient ${matter}.`);
       render();
     });
-  }
-
-  // Read-only "peek" modal so users can quickly read Notes and all details
-  // without going into Edit.
-  function openPatientPeek(matter){
-    const p = state.patients.find(x => x.matter===matter);
-    if(!p){ toast("Not found", `Patient ${matter} not found.`); return; }
-
-    const status = escapeHtml(p.status||"-");
-    const waiting = escapeHtml(p.waitingOn||"-");
-    const channel = escapeHtml(p.channel||"-");
-    const provider = escapeHtml(p.provider||"-");
-    const providerEmail = escapeHtml(p.providerEmail||"-");
-    const patient = escapeHtml(p.patient||"-");
-    const stateStr = escapeHtml(p.state||"-");
-    const typeStr = escapeHtml(p.type||"-");
-    const requested = formatDate(p.requestedDate)||"-";
-    const due = p.dueDate ? formatDate(p.dueDate) : "-";
-    const notes = escapeHtml(p.notes||"");
-
-    openModal(
-      `Patient • ${escapeHtml(matter)}`,
-      `
-        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap">
-          <div>
-            <div style="font-size:18px; font-weight:800; margin-bottom:4px">${patient}</div>
-            <div class="mini">Matter <strong>${escapeHtml(matter)}</strong> • ${stateStr} • ${typeStr}</div>
-          </div>
-          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center">
-            <span class="badge">Status: <strong>${status}</strong></span>
-            <span class="badge">Waiting: <strong>${waiting}</strong></span>
-            <span class="badge">Channel: <strong>${channel}</strong></span>
-          </div>
-        </div>
-
-        <div style="margin-top:14px" class="modalGrid">
-          <div>
-            <div class="mini">Provider</div>
-            <div style="font-weight:700">${provider}</div>
-            <div class="mini" style="opacity:.85">${providerEmail}</div>
-          </div>
-          <div>
-            <div class="mini">Dates</div>
-            <div style="display:flex; gap:10px; flex-wrap:wrap">
-              <span class="badge">Requested: <strong>${escapeHtml(requested)}</strong></span>
-              <span class="badge">Due: <strong>${escapeHtml(due)}</strong></span>
-            </div>
-          </div>
-        </div>
-
-        <div style="margin-top:14px">
-          <div class="mini" style="margin-bottom:6px">Notes</div>
-          <div style="
-            border: 1px solid rgba(255,255,255,.10);
-            background: rgba(0,0,0,.25);
-            border-radius: 14px;
-            padding: 12px;
-            min-height: 120px;
-            white-space: pre-wrap;
-            line-height: 1.35;
-            ">
-            ${notes ? notes : '<span class="mini">No notes yet.</span>'}
-          </div>
-        </div>
-
-        <div style="display:flex; gap:10px; justify-content:flex-end; margin-top:14px">
-          <button class="btn" data-action="edit_patient" data-matter="${escapeHtml(matter)}">Edit</button>
-        </div>
-      `,
-      "Click Edit if you need to update anything.",
-      null
-    );
   }
 
   function deletePatient(matter){
@@ -4121,6 +3687,7 @@ function renderChartVisualizations() {
         <select class="input" id="qt_priority">${buildOptions(OPTIONS.taskPriority, "Medium")}</select>
         <select class="input" id="qt_type">${buildOptions(OPTIONS.taskType, "Follow-up clinic")}</select>
         <select class="input" id="qt_progress">${buildOptions(OPTIONS.taskProgress, "Open")}</select>
+        <input class="input" id="qt_req" type="date" placeholder="Requested date" value="${new Date().toISOString().slice(0,10)}"/>
         <input class="input" id="qt_due" type="date" placeholder="Due date"/>
       </div>
       <div style="margin-top:10px">
@@ -4133,7 +3700,8 @@ function renderChartVisualizations() {
         priority: norm($("#qt_priority").value),
         taskType: norm($("#qt_type").value),
         progress: norm($("#qt_progress").value),
-        dueDate: formatDate(norm($("#qt_due").value)),
+        requestedDate: norm($("#qt_req").value),
+        dueDate: norm($("#qt_due").value),
         description: norm($("#qt_desc").value),
         createdAt: new Date().toISOString()
       };
@@ -4161,7 +3729,8 @@ function renderChartVisualizations() {
         <select class="input" id="et_priority">${buildOptions(OPTIONS.taskPriority, t.priority||"Medium")}</select>
         <select class="input" id="et_type">${buildOptions(OPTIONS.taskType, t.taskType||"Follow-up clinic")}</select>
         <select class="input" id="et_progress">${buildOptions(OPTIONS.taskProgress, t.progress||"Open")}</select>
-        <input class="input" id="et_due" type="date" placeholder="Due date" value="${parseDateForInput(t.dueDate||"")}"/>
+        <input class="input" id="et_req" type="date" placeholder="Requested date" value="${escapeHtml(t.requestedDate||"")}"/>
+        <input class="input" id="et_due" type="date" placeholder="Due date" value="${escapeHtml(t.dueDate||"")}"/>
       </div>
       <div style="margin-top:10px">
         <textarea class="input" id="et_desc" style="min-height:140px">${escapeHtml(t.description||"")}</textarea>
@@ -4172,7 +3741,8 @@ function renderChartVisualizations() {
         priority: norm($("#et_priority").value),
         taskType: norm($("#et_type").value),
         progress: norm($("#et_progress").value),
-        dueDate: formatDate(norm($("#et_due").value)),
+        requestedDate: norm($("#et_req").value),
+        dueDate: norm($("#et_due").value),
         description: norm($("#et_desc").value)
       });
       addAssistantSystem(`Updated a task for ${t.matter}.`);
@@ -4201,21 +3771,9 @@ function renderChartVisualizations() {
     const openTasks = state.tasks.filter(t => lower(t.progress)==="open");
     const needsReply = state.patients.filter(p => lower(p.status)==="needs reply");
     const waitingClinic = state.patients.filter(p => lower(p.waitingOn)==="clinic" && lower(p.status)!=="done");
-    
-    const today = new Date();
-    const todayFormatted = today.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: '2-digit', 
-      day: '2-digit' 
-    }).replace(/(\d+)\/(\d+)\/(\d+)/, '$1/$2/$3');
-    
-    const isoToday = new Date().toISOString().slice(0,10);
-    const newPatientsToday = state.patients.filter(p => sameDayByRequestedDate(p.requestedDate, isoToday)).length;
 
     const lines = [];
     lines.push(`4pm Report — ${nowStamp()}`);
-    lines.push("");
-    lines.push(`New patients added today: ${newPatientsToday}`);
     lines.push("");
     lines.push(`Patients waiting on clinic: ${waitingClinic.length}`);
     for(const p of waitingClinic.slice(0,12)){
@@ -4282,20 +3840,11 @@ function renderChartVisualizations() {
   }
 
   // -----------------------------
-  // Assistant - MODIFICADO: función para minimizar
+  // Assistant
   // -----------------------------
   function renderAssistant(){
     const panel = $("#assistant");
     panel.style.display = state.assistant.open ? "block" : "none";
-    
-    if (state.assistant.minimized) {
-      panel.classList.add("minimized");
-      $("#btnMinimizeAssistant").textContent = "+";
-    } else {
-      panel.classList.remove("minimized");
-      $("#btnMinimizeAssistant").textContent = "−";
-    }
-    
     $("#pendingCount").textContent = String(state.assistant.pending||0);
 
     const body = $("#assistantBody");
@@ -4309,7 +3858,7 @@ function renderChartVisualizations() {
       {cmd: "show patients status Needs reply", desc: "Show patients with status Needs reply"},
       {cmd: "show patients waiting on Clinic", desc: "Show patients waiting on Clinic"},
       {cmd: "open 107853", desc: "Open specific patient"},
-      {cmd: "update patient 107853 dueDate=01/13/2026 status=Needs reply", desc: "Update patient info"},
+      {cmd: "update patient 107853 dueDate=2026-01-13 status=Needs reply", desc: "Update patient info"},
       {cmd: "add patient", desc: "Add new patient"},
       {cmd: "add task", desc: "Add new task"},
       {cmd: "export data", desc: "Download all data as CSV"},
@@ -4343,12 +3892,6 @@ function renderChartVisualizations() {
     body.scrollTop = body.scrollHeight;
   }
 
-  function toggleAssistantMinimize() {
-    state.assistant.minimized = !state.assistant.minimized;
-    renderAssistant();
-    saveState();
-  }
-
   function addAssistant(role, text, meta){
     state.assistant.chat.push({ role, text, meta: meta||"" });
     saveState();
@@ -4368,7 +3911,7 @@ function renderChartVisualizations() {
     const raw = norm(input);
     const msg = lower(raw);
 
-    const todayISO = new Date().toISOString().slice(0,10);
+    const today = new Date().toISOString().slice(0,10);
 
     const STATUS = OPTIONS.patientStatus;
     const WAITING = OPTIONS.waitingOn;
@@ -4381,17 +3924,20 @@ function renderChartVisualizations() {
 
     const bestMatch = (candidates, text) => {
       const t = simplify(text);
+      // exact / includes
       for(const c of candidates){
         const cs = simplify(c);
         if(t === cs) return c;
         if(t.includes(cs)) return c;
       }
+      // partial token match
       const toks = t.split(" ").filter(Boolean);
       for(const c of candidates){
         const cs = simplify(c);
         const ctoks = cs.split(" ");
         if(ctoks.every(x => toks.includes(x))) return c;
       }
+      // common aliases
       const alias = {
         "needsreply":"Needs reply",
         "needs reply":"Needs reply",
@@ -4435,6 +3981,7 @@ function renderChartVisualizations() {
       return lines.join("\n");
     };
 
+    // HELP (EN/ES)
     if(msgS === "help" || msgS === "ayuda" || msgS === "?"){
       addAssistant("sys",
 `I can do:
@@ -4443,7 +3990,7 @@ function renderChartVisualizations() {
 • show patients status <status>
 • show patients waiting on <who>
 • open <matter>
-• update patient <matter> status=... waitingOn=... dueDate=MM/DD/YYYY
+• update patient <matter> status=... waitingOn=... dueDate=YYYY-MM-DD
 • add patient
 • add task
 • export data
@@ -4453,11 +4000,13 @@ function renderChartVisualizations() {
       return;
     }
 
+    // SHOW OVERDUE
     if(msgS.includes("overdue") || msgS.includes("vencid") || msgS.includes("atrasad")){
       addAssistant("sys", listOverdue());
       return;
     }
 
+    // SHOW NEEDS REPLY
     if(msgS.includes("show needs reply") || msgS === "needs reply" || msgS.includes("show needs reply") || msgS.includes("necesita respuesta") ){
       state.ui.tab="Patients"; state.ui.patientStatus="Needs reply"; state.ui.patientWaiting="all"; state.ui.patientSearch="";
       addAssistant("sys","Showing patients/tasks that need reply.");
@@ -4465,6 +4014,7 @@ function renderChartVisualizations() {
       return;
     }
 
+    // SHOW CHARTS
     if(msgS.includes("show charts") || msgS.includes("view analytics") || msgS.includes("show charts") || msgS.includes("analytics")){
       state.ui.tab = "Charts";
       addAssistant("sys", "Opening charts and analytics.");
@@ -4472,6 +4022,7 @@ function renderChartVisualizations() {
       return;
     }
 
+    // SHOW PATIENTS BY STATUS (ex: "show patients with new status", "show patients status new")
     if((msgS.includes("show patients") || msgS.includes("show patients")) && (msgS.includes("status") || msgS.includes("status"))){
       let target = extractAfter(/(?:status|estado)\s*(?:is|=|:|to)?\s*([a-zA-Z\s]+)/i);
       if(!target && msgS.includes("new status")) target = "New";
@@ -4487,6 +4038,7 @@ function renderChartVisualizations() {
       }
     }
 
+    // SHOW PATIENTS BY WAITING ON
     if((msgS.includes("show patients") || msgS.includes("show patients")) && (msgS.includes("waiting on") || msgS.includes("waiting") || msgS.includes("waiting"))){
       let target = extractAfter(/(?:waiting on|esperando)\s*(?:is|=|:|a)?\s*([a-zA-Z\s]+)/i);
       const waiting = bestMatch(WAITING, target || raw);
@@ -4501,6 +4053,7 @@ function renderChartVisualizations() {
       }
     }
 
+    // OPEN
     if(msgS.startsWith("open ") || msgS.startsWith("abrir ")){
       const matter = parseMatterFromText(raw) || state.assistant.lastMatter;
       if(matter){
@@ -4515,6 +4068,7 @@ function renderChartVisualizations() {
       }
     }
 
+    // PATIENT SUMMARY QUERY ("status of ...", "qué pasó con ...")
     if(msgS.includes("give an update") || msgS.includes("update about") || msgS.includes("status of") || msgS.includes("what about")
        || msgS.includes("give me an update") || msgS.includes("status of") || msgS.includes("what happened with")){
       const name = input.split(/about|of|de|con/i)[1]?.trim();
@@ -4528,6 +4082,7 @@ function renderChartVisualizations() {
       return;
     }
 
+    // WHAT'S PENDING
     if(msgS.includes("what's pending") || msgS.includes("what do i have") || msgS.includes("pending items")
        || msgS.includes("que tengo pendiente") || msgS.includes("pendiente")){
       const overduePatients = state.patients.filter(p => p.dueDate && p.dueDate <= today && lower(p.status)!=="done").length;
@@ -4537,6 +4092,7 @@ function renderChartVisualizations() {
       return;
     }
 
+    // CLEAR FILTERS
     if(msgS.includes("clear search") || msgS.includes("clear filters") || msgS.includes("limpiar filtros") || msgS.includes("limpiar busqueda")){
       state.ui.patientSearch = "";
       state.ui.patientStatus = "all";
@@ -4548,12 +4104,14 @@ function renderChartVisualizations() {
       return;
     }
 
+    // EXPORT
     if(msgS.includes("export data") || msgS.includes("download excel") || msgS.includes("download data") || msgS.includes("exportar")){
       downloadCSV();
       addAssistant("sys", "Downloading all patient data as CSV file.");
       return;
     }
 
+    // GENERATE REPORT
     if(msgS.includes("generate report") || msgS.includes("create report") || msgS.includes("generar reporte") || msgS.includes("generar informe")){
       state.ui.tab = "Reports";
       generateDraftInto("#reportText");
@@ -4561,6 +4119,7 @@ function renderChartVisualizations() {
       return;
     }
 
+    // ADD
     if(msgS.includes("add patient") || msgS.includes("new patient") || msgS.includes("add patient") || msgS.includes("new patient")){
       openQuickPatient();
       addAssistant("sys", "Opening Quick Log to add a new patient.");
@@ -4573,6 +4132,7 @@ function renderChartVisualizations() {
       return;
     }
 
+    // UPDATE PATIENT (richer parsing, EN/ES)
     if(msgS.includes("update patient") || msgS.includes("update patient") || msgS.includes("update the patient")){
       const matter = parseMatterFromText(raw) || state.assistant.lastMatter;
       if(!matter){
@@ -4585,9 +4145,10 @@ function renderChartVisualizations() {
         return;
       }
 
-      const pairs = Array.from(raw.matchAll(/\b(status|estado|waitingOn|esperando|type|tipo|provider|proveedor|state|estadoUS|patient|paciente|channel|canal|requestedDate|requested|solicitado|dueDate|due|vencimiento)\s*=\s*([^,\n]+)/gi));
+      // key=value pairs (EN/ES keys)
+      const pairs = Array.from(raw.matchAll(/\b(status|estado|waitingOn|esperando|type|tipo|provider|proveedor|state|estadoUS|patient|paciente|sender|remitente|requestedDate|requested|solicitado|dueDate|due|vencimiento)\s*=\s*([^,\n]+)/gi));
       if(pairs.length===0){
-        addAssistant("sys","Tell me what to change. Example: update patient 107853 status=Needs reply waitingOn=You dueDate=01/13/2026");
+        addAssistant("sys","Tell me what to change. Example: update patient 107853 status=Needs reply waitingOn=You dueDate=2026-01-13");
         return;
       }
 
@@ -4613,11 +4174,7 @@ function renderChartVisualizations() {
         if(keyRaw==="provider" || keyRaw==="provider"){ p.provider = val; continue; }
         if(keyRaw==="state" || keyRaw==="estadous"){ p.state = val; continue; }
         if(keyRaw==="patient" || keyRaw==="patient"){ p.patient = val; continue; }
-        if(keyRaw==="channel" || keyRaw==="canal"){ 
-          const c = bestMatch(OPTIONS.patientChannel, val);
-          if(c) p.channel = c; else p.channel = val;
-          continue;
-        }
+        if(keyRaw==="sender" || keyRaw==="sender"){ p.sender = val; continue; }
         if(keyRaw==="requesteddate" || keyRaw==="requested" || keyRaw==="solicitado"){ p.requestedDate = val; continue; }
         if(keyRaw==="duedate" || keyRaw==="due" || keyRaw==="vencimiento"){ p.dueDate = val; continue; }
       }
@@ -4628,6 +4185,7 @@ function renderChartVisualizations() {
       return;
     }
 
+    // If user typed a matter number, show quick summary
     const m = parseMatterFromText(raw);
     if(m){
       const p = state.patients.find(x => x.matter===m);
@@ -4640,16 +4198,16 @@ function renderChartVisualizations() {
       return;
     }
 
-    addAssistant("sys","Try: • help/ayuda • show overdue • show patients status New • show patients waiting on Clinic • open 107853 • update patient 107853 status=Needs reply dueDate=01/13/2026 • export data • generate report • what's pending");
+    addAssistant("sys","Try: • help/ayuda • show overdue • show patients status New • show patients waiting on Clinic • open 107853 • update patient 107853 status=Needs reply dueDate=2026-01-13 • export data • generate report • what's pending");
   }
 
   // -----------------------------
   // CSV download
   // -----------------------------
   function downloadCSV(){
-    const patientHeaders = ["Matter","Patient","State","Type","Provider","Provider Email","Requested Date","Due Date","Channel","Status","Waiting On","Notes", "Created At"];
+    const patientHeaders = ["Matter","Patient","State","Type","Provider","Provider Email","Requested Date","Due Date","Sender","Status","Waiting On","Notes", "Created At"];
     const patientRows = state.patients.map(p => [
-      p.matter, p.patient, p.state, p.type, p.provider, p.providerEmail, p.requestedDate, p.dueDate, p.channel, p.status, p.waitingOn, p.notes, p.createdAt
+      p.matter, p.patient, p.state, p.type, p.provider, p.providerEmail, p.requestedDate, p.dueDate, p.sender, p.status, p.waitingOn, p.notes, p.createdAt
     ]);
     
     const taskHeaders = ["ID","Matter","Task Type","Priority","Progress","Due Date","Description","Created At"];
@@ -4710,23 +4268,7 @@ function renderChartVisualizations() {
   // -----------------------------
   $("#btnToggleAssistant").addEventListener("click", ()=>{
     state.assistant.open = !state.assistant.open;
-    if (state.assistant.open) {
-      state.assistant.minimized = false;
-    }
     render();
-  });
-
-  // Botón para minimizar el asistente
-  $("#btnMinimizeAssistant").addEventListener("click", (e) => {
-    e.stopPropagation();
-    toggleAssistantMinimize();
-  });
-
-  // Hacer clic en el nombre del asistente para maximizar
-  $("#assistant .assistantHead .name").addEventListener("click", () => {
-    if (state.assistant.minimized) {
-      toggleAssistantMinimize();
-    }
   });
 
   $("#btnDownload").addEventListener("click", downloadCSV);
