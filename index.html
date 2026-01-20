@@ -1222,6 +1222,23 @@ body.navCollapsed .btn.navToggle .navToggleIcon{transform: rotate(180deg);}
 }
 .focusItem:hover{ filter: brightness(1.05); }
 .focusDot{ width:10px; height:10px; border-radius:50%; margin-top:5px; box-shadow: 0 0 0 6px rgba(255,255,255,.04); }
+
+    /* Preview (floating card) */
+    .previewCard{ padding:12px; border:1px solid rgba(255,255,255,0.10); border-radius:16px; background: rgba(14,18,24,0.72); }
+    .previewTop{ display:flex; gap:12px; align-items:flex-start; justify-content:space-between; }
+    .previewTitle{ font-size:18px; font-weight:800; letter-spacing:0.2px; }
+    .previewSub{ margin-top:4px; color: var(--muted); font-size:12px; }
+    .previewBadges{ display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+    .previewGrid{ margin-top:12px; display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+    .kv{ padding:10px; border-radius:12px; background: rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.06); }
+    .kv .k{ font-size:11px; color: var(--muted); margin-bottom:4px; }
+    .kv .v{ font-size:13px; color: var(--text); word-break:break-word; }
+    .noteBox{ padding:10px; border-radius:12px; background: rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); color: var(--text); line-height:1.35; }
+    .previewActions{ margin-top:14px; display:flex; gap:10px; justify-content:flex-end; }
+    @media (max-width: 720px){
+      .previewGrid{ grid-template-columns: 1fr; }
+    }
+
 </style>
 
 </head>
@@ -1711,6 +1728,28 @@ function getStatusProgress(status){
     if(modalOnSave) modalOnSave(); 
     closeModal();
   });
+
+
+  // -----------------------------
+  // View-only modal helper (no edit needed)
+  // -----------------------------
+  const modalSaveBtn = $("#modalSave");
+  const modalCancelBtn = $("#modalCancel");
+
+  function openViewModal(title, html, hint){
+    openModal(title, html, hint || "", null);
+    // Turn the modal into a read-only viewer
+    modalSaveBtn.textContent = "Close";
+    modalCancelBtn.style.display = "none";
+  }
+
+  // Restore modal buttons when closing
+  const _closeModalOriginal = closeModal;
+  closeModal = function(){
+    _closeModalOriginal();
+    modalSaveBtn.textContent = "Save";
+    modalCancelBtn.style.display = "";
+  };
 
   // -----------------------------
   // Confirmation Modal System (NEW)
@@ -2317,7 +2356,7 @@ function filteredPatients(){
           <td>${prSel}</td>
           <td>${progSel}</td>
           ${compact ? "" : `<td><input type="date" class="cellSelect" data-action="t_update" data-field="requestedDate" data-id="${id}" value="${escapeHtml(t.requestedDate||"")}"/></td><td><input type="date" class="cellSelect" data-action="t_update" data-field="dueDate" data-id="${id}" value="${escapeHtml(t.dueDate||"")}"/></td>`}
-          <td style="max-width:360px">${escapeHtml(t.description||"")}</td>
+          <td style="max-width:360px"><a class="link" data-action="open_task" data-id="${id}">${escapeHtml(t.description||"")}</a></td>
           <td class="rowActions">
             <button class="iconBtn" data-action="edit_task" data-id="${id}" title="Edit">${ICON_EDIT}</button>
             <button class="iconBtn danger" data-action="del_task" data-id="${id}" title="Delete">${ICON_TRASH}</button>
@@ -2423,6 +2462,7 @@ function filteredPatients(){
     OPTIONS.patientTypes.forEach(t => typeCounts[t] = 0);
     
     // Count actual data
+    const patientsForDate = state.patients;
     patientsForDate.forEach(p => {
       if(p.status) statusCounts[p.status] = (statusCounts[p.status] || 0) + 1;
       if(p.waitingOn) waitingCounts[p.waitingOn] = (waitingCounts[p.waitingOn] || 0) + 1;
@@ -3414,8 +3454,10 @@ function filteredPatients(){
       });
     }
 
-    // Delegated actions for the entire page
-    $("#page").addEventListener("click", (e)=>{
+
+    // Delegated actions for the entire page (bind once)
+    if(!state.ui._pageDelegated){
+      $("#page").addEventListener("click", (e)=>{
       const actEl = e.target.closest("[data-action]");
       if(!actEl) return;
       const action = actEl.dataset.action;
@@ -3487,15 +3529,18 @@ function filteredPatients(){
         return;
       }
       if(action==="open_patient"){
-
-        state.ui.tab="Patients";
-        state.ui.patientSearch = actEl.dataset.matter || "";
-        state.ui.patientStatus="all";
-        state.ui.patientWaiting="all";
-        state.assistant.lastMatter = actEl.dataset.matter || null;
-        render();
+        const matter = actEl.dataset.matter || "";
+        if(!matter){ toast("Not found","Missing matter number."); return; }
+        openPatientPreview(matter);
         return;
       }
+      if(action==="open_task"){
+        const id = actEl.dataset.id || "";
+        if(!id){ toast("Not found","Missing task id."); return; }
+        openTaskPreview(id);
+        return;
+      }
+
       if(action==="edit_patient"){ editPatient(actEl.dataset.matter); return; }
       if(action==="del_patient"){ 
         const matter = actEl.dataset.matter;
@@ -3544,9 +3589,9 @@ function filteredPatients(){
         );
         return; 
       }
-    });
+      });
 
-    $("#page").addEventListener("change", (e)=>{
+      $("#page").addEventListener("change", (e)=>{
       const sel = e.target.closest("[data-action='p_update'], [data-action='t_update']");
       if(!sel) return;
 
@@ -3560,11 +3605,97 @@ function filteredPatients(){
         const field = sel.dataset.field;
         updateTaskField(id, field, sel.value);
       }
-    });
+      });
+      state.ui._pageDelegated = true;
+    }
+
   }
 
   // -----------------------------
   // CRUD: Patients
+
+
+  function patientPreviewHtml(p){
+    const row = (k,v)=>`<div class="kv"><div class="k">${escapeHtml(k)}</div><div class="v">${v||"<span class='mini'>—</span>"}</div></div>`;
+    const notes = (p.notes||"").trim();
+    return `
+      <div class="previewCard">
+        <div class="previewTop">
+          <div>
+            <div class="previewTitle">${escapeHtml(p.patient||"")}</div>
+            <div class="previewSub">Matter <strong>${escapeHtml(p.matter||"")}</strong> • ${escapeHtml(p.state||"")}</div>
+          </div>
+          <div class="previewBadges">
+            <span class="pill"><span class="miniDot" style="background:var(--danger)"></span>${escapeHtml(p.status||"")}</span>
+            <span class="pill"><span class="miniDot" style="background:var(--blue)"></span>Waiting: ${escapeHtml(p.waitingOn||"")}</span>
+          </div>
+        </div>
+        <div class="previewGrid">
+          ${row("Type", escapeHtml(p.type||""))}
+          ${row("Provider", escapeHtml(p.provider||""))}
+          ${row("Provider Email", escapeHtml(p.providerEmail||""))}
+          ${row("Channel", escapeHtml(p.sender||""))}
+          ${row("Requested", p.requestedDate ? escapeHtml(formatDateMDY(p.requestedDate)) : "")}
+          ${row("Due", p.dueDate ? escapeHtml(formatDateMDY(p.dueDate)) : "")}
+        </div>
+        <div style="margin-top:12px">
+          <div class="mini" style="margin-bottom:6px">Notes</div>
+          <div class="noteBox">${notes ? escapeHtml(notes).replace(/\n/g,"<br/>") : "<span class='mini'>No notes yet.</span>"}</div>
+        </div>
+        <div class="previewActions">
+          <button class="btn" data-action="edit_patient" data-matter="${escapeHtml(p.matter)}">${ICON_EDIT} Edit</button>
+          <button class="btn danger" data-action="del_patient" data-matter="${escapeHtml(p.matter)}">${ICON_TRASH} Delete</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function openPatientPreview(matter){
+    const p = state.patients.find(x => x.matter === matter);
+    if(!p){ toast("Not found", "Patient not found."); return; }
+    state.assistant.lastMatter = matter;
+    openViewModal(`Patient • ${matter}`, patientPreviewHtml(p), "Tip: click Edit if you need to change anything.");
+  }
+
+  function taskPreviewHtml(t){
+    const row = (k,v)=>`<div class="kv"><div class="k">${escapeHtml(k)}</div><div class="v">${v||"<span class='mini'>—</span>"}</div></div>`;
+    const desc = (t.description||"").trim();
+    return `
+      <div class="previewCard">
+        <div class="previewTop">
+          <div>
+            <div class="previewTitle">Task</div>
+            <div class="previewSub">Matter <strong>${escapeHtml(t.matter||"")}</strong> • ID ${escapeHtml(t.id||"")}</div>
+          </div>
+          <div class="previewBadges">
+            <span class="pill"><span class="miniDot" style="background:var(--amber)"></span>${escapeHtml(t.priority||"")}</span>
+            <span class="pill"><span class="miniDot" style="background:var(--green)"></span>${escapeHtml(t.progress||"")}</span>
+          </div>
+        </div>
+        <div class="previewGrid">
+          ${row("Type", escapeHtml(t.taskType||""))}
+          ${row("Requested", t.requestedDate ? escapeHtml(formatDateMDY(t.requestedDate)) : "")}
+          ${row("Due", t.dueDate ? escapeHtml(formatDateMDY(t.dueDate)) : "")}
+        </div>
+        <div style="margin-top:12px">
+          <div class="mini" style="margin-bottom:6px">Description</div>
+          <div class="noteBox">${desc ? escapeHtml(desc).replace(/\n/g,"<br/>") : "<span class='mini'>—</span>"}</div>
+        </div>
+        <div class="previewActions">
+          <button class="btn" data-action="edit_task" data-id="${escapeHtml(t.id)}">${ICON_EDIT} Edit</button>
+          <button class="btn danger" data-action="del_task" data-id="${escapeHtml(t.id)}">${ICON_TRASH} Delete</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function openTaskPreview(id){
+    const t = state.tasks.find(x => x.id === id);
+    if(!t){ toast("Not found","Task not found."); return; }
+    if(t.matter) state.assistant.lastMatter = t.matter;
+    openViewModal(`Task • ${t.matter || ""}`, taskPreviewHtml(t), "Tip: click Edit if you need to change anything.");
+  }
+
   // -----------------------------
   function openQuickPatient(){
     openModal("Quick Log — Patient", `
