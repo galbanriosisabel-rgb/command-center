@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Medical Department Command Center — Enhanced with Charts</title>
+<title>Command Center - Medical Department</title>
 <!-- Chart.js para gráficos visuales -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -1064,12 +1064,29 @@
   max-height: 260px !important;
 }
 
-
-
 /* === FIX: hide Chart.js size monitor artifacts (prevents dark blocks) === */
 .chartjs-size-monitor, .chartjs-size-monitor-expand, .chartjs-size-monitor-shrink {
   display: none !important;
 }
+
+  /* Assistant minimized */
+  .assistant.minimized{
+    height:auto !important;
+  }
+  .assistant.minimized .assistantBody,
+  .assistant.minimized .assistantFoot{
+    display:none !important;
+  }
+  .assistantHead{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+  #assistantMinBtn{
+    width:36px; height:36px;
+    border-radius:999px;
+  }
 </style>
 
 <style>
@@ -1365,7 +1382,7 @@ body.navCollapsed .btn.navToggle .navToggleIcon{transform: rotate(180deg);}
         <div class="dot glowing-dot"></div>
         <div>
           <div class="title">Command Center</div>
-          <div class="subtitle">Medical Department • Enhanced with Charts</div>
+          <div class="subtitle">Medical Department</div>
         </div>
       </div>
 <div class="tabs" id="tabs"></div>
@@ -1430,6 +1447,9 @@ body.navCollapsed .btn.navToggle .navToggleIcon{transform: rotate(180deg);}
     <div class="assistantHead">
       <div class="name"><span class="dot" style="width:10px;height:10px;box-shadow:none"></span> Isabel's Assistant</div>
       <div class="pending"><span id="pendingCount">0</span> pending</div>
+      <button class="iconBtn" id="assistantMinBtn" title="Minimize" aria-label="Minimize assistant">
+        <span style="font-weight:800; font-size:18px; line-height:1; margin-top:-2px">–</span>
+      </button>
     </div>
     <div class="assistantBody" id="assistantBody">
       <!-- Command suggestions will be inserted here -->
@@ -1606,7 +1626,7 @@ body.navCollapsed .btn.navToggle .navToggleIcon{transform: rotate(180deg);}
     patients: getInitialPatients(),
     tasks: getInitialTasks(),
     reports: [],
-    assistant: { open:false, chat:[], lastMatter:null, pending:0 },
+    assistant: { open:false, minimized:false, chat:[], lastMatter:null, pending:0 },
     charts: {} // Cache for chart instances
   });
 
@@ -1767,6 +1787,26 @@ function getStatusProgress(status){
     setTimeout(()=> el.remove(), 4200);
   }
 
+
+// Global error guards so navigation doesn't hard-crash the app
+window.addEventListener("error", (event) => {
+  try {
+    const msg = (event && (event.message || (event.error && event.error.message))) || "Unknown error";
+    console.error("Unhandled error:", event.error || event);
+    toast("Script error", msg);
+  } catch(_) {}
+});
+
+window.addEventListener("unhandledrejection", (event) => {
+  try {
+    const reason = event && event.reason;
+    const msg = (reason && (reason.message || String(reason))) || "Unhandled promise rejection";
+    console.error("Unhandled rejection:", reason);
+    toast("Script error", msg);
+  } catch(_) {}
+});
+
+
   function saveState(){
     try { 
       // Guardar TODO el estado correctamente
@@ -1868,7 +1908,78 @@ function getStatusProgress(status){
     modalCancelBtn.style.display = "";
   };
 
+  
   // -----------------------------
+  // Modal click delegation for action buttons inside popups (Patients + Tasks)
+  // -----------------------------
+  (function(){
+    let modalDelegated = false;
+    function ensureModalDelegation(){
+      if(modalDelegated) return;
+      if(!modalBody) return;
+      modalDelegated = true;
+
+      modalBody.addEventListener("click", (e)=>{
+        const actEl = e.target.closest("[data-action]");
+        if(!actEl) return;
+
+        // These clicks are intentional actions; don't let other click handlers interfere.
+        e.preventDefault();
+        e.stopPropagation();
+
+        const action = actEl.dataset.action || "";
+
+        if(action==="edit_patient"){ 
+          const matter = actEl.dataset.matter || "";
+          closeModal();
+          editPatient(matter);
+          return;
+        }
+        if(action==="del_patient"){
+          const matter = actEl.dataset.matter || "";
+          const p = state.patients.find(x => (x.matter||"") === matter);
+          const patientName = p ? (p.patient||"") : "";
+          openConfirm(
+            "Delete Patient",
+            `Are you sure you want to delete patient ${patientName} (Matter: ${matter})?`,
+            () => { deletePatient(matter); }
+          );
+          return;
+        }
+        if(action==="edit_task"){
+          const id = actEl.dataset.id || "";
+          closeModal();
+          editTask(id);
+          return;
+        }
+        if(action==="del_task"){
+          const taskId = actEl.dataset.id || "";
+          const task = state.tasks.find(t => t.id === taskId);
+          const matterInfo = task ? `for Matter ${task.matter}` : "";
+          openConfirm(
+            "Delete Task",
+            `Are you sure you want to delete this task ${matterInfo}?`,
+            () => { deleteTask(taskId); }
+          );
+          return;
+        }
+
+        // Allow other actions inside modals to flow through the main page handler if needed.
+      });
+    }
+
+    // Ensure delegation once on load
+    ensureModalDelegation();
+    // Also ensure after any modal render (safety)
+    const _openModalOriginal = openModal;
+    openModal = function(title, html, hint, onSave){
+      const ret = _openModalOriginal(title, html, hint, onSave);
+      ensureModalDelegation();
+      return ret;
+    };
+  })();
+
+// -----------------------------
   // Confirmation Modal System (NEW)
   // -----------------------------
   const confirmBackdrop = $("#confirmBackdrop");
@@ -2046,12 +2157,8 @@ function getStatusProgress(status){
             <td>${escapeHtml(p.patient||"")}</td>
             <td>${statusSel}</td>
             <td>${waitSel}</td>
-            <td class="nowrap2">${due ? escapeHtml(formatDateMDY(due)) : "-"}</td>
-            <td class="rowActions">
-              <button class="iconBtn" data-action="edit_patient" data-matter="${matter}" title="Edit">${ICON_EDIT}</button>
-              <button class="iconBtn danger" data-action="del_patient" data-matter="${matter}" title="Delete">${ICON_TRASH}</button>
-            </td>
-          </tr>
+            <td class="nowrap2">${due ? escapeHtml(formatDateMDY(due)) : "-"}</td>          
+        </tr>
         `;
       }).join("");
 
@@ -2060,7 +2167,7 @@ function getStatusProgress(status){
           <table class="tableCompact">
             <thead>
               <tr>
-                <th>Matter</th><th>Patient</th><th>Status</th><th>Waiting On</th><th>Due</th><th></th>
+                <th>Matter</th><th>Patient</th><th>Status</th><th>Waiting On</th><th>Due</th>
               </tr>
             </thead>
             <tbody>${rows}</tbody>
@@ -2098,10 +2205,7 @@ function getStatusProgress(status){
             <td>${progSel}</td>
             <td class="nowrap2">${due ? escapeHtml(formatDateMDY(due)) : "-"}</td>
             <td><div class="descClamp" title="${escapeHtml(t.description||"")}">${escapeHtml(t.description||"")}</div></td>
-            <td class="rowActions">
-              <button class="iconBtn" data-action="edit_task" data-id="${id}" title="Edit">${ICON_EDIT}</button>
-              <button class="iconBtn danger" data-action="del_task" data-id="${id}" title="Delete">${ICON_TRASH}</button>
-            </td>
+            
           </tr>
         `;
       }).join("");
@@ -2111,7 +2215,7 @@ function getStatusProgress(status){
           <table class="tableCompact">
             <thead>
               <tr>
-                <th>Matter</th><th>Priority</th><th>Progress</th><th>Due</th><th>Description</th><th></th>
+                <th>Matter</th><th>Priority</th><th>Progress</th><th>Due</th><th>Description</th>
               </tr>
             </thead>
             <tbody>${rows}</tbody>
@@ -2139,7 +2243,7 @@ function getStatusProgress(status){
       </div>
 
       <div class="card focusCard" style="position:relative">
-        <h3>🎯 Today’s Focus</h3>
+        <h3>🎯 Today's Focus</h3>
         <div class="mini">Click an item to focus Home lists.</div>
         <div class="focusGrid">
           ${focusItem("var(--link)","Follow up", `${waitingClinicPatients} patients waiting on clinic`, "waiting_clinic")}
@@ -2206,35 +2310,24 @@ function getStatusProgress(status){
 
       return `
         <tr>
-          <td class="nowrap">${bulk ? `<input type="checkbox" class="pSel" data-matter="${matter}" ${state.ui.selectedPatients?.includes(matter) ? "checked" : ""}/>` : ""}</td>
+          ${bulk ? `<td class="nowrap"><input type="checkbox" class="pSel" data-matter="${matter}" ${state.ui.selectedPatients?.includes(matter) ? "checked" : ""}/></td>` : ""}
           <td class="nowrap"><a class="link matterLink" data-action="open_patient" data-matter="${matter}">${matter}</a></td>
           <td>${escapeHtml(p.patient||"")}</td>
           <td class="nowrap">${escapeHtml(p.state||"")}</td>
-          ${compact ? "" : `<td>${typeSel}</td>`}
+          <td>${typeSel}</td>
           <td>${escapeHtml(p.provider||"")}</td>
-          ${compact ? "" : `<td class="nowrap">${escapeHtml(formatDateMDY(p.requestedDate||""))}</td>`}
-          ${compact ? "" : `<td><input type="date" class="cellSelect" data-action="p_update" data-field="dueDate" data-matter="${matter}" value="${escapeHtml(p.dueDate||"")}"/></td>`}
-          ${compact ? "" : `<td>${escapeHtml(p.sender||"")}</td>`}
           <td>${statusSel}</td>
           <td>${waitSel}</td>
-          ${compact ? "" : `<td style="max-width:320px">${escapeHtml(p.notes||"")}</td>`}
-          ${showActions ? `<td class="rowActions">
-            <button class="iconBtn" data-action="edit_patient" data-matter="${matter}" title="Edit">${ICON_EDIT}</button>
-            <button class="iconBtn danger" data-action="del_patient" data-matter="${matter}" title="Delete">${ICON_TRASH}</button>
-          </td>` : ''}
+          ${showActions ? `` : ''}
         </tr>
       `;
     }).join("");
 
     const head = `
       <tr>
-        <th class="nowrap">${bulk ? `<input type="checkbox" id="pSelectAll" />` : ""}</th>
-        <th>Matter</th><th>Client</th><th>State</th>
-        ${compact ? "" : "<th>Type</th>"}
-        <th>Provider</th>
-        ${compact ? "" : "<th>Requested</th><th>Due</th><th>Channel</th>"}
-        <th>Status</th><th>Waiting On</th>
-        ${compact ? "" : "<th>Notes</th>"}
+        ${bulk ? '<th class="nowrap"><input type="checkbox" id="pSelectAll" /></th>' : ""}
+        <th>Matter</th><th>Client</th><th>State</th><th>Type</th>
+        <th>Provider</th><th>Status</th><th>Waiting On</th>
         ${showActions ? "<th></th>" : ""}
       </tr>
     `;
@@ -2272,21 +2365,23 @@ function getStatusProgress(status){
             ${["all", ...OPTIONS.waitingOn].map(v=>`<option value="${v}" ${state.ui.patientWaiting===v?"selected":""}>Waiting (${v})</option>`).join("")}
           </select>
           <select id="patientSort">
-            ${[
-              ["requested_desc","Sort: Requested (newest)"],
-              ["requested_asc","Sort: Requested (oldest)"],
-              ["due_desc","Sort: Due (latest)"],
-              ["due_asc","Sort: Due (earliest)"],
-              ["matter","Sort: Matter"],
-              ["client","Sort: Client"],
-              ["created_desc","Sort: Created (newest)"]
-            ].map(([v,l])=>`<option value="${v}" ${state.ui.patientSort===v?"selected":""}>${l}</option>`).join("")}
+            ${
+              [
+                ["requested_desc","Sort: Requested (newest)"],
+                ["requested_asc","Sort: Requested (oldest)"],
+                ["due_desc","Sort: Due (latest)"],
+                ["due_asc","Sort: Due (earliest)"],
+                ["matter","Sort: Matter"],
+                ["client","Sort: Client"],
+                ["created_desc","Sort: Created (newest)"]
+              ].map(([v,l])=>`<option value="${v}" ${state.ui.patientSort===v?"selected":""}>${l}</option>`).join("")
+            }
           </select>
           <button class="btn" id="patientClear">Clear</button>
         </div>
 
         ${renderPatientBulkBar()}
-        ${tablePatients(filteredPatients(), {compact:false, bulk:true})}
+        ${tablePatients(filteredPatients(), {compact:false, bulk:true, showActions:false})}
 
         <div class="mini" style="margin-top:8px">Selections and bulk actions work only inside Patients (not the compact Home tables).</div>
       </div>
@@ -2448,7 +2543,7 @@ function filteredPatients(){
     return list;
   }
 
-  function tableTasks(list, {compact=false, bulk=false}={}){
+  function tableTasks(list, {compact=false, bulk=false, showActions=true}={}){
     if(list.length===0){
       return `<div class="mini">No tasks found.</div>`;
     }
@@ -2474,10 +2569,7 @@ function filteredPatients(){
           <td>${progSel}</td>
           ${compact ? "" : `<td><input type="date" class="cellSelect" data-action="t_update" data-field="requestedDate" data-id="${id}" value="${escapeHtml(t.requestedDate||"")}"/></td><td><input type="date" class="cellSelect" data-action="t_update" data-field="dueDate" data-id="${id}" value="${escapeHtml(t.dueDate||"")}"/></td>`}
           <td style="max-width:360px"><a class="link taskLink" data-action="open_task" data-id="${id}">${escapeHtml(t.description||"")}</a></td>
-          <td class="rowActions">
-            <button class="iconBtn" data-action="edit_task" data-id="${id}" title="Edit">${ICON_EDIT}</button>
-            <button class="iconBtn danger" data-action="del_task" data-id="${id}" title="Delete">${ICON_TRASH}</button>
-          </td>
+          
         </tr>
       `;
     }).join("");
@@ -2522,12 +2614,14 @@ function filteredPatients(){
         <div class="tools">
           <input class="input" id="taskSearch" placeholder="Search by matter, task type, description..." value="${escapeHtml(state.ui.taskSearch||"")}"/>
           <select id="taskSort">
-            ${[
-              ["created","Sort: Created"],
-              ["requested","Sort: Requested date"],
-              ["due","Sort: Due date"],
-              ["priority","Sort: Priority"]
-            ].map(([v,l])=>`<option value="${v}" ${state.ui.tasksSort===v?"selected":""}>${l}</option>`).join("")}
+            ${
+              [
+                ["created","Sort: Created"],
+                ["requested","Sort: Requested date"],
+                ["due","Sort: Due date"],
+                ["priority","Sort: Priority"]
+              ].map(([v,l])=>`<option value="${v}" ${state.ui.tasksSort===v?"selected":""}>${l}</option>`).join("")
+            }
           </select>
           <label class="badge" style="cursor:pointer">
             <input type="checkbox" id="tasksShowDone" ${state.ui.tasksShowDone?"checked":""} style="margin-right:8px; transform: translateY(1px)"/>
@@ -2537,7 +2631,7 @@ function filteredPatients(){
         </div>
 
         ${renderTaskBulkBar()}
-        ${tableTasks(filteredTasks(), {compact:false, bulk:true})}
+        ${tableTasks(filteredTasks(), {compact:false, bulk:true, showActions:false})}
         <div class="mini" style="margin-top:8px">Tip: use templates to quickly create standardized tasks.</div>
       </div>
     `;
@@ -2555,7 +2649,6 @@ function filteredPatients(){
     if(state.ui.tasksSort==="requested"){
       list = list.slice().sort((a,b)=> (a.requestedDate||"9999-12-31").localeCompare(b.requestedDate||"9999-12-31"));
     } else if(state.ui.tasksSort==="due"){
-
       list = list.slice().sort((a,b)=> (a.dueDate||"9999-12-31").localeCompare(b.dueDate||"9999-12-31"));
     } else if(state.ui.tasksSort==="priority"){
       const rank = {high:0, medium:1, low:2};
@@ -3223,8 +3316,6 @@ function filteredPatients(){
       render(); 
     }));
 
-
-    
     // Home Quick Actions
     $("#qaCallClinic")?.addEventListener("click", ()=>{ runQuickAction("callClinic"); render(); });
     $("#qaSendReply")?.addEventListener("click", ()=>{ runQuickAction("sendReply"); render(); });
@@ -3587,12 +3678,14 @@ function filteredPatients(){
       });
     }
 
-
     // Delegated actions for the entire page (bind once)
     if(!state.ui._pageDelegated){
       $("#page").addEventListener("click", (e)=>{
       const actEl = e.target.closest("[data-action]");
       if(!actEl) return;
+      // Prevent the global row-click preview handler from hijacking action clicks.
+      e.preventDefault();
+      e.stopPropagation();
       const action = actEl.dataset.action;
 
             if(action==="home_focus"){
@@ -4109,6 +4202,7 @@ function filteredPatients(){
   function renderAssistant(){
     const panel = $("#assistant");
     panel.style.display = state.assistant.open ? "block" : "none";
+    panel.classList.toggle("minimized", !!state.assistant.minimized);
     $("#pendingCount").textContent = String(state.assistant.pending||0);
 
     const body = $("#assistantBody");
@@ -4535,6 +4629,13 @@ function filteredPatients(){
     render();
   });
 
+
+  $("#assistantMinBtn").addEventListener("click", (e)=>{
+    e.preventDefault();
+    e.stopPropagation();
+    state.assistant.minimized = !state.assistant.minimized;
+    renderAssistant();
+  });
   $("#btnDownload").addEventListener("click", downloadCSV);
 
   $("#btnGenerate").addEventListener("click", ()=>{
@@ -4582,9 +4683,16 @@ function filteredPatients(){
   // Global click delegation for previews (Patients + Tasks)
   // -----------------------------
   document.addEventListener("click", (e) => {
-    // Ignore clicks on form controls / buttons (they have their own actions)
-    const ignoreTags = ["INPUT","SELECT","TEXTAREA","BUTTON","OPTION","LABEL"];
-    if (ignoreTags.includes((e.target.tagName||"").toUpperCase())) return;
+    // Ignore clicks that are clearly "actions" (buttons/controls) so row-click previews don't hijack them.
+    if (e.target.closest("button, input, select, textarea, label, option")) return;
+
+    // If a click is inside a data-action element, only allow the preview handler to run for
+    // open_patient / open_task actions; everything else is handled elsewhere.
+    const actionEl = e.target.closest("[data-action]");
+    if (actionEl) {
+      const act = actionEl.dataset.action || "";
+      if (act && act !== "open_patient" && act !== "open_task") return;
+    }
 
     // 1) Direct links
     const matterEl = e.target.closest(".matterLink, [data-action='open_patient']");
@@ -4617,13 +4725,27 @@ function filteredPatients(){
     }
   });
 
+
+  // -----------------------------
+  // Assistant minimize (UI only)
+  // -----------------------------
+  function setAssistantMinimized(min){
+    const a = $("#assistant");
+    if(!a) return;
+    a.classList.toggle("minimized", !!min);
+    state.assistant = state.assistant || {};
+    state.assistant.minimized = !!min;
+    saveState();
+  }
+  function toggleAssistantMinimized(){
+    setAssistantMinimized(!(state.assistant && state.assistant.minimized));
+  }
+
   // First render
   render();
 })();
 
 </script>
-
-
 
 </body>
 </html>
